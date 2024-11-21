@@ -6,6 +6,7 @@ import { showDialog } from 'vant'
 import ExportDialog from './ExportDialog.vue'
 
 const chatStore = useChatStore()
+const themeStore = useThemeStore()
 const editingId = ref<string | null>(null)
 const editingTitle = ref('')
 const searchKeyword = ref('')
@@ -67,141 +68,220 @@ function showMoreActions(conv: Conversation) {
 
 <template>
   <div class="conversation-list">
-    <!-- 搜索框 -->
-    <div class="search-bar">
-      <van-search
-        v-model="searchKeyword"
-        placeholder="搜索会话"
-        shape="round"
-      />
-    </div>
-    
-    <!-- 新建会话按钮 -->
-    <div class="new-chat" @click="createNewSession">
-      <van-button block type="primary" size="small">
+    <div class="header">
+      <van-button 
+        block 
+        class="new-chat-btn"
+        @click="createNewSession"
+      >
+        <template #icon>
+          <van-icon name="plus" />
+        </template>
         新建会话
       </van-button>
     </div>
 
-    <!-- 会话列表 -->
+    <div class="search-bar">
+      <van-search
+        v-model="searchKeyword"
+        placeholder="搜索会话历史"
+        shape="round"
+      />
+    </div>
+
     <div class="sessions">
       <div
-        v-for="session in filteredConversations"
-        :key="session.id"
+        v-for="conv in filteredConversations"
+        :key="conv.id"
         class="session-item"
-        :class="{ active: session.id === currentSession }"
-        @click="selectSession(session.id)"
+        :class="{ active: conv.id === chatStore.currentConversationId }"
+        @click="chatStore.currentConversationId = conv.id"
       >
-        <span class="session-title">{{ session.title || '新会话' }}</span>
-        <span class="session-time">{{ session.lastTime }}</span>
+        <div class="session-icon">
+          <van-icon name="chat-o" />
+        </div>
+        <div class="session-info">
+          <div class="session-title">{{ conv.title || '新会话' }}</div>
+          <div class="session-preview">
+            {{ conv.messages[conv.messages.length - 1]?.content.slice(0, 30) || '暂无消息' }}
+          </div>
+        </div>
+        <div class="session-actions">
+          <van-button
+            size="mini"
+            icon="ellipsis"
+            @click.stop="showMoreActions(conv)"
+          />
+        </div>
       </div>
+    </div>
+
+    <div class="footer">
+      <van-button
+        block
+        class="theme-toggle"
+        @click="themeStore.toggleTheme"
+      >
+        <template #icon>
+          <van-icon :name="themeStore.isDark ? 'sunny-o' : 'moon-o'" />
+        </template>
+        {{ themeStore.isDark ? '浅色模式' : '深色模式' }}
+      </van-button>
     </div>
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .conversation-list {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background-color: var(--van-background-2);
+  background: var(--van-background);
+  border-right: 1px solid var(--van-border-color);
 }
 
-.new-chat {
-  padding: var(--van-padding-sm);
+.header {
+  padding: 0.75rem;
   border-bottom: 1px solid var(--van-border-color);
+}
+
+.new-chat-btn {
+  height: 2.75rem;
+  border: 1px solid var(--van-border-color);
+  border-radius: var(--radius-md);
+  background: var(--van-background);
+  color: var(--van-text-color);
+  font-size: 0.875rem;
+  
+  &:hover {
+    background: var(--van-active-color);
+  }
+  
+  :deep(.van-icon) {
+    font-size: 1rem;
+  }
+}
+
+.search-bar {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--van-border-color);
+  
+  :deep(.van-search) {
+    padding: 0;
+    background: transparent;
+  }
+  
+  :deep(.van-search__content) {
+    background: var(--van-active-color);
+  }
 }
 
 .sessions {
   flex: 1;
   overflow-y: auto;
-  padding: var(--van-padding-xs);
+  padding: 0.5rem;
 }
 
 .session-item {
   display: flex;
-  flex-direction: column;
-  padding: var(--van-padding-sm);
-  margin-bottom: var(--van-padding-xs);
-  border-radius: var(--van-radius-md);
+  align-items: center;
+  padding: 0.75rem;
+  margin-bottom: 0.25rem;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: background-color 0.2s;
-
+  transition: var(--transition-normal);
+  
   &:hover {
-    background-color: var(--van-active-color);
+    background: var(--van-active-color);
+    
+    .session-actions {
+      opacity: 1;
+    }
   }
-
+  
   &.active {
-    background-color: var(--van-primary-color);
-    color: var(--van-white);
+    background: var(--van-primary-color-light);
+    
+    .session-icon {
+      color: var(--van-primary-color);
+    }
   }
+}
+
+.session-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.75rem;
+  color: var(--van-text-color-2);
+  
+  :deep(.van-icon) {
+    font-size: 1.25rem;
+  }
+}
+
+.session-info {
+  flex: 1;
+  min-width: 0;
 }
 
 .session-title {
-  font-size: var(--van-font-size-md);
-  margin-bottom: var(--van-padding-xs);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  color: var(--van-text-color);
 }
 
-.session-time {
-  font-size: var(--van-font-size-sm);
+.session-preview {
+  font-size: 0.75rem;
   color: var(--van-text-color-2);
-
-  .active & {
-    color: var(--van-white);
-    opacity: 0.8;
-  }
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.title-input {
-  width: 100%;
-  background: transparent;
-  border: 1px solid var(--primary-color);
-  border-radius: 4px;
-  padding: 4px 8px;
-  color: var(--text-color);
-  font-size: 14px;
-  
-  &:focus {
-    outline: none;
-  }
-}
-
-.action-buttons {
-  display: flex;
-  gap: 8px;
+.session-actions {
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: var(--transition-normal);
   
-  button {
-    padding: 4px;
+  :deep(.van-button) {
+    color: var(--van-text-color-2);
     background: transparent;
     border: none;
-    color: var(--van-gray-5);
-    cursor: pointer;
     
     &:hover {
-      color: var(--text-color);
+      color: var(--van-text-color);
     }
   }
 }
 
-.conversation-item {
-  &:hover .action-buttons,
-  &.active .action-buttons {
-    opacity: 1;
+.footer {
+  padding: 0.75rem;
+  border-top: 1px solid var(--van-border-color);
+}
+
+.theme-toggle {
+  height: 2.75rem;
+  border: 1px solid var(--van-border-color);
+  border-radius: var(--radius-md);
+  background: var(--van-background);
+  color: var(--van-text-color);
+  font-size: 0.875rem;
+  
+  &:hover {
+    background: var(--van-active-color);
   }
   
-  &.editing {
-    background: rgba(255, 255, 255, 0.1);
-    
-    .action-buttons {
-      display: none;
-    }
+  :deep(.van-icon) {
+    font-size: 1rem;
   }
 }
 
+// 移动端适配
 @media (max-width: 768px) {
-  .action-buttons {
+  .session-actions {
     opacity: 1;
   }
 }

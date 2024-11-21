@@ -1,183 +1,174 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import { showToast } from 'vant'
-import axios from 'axios'
-
-interface Message {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-  timestamp: number
-  status?: 'success' | 'error' | 'sending'
-}
-
-interface Conversation {
-  id: string
-  title: string
-  lastTime: string
-  messages: Message[]
-}
+import { ref, computed } from 'vue'
+import { showToast, showDialog } from 'vant'
+import { ConversationAPI, ChatClient } from '@/services/api'
+import type { Message, Conversation, MessageStatus } from '@/types/chat'
 
 export const useChatStore = defineStore('chat', () => {
-  const messages = ref<Message[]>([])
-  const isLoading = ref(false)
-  const currentSession = ref<string>('')
+  // 状态
   const conversations = ref<Conversation[]>([])
   const currentConversationId = ref<string | null>(null)
+  const isLoading = ref(false)
+  const error = ref<string | null>(null)
+
+  // 计算属性
+  const currentConversation = computed(() => 
+    conversations.value.find(conv => conv.id === currentConversationId.value)
+  )
+
+  const currentMessages = computed(() => 
+    currentConversation.value?.messages || []
+  )
 
   // 初始化聊天
   async function initializeChat() {
     try {
-      // 如果没有当前会话，创建一个新会话
-      if (!currentSession.value) {
-        const sessionId = 'new-session-' + Date.now()
-        setCurrentSession(sessionId)
-      }
-
-      // 如果有持久化的会话数据，加载会话
-      if (currentSession.value) {
-        const conversation = conversations.value.find(
-          conv => conv.id === currentSession.value
-        )
-        if (conversation) {
-          messages.value = conversation.messages
-        }
-      }
-
-      // 可以添加加载历史会话的 API 调用
-      // const response = await axios.get('/api/v1/conversations')
-      // conversations.value = response.data
-
-    } catch (error) {
-      console.error('初始化聊天失败:', error)
-      showToast({
-        message: '初始化聊天失败',
-        type: 'fail',
-        position: 'top'
-      })
-    }
-  }
-
-  // 发送消息
-  async function sendMessage(content: string) {
-    if (!currentSession.value) return
-
-    const messageId = Date.now().toString()
-    const message: Message = {
-      id: messageId,
-      role: 'user',
-      content,
-      timestamp: Date.now(),
-      status: 'sending'
-    }
-
-    try {
-      messages.value.push(message)
-      updateConversation(currentSession.value, message)
-
-      const response = await axios.post(`/api/v1/chat/${currentSession.value}`, {
-        message: content
-      })
-
-      // 更新消息状态为成功
-      message.status = 'success'
-
-      const assistantMessage: Message = {
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: response.data.message,
-        timestamp: Date.now(),
-        status: 'success'
-      }
+      isLoading.value = true
+      const data = await ConversationAPI.getConversations()
       
-      messages.value.push(assistantMessage)
-      updateConversation(currentSession.value, assistantMessage)
+      conversations.value = data.map((conv: any) => ({
+        id: conv.session_id,
+        title: conv.title || '新会话',
+        messages: conv.messages || [],
+        lastTime: conv.created_at,
+        model: conv.model || 'gpt-3.5-turbo'
+      }))
       
+      if (conversations.value.length > 0) {
+        currentConversationId.value = conversations.value[0].id
+      } else {
+        await createNewConversation()
+      }
     } catch (error) {
-      message.status = 'error'
       showToast({
-        message: '发送消息失败，请重试',
         type: 'fail',
-        position: 'top'
+        message: '初始化失败'
       })
-      console.error('发送消息失败:', error)
+      throw error
     } finally {
       isLoading.value = false
     }
   }
 
-  // 更新会话信息
-  function updateConversation(sessionId: string, message: Message) {
-    const index = conversations.value.findIndex(conv => conv.id === sessionId)
-    if (index === -1) {
-      conversations.value.push({
-        id: sessionId,
-        title: message.content.slice(0, 20) + (message.content.length > 20 ? '...' : ''),
-        lastTime: new Date().toLocaleString(),
-        messages: [message]
+  // 创建新会话
+  async function createNewConversation(title = '新会话') {
+    try {
+      isLoading.value = true
+      const { session_id } = await ConversationAPI.createConversation(title)
+      
+      const newConversation: Conversation = {
+        id: session_id,
+        title,
+        messages: [],
+        lastTime: new Date().toISOString(),
+        model: 'gpt-3.5-turbo'
+      }
+      
+      conversations.value.unshift(newConversation)
+      currentConversationId.value = newConversation.id
+      
+      return session_id
+    } catch (error) {
+      showToast({
+        type: 'fail',
+        message: '创建会话失败'
       })
-    } else {
-      const conversation = conversations.value[index]
-      conversation.messages.push(message)
-      conversation.lastTime = new Date().toLocaleString()
-      if (message.role === 'user') {
-        conversation.title = message.content.slice(0, 20) + (message.content.length > 20 ? '...' : '')
-      }
+      throw error
+    } finally {
+      isLoading.value = false
     }
   }
 
-  function clearMessages() {
-    messages.value = []
-  }
-
-  function setCurrentSession(sessionId: string) {
-    currentSession.value = sessionId
-    clearMessages()
-  }
-
-  async function updateConversationTitle(id: string, newTitle: string) {
-    try {
-      const conversation = conversations.value.find(conv => conv.id === id)
-      if (conversation) {
-        conversation.title = newTitle.trim() || '新对话'
-        
-        // 可以添加调用后端 API 更新标题的逻辑
-      }
-    } catch (error) {
-      console.error('更新标题失败:', error)
-      message.error('更新标题失败')
+  // 发送消息
+  async function sendMessage(content: string, options: {
+    quote?: Message
+    retry?: boolean
+    messageId?: string
+  } = {}) {
+    if (!currentConversationId.value) {
+      throw new Error('未选择会话')
     }
-  }
 
-  // 获取消息预览
-  function getMessagePreview(message?: Message) {
-    if (!message) return '新会话'
-    return message.content.slice(0, 30) + (message.content.length > 30 ? '...' : '')
-  }
-  
-  // 设置当前会话
-  function setCurrentConversation(id: string) {
-    currentConversationId.value = id
-  }
-  
-  // 删除会话
-  async function deleteConversation(id: string) {
+    const conversation = currentConversation.value
+    if (!conversation) return
+
+    const abortController = new AbortController()
+    let tempMessageId = options.messageId || Date.now().toString()
+
     try {
-      // 如果删除的是当前会话，切换到其他会话
-      if (currentConversationId.value === id) {
-        const otherConv = conversations.value.find(conv => conv.id !== id)
-        currentConversationId.value = otherConv?.id || null
+      // 添加用户消息
+      const userMessage: Message = {
+        id: tempMessageId,
+        role: 'user',
+        content,
+        timestamp: Date.now(),
+        status: 'sending',
+        quote: options.quote
       }
       
-      conversations.value = conversations.value.filter(conv => conv.id !== id)
+      if (!options.retry) {
+        conversation.messages.push(userMessage)
+      }
+
+      // 创建助手消息占位
+      const assistantMessage: Message = {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: '',
+        timestamp: Date.now(),
+        status: 'sending'
+      }
       
-      // 可以添加调用后端 API 删除会话的逻辑
+      conversation.messages.push(assistantMessage)
+
+      // 创建聊天客户端
+      const chatClient = new ChatClient(currentConversationId.value)
+      
+      // 发送消息并处理流式响应
+      await chatClient.streamChat(content, {
+        signal: abortController.signal,
+        onStart: () => {
+          userMessage.status = 'success'
+        },
+        onChunk: (chunk, fullText) => {
+          assistantMessage.content = fullText
+        },
+        onEnd: (fullText) => {
+          assistantMessage.status = 'success'
+          conversation.lastTime = new Date().toISOString()
+        },
+        onError: (error) => {
+          assistantMessage.status = 'error'
+          assistantMessage.error = error.message
+          throw error
+        }
+      })
+
     } catch (error) {
-      console.error('删除会话失败:', error)
-      showToast('删除会话失败')
+      if (error.name === 'AbortError') {
+        console.log('请求已取消')
+        return
+      }
+
+      showToast({
+        type: 'fail',
+        message: error.message || '发送失败'
+      })
+      
+      // 更新消息状态
+      const failedMessage = conversation.messages.find(msg => msg.id === tempMessageId)
+      if (failedMessage) {
+        failedMessage.status = 'error'
+        failedMessage.error = error.message
+      }
+    }
+
+    return {
+      abort: () => abortController.abort()
     }
   }
 
+  // 重试消息
   async function retryMessage(messageId: string) {
     const conversation = conversations.value.find(
       conv => conv.messages.some(msg => msg.id === messageId)
@@ -198,26 +189,98 @@ export const useChatStore = defineStore('chat', () => {
     conversation.messages = conversation.messages.slice(0, messageIndex)
     
     // 重新发送消息
-    await sendMessage(message.content)
+    await sendMessage(message.content, {
+      retry: true,
+      messageId: message.id,
+      quote: message.quote
+    })
+  }
+
+  // 删除会话
+  async function deleteConversation(id: string) {
+    try {
+      await showDialog({
+        title: '删除会话',
+        message: '确定要删除这个会话吗？',
+        showCancelButton: true
+      })
+
+      // 如果删除的是当前会话，切换到其他会话
+      if (currentConversationId.value === id) {
+        const otherConv = conversations.value.find(conv => conv.id !== id)
+        currentConversationId.value = otherConv?.id || null
+      }
+      
+      conversations.value = conversations.value.filter(conv => conv.id !== id)
+      
+      await ConversationAPI.deleteConversation(id)
+      
+      showToast({
+        type: 'success',
+        message: '删除成功'
+      })
+    } catch (error) {
+      if (error.cancel) return
+      
+      showToast({
+        type: 'fail',
+        message: '删除失败'
+      })
+    }
+  }
+
+  // 清空会话
+  async function clearConversation(id: string) {
+    try {
+      await showDialog({
+        title: '清空会话',
+        message: '确定要清空这个会话的所有消息吗？',
+        showCancelButton: true
+      })
+
+      const conversation = conversations.value.find(conv => conv.id === id)
+      if (conversation) {
+        conversation.messages = []
+      }
+      
+      await ConversationAPI.clearContext(id)
+      
+      showToast({
+        type: 'success',
+        message: '清空成功'
+      })
+    } catch (error) {
+      if (error.cancel) return
+      
+      showToast({
+        type: 'fail',
+        message: '清空失败'
+      })
+    }
+  }
+
+  // 重命名会话
+  async function renameConversation(id: string, title: string) {
+    const conversation = conversations.value.find(conv => conv.id === id)
+    if (conversation) {
+      conversation.title = title
+      // TODO: 调用重命名 API
+    }
   }
 
   return {
-    messages,
-    isLoading,
-    currentSession,
     conversations,
     currentConversationId,
+    currentConversation,
+    currentMessages,
+    isLoading,
+    error,
     initializeChat,
+    createNewConversation,
     sendMessage,
-    clearMessages,
-    setCurrentSession,
-    updateConversation,
-    updateConversationTitle,
-    getMessagePreview,
-    setCurrentConversation,
+    retryMessage,
     deleteConversation,
-    retryMessage
+    clearConversation,
+    renameConversation
   }
-}, {
-  persist: true
 })

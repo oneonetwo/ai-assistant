@@ -39,6 +39,7 @@ declare module 'vue' {
     VanLoading: typeof import('vant/es')['Loading']
     VanPopup: typeof import('vant/es')['Popup']
     VanSearch: typeof import('vant/es')['Search']
+    VanSwitch: typeof import('vant/es')['Switch']
     VanTag: typeof import('vant/es')['Tag']
     VirtualList: typeof import('./src/components/common/VirtualList.vue')['default']
     VoiceInput: typeof import('./src/components/chat/VoiceInput.vue')['default']

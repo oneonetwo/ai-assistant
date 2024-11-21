@@ -1,39 +1,15 @@
 import { defineStore } from 'pinia'
-import { computed, ref, watch } from 'vue'
 
-type Theme = 'light' | 'dark' | 'system'
-
-export const useThemeStore = defineStore('theme', () => {
-  const theme = ref<Theme>('system')
-  const systemDark = ref(window.matchMedia('(prefers-color-scheme: dark)').matches)
-
-  // 监听系统主题变化
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-    systemDark.value = e.matches
-  })
-
-  // 计算当前实际使用的主题
-  const currentTheme = computed(() => {
-    if (theme.value === 'system') {
-      return systemDark.value ? 'dark' : 'light'
+export const useThemeStore = defineStore('theme', {
+  state: () => ({
+    isDark: false
+  }),
+  
+  actions: {
+    toggleTheme() {
+      this.isDark = !this.isDark
+      // 可以在这里添加实际的主题切换逻辑
+      document.documentElement.classList.toggle('dark', this.isDark)
     }
-    return theme.value
-  })
-
-  // 监听主题变化并应用
-  watch(currentTheme, (newTheme) => {
-    document.documentElement.setAttribute('data-theme', newTheme)
-  }, { immediate: true })
-
-  function setTheme(newTheme: Theme) {
-    theme.value = newTheme
   }
-
-  return {
-    theme,
-    currentTheme,
-    setTheme
-  }
-}, {
-  persist: true
 }) 

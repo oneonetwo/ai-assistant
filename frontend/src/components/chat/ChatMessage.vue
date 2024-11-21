@@ -157,178 +157,136 @@ function showMessageActions() {
   <div 
     class="message" 
     :class="messageClass"
-    @click="handleCodeClick"
+    @click="handleImageClick"
   >
-    <!-- 如果是引用消息，显示引用内容 -->
-    <MessageQuote
-      v-if="message.quote"
-      :message="message.quote"
-    />
-    
-    <div class="message-main">
-      <div class="message-avatar">
-        <van-image
-          :src="isUser ? '/avatar-user.png' : '/avatar-assistant.png'"
-          width="40"
-          height="40"
-          radius="4"
-        />
-      </div>
-      
-      <div class="message-content">
+    <!-- 头像 -->
+    <div class="message-avatar">
+      <van-image
+        :src="isUser ? '/avatar-user.png' : '/avatar-ai.png'"
+        width="30"
+        height="30"
+        radius="4"
+      />
+    </div>
+
+    <div class="message-wrapper">
+      <!-- 引用消息 -->
+      <MessageQuote 
+        v-if="message.quote"
+        :message="message.quote"
+        class="message-quote"
+      />
+
+      <!-- 消息内容 -->
+      <div class="message-bubble">
         <div 
-          class="message-text"
-          :class="{ 'markdown-body': !isUser }"
+          class="message-content markdown-body"
           v-html="formattedContent"
         />
         
-        <div class="message-footer">
-          <span class="message-time">
-            {{ new Date(message.timestamp).toLocaleString() }}
-          </span>
-          
-          <div class="message-actions">
-            <van-button
-              size="mini"
-              icon="ellipsis"
-              @click.stop="showMessageActions"
-            />
-          </div>
+        <!-- 消息状态 -->
+        <div v-if="message.status" class="message-status">
+          <van-icon 
+            v-if="message.status === 'sending'" 
+            name="loading" 
+            class="loading"
+          />
+          <van-icon 
+            v-else-if="message.status === 'error'" 
+            name="warning-o" 
+            class="error"
+          />
+        </div>
+
+        <!-- 消息操作 -->
+        <div class="message-actions">
+          <van-button
+            v-if="message.status === 'error'"
+            size="mini"
+            icon="replay"
+            @click="handleRetry"
+          />
+          <van-button
+            size="mini"
+            icon="copy-o"
+            @click="copyContent(message.content)"
+          />
+          <van-button
+            size="mini"
+            icon="edit"
+            @click="showEditor = true"
+          />
+          <van-button
+            size="mini"
+            icon="star-o"
+            @click="handleCollect"
+          />
         </div>
       </div>
     </div>
   </div>
-  
-  <!-- 代码片段收藏组件 -->
-  <CodeSnippets ref="codeSnippetsRef" />
-  
-  <!-- 消息编辑组件 -->
-  <MessageEditor
-    v-model:show="showEditor"
-    :message="message"
-    @save="handleEdit"
-  />
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .message {
   display: flex;
-  padding: var(--van-padding-sm);
-  gap: var(--van-padding-sm);
+  padding: 1.5rem;
+  gap: 1rem;
   position: relative;
-  animation: message-appear 0.3s ease-out;
+  transition: var(--transition-normal);
   
-  &-user {
-    flex-direction: row-reverse;
+  &:hover {
+    background: var(--van-background-2);
     
-    .message-content {
-      align-items: flex-end;
-    }
-    
-    .message-text {
-      background-color: var(--van-primary-color);
-      color: var(--van-white);
+    .message-actions {
+      opacity: 1;
     }
   }
   
-  &.message-sending {
-    opacity: 0.8;
+  &-user {
+    background: var(--van-background);
+  }
+  
+  &-assistant {
+    background: var(--van-background-2);
   }
 }
 
 .message-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  overflow: hidden;
   flex-shrink: 0;
 }
 
-.message-content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--van-padding-xs);
-  max-width: 80%;
-  
-  img {
-    max-width: 100%;
-    border-radius: 8px;
-    cursor: zoom-in;
-    transition: opacity 0.2s;
-    
-    &:hover {
-      opacity: 0.9;
-    }
-  }
+.message-wrapper {
+  flex: 1;
+  min-width: 0;
+  max-width: var(--max-width);
+  margin: 0 auto;
 }
 
-.message-text {
-  padding: var(--van-padding-sm);
+.message-quote {
+  margin-bottom: 1rem;
+}
+
+.message-bubble {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 100%;
+  padding: 1rem;
   background-color: var(--van-background-2);
   border-radius: var(--van-radius-lg);
   word-break: break-word;
-  
-  :deep(pre) {
-    margin: var(--van-padding-sm) 0;
-    padding: var(--van-padding-sm);
-    background-color: var(--van-gray-8);
-    border-radius: var(--van-radius-md);
-    overflow-x: auto;
-    
-    code {
-      background-color: transparent;
-      padding: 0;
-    }
-  }
-  
-  :deep(code) {
-    background-color: var(--van-gray-2);
-    padding: 2px 4px;
-    border-radius: var(--van-radius-sm);
-  }
-  
-  :deep(p) {
-    margin: var(--van-padding-xs) 0;
-    
-    &:first-child {
-      margin-top: 0;
-    }
-    
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
 }
 
-.message-actions {
-  display: flex;
-  gap: var(--van-padding-xs);
-  opacity: 0;
-  transition: opacity 0.2s;
-  
-  .message:hover & {
-    opacity: 1;
-  }
-}
-
-@media (max-width: 768px) {
-  .message-actions {
-    opacity: 1;
-  }
-  
-  .message-content {
-    max-width: 90%;
-  }
-}
-
-.message-error {
-  .message-text {
-    border: 1px solid var(--van-danger-color);
-  }
-}
-
-.message-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 8px;
-  font-size: 12px;
+.message-content {
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0 auto;
 }
 
 .message-status {
@@ -338,35 +296,9 @@ function showMessageActions() {
   transform: translateY(-50%);
 }
 
-@keyframes message-appear {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.message-main {
-  display: flex;
-  gap: var(--van-padding-sm);
-}
-
-.message-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: var(--van-padding-xs);
-  
-  .message-time {
-    font-size: 12px;
-    color: var(--van-text-color-2);
-  }
-}
-
 .message-actions {
+  display: flex;
+  gap: 0.5rem;
   opacity: 0;
   transition: opacity 0.2s;
   
