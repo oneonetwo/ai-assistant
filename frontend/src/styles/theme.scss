@@ -1,0 +1,25 @@
+:root {
+  // Light theme
+  &[data-theme='light'] {
+    --van-background: #ffffff;
+    --van-background-2: #f7f7f8;
+    --van-text-color: #343541;
+    --van-text-color-2: #6e6e80;
+    --van-border-color: #e5e5e5;
+    --van-active-color: #f5f5f6;
+    --van-primary-color: #10a37f;
+    --van-error-color: #ef4444;
+  }
+
+  // Dark theme
+  &[data-theme='dark'] {
+    --van-background: #343541;
+    --van-background-2: #444654;
+    --van-text-color: #ececf1;
+    --van-text-color-2: #c5c5d2;
+    --van-border-color: #4b4b4b;
+    --van-active-color: #40414f;
+    --van-primary-color: #19c37d;
+    --van-error-color: #ef4444;
+  }
+} 

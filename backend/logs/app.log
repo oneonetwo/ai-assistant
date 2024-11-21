@@ -1,0 +1,25 @@
+2024-11-21 16:45:35.327 | ERROR    | app.services.context:create_conversation:22 - 创建对话失败: (pymysql.err.IntegrityError) (1062, "Duplicate entry 'string' for key 'conversations.ix_conversations_session_id'")
+[SQL: INSERT INTO conversations (session_id, created_at, updated_at) VALUES (%s, %s, %s)]
+[parameters: ('string', datetime.datetime(2024, 11, 21, 8, 45, 35, 323415), datetime.datetime(2024, 11, 21, 8, 45, 35, 323415))]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2024-11-21 16:45:35.339 | ERROR    | app.api.v1.context:create_conversation:24 - 创建会话失败: 500: Database error: 创建对话失败
+2024-11-21 16:45:48.593 | ERROR    | app.services.context:create_conversation:22 - 创建对话失败: (pymysql.err.IntegrityError) (1062, "Duplicate entry 'string' for key 'conversations.ix_conversations_session_id'")
+[SQL: INSERT INTO conversations (session_id, created_at, updated_at) VALUES (%s, %s, %s)]
+[parameters: ('string', datetime.datetime(2024, 11, 21, 8, 45, 48, 590179), datetime.datetime(2024, 11, 21, 8, 45, 48, 590179))]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2024-11-21 16:45:48.596 | ERROR    | app.api.v1.context:create_conversation:24 - 创建会话失败: 500: Database error: 创建对话失败
+2024-11-21 16:52:52.871 | ERROR    | app.services.context:create_conversation:23 - 创建对话失败: (pymysql.err.IntegrityError) (1062, "Duplicate entry 'string' for key 'conversations.ix_conversations_session_id'")
+[SQL: INSERT INTO conversations (session_id, created_at, updated_at) VALUES (%s, %s, %s)]
+[parameters: ('string', datetime.datetime(2024, 11, 21, 8, 52, 52, 867983), datetime.datetime(2024, 11, 21, 8, 52, 52, 867983))]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2024-11-21 16:52:52.872 | ERROR    | app.api.v1.context:create_conversation:26 - 创建会话失败: 500: Database error: 会话ID已存在
+2024-11-21 16:53:26.111 | ERROR    | app.services.context:create_conversation:23 - 创建对话失败: (pymysql.err.IntegrityError) (1062, "Duplicate entry 'string' for key 'conversations.ix_conversations_session_id'")
+[SQL: INSERT INTO conversations (session_id, created_at, updated_at) VALUES (%s, %s, %s)]
+[parameters: ('string', datetime.datetime(2024, 11, 21, 8, 53, 26, 108690), datetime.datetime(2024, 11, 21, 8, 53, 26, 108690))]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2024-11-21 16:53:26.112 | ERROR    | app.api.v1.context:create_conversation:26 - 创建会话失败: 500: Database error: 会话ID已存在
+2024-11-21 16:53:58.893 | ERROR    | app.services.context:create_conversation:23 - 创建对话失败: (pymysql.err.IntegrityError) (1062, "Duplicate entry 'string' for key 'conversations.ix_conversations_session_id'")
+[SQL: INSERT INTO conversations (session_id, created_at, updated_at) VALUES (%s, %s, %s)]
+[parameters: ('string', datetime.datetime(2024, 11, 21, 8, 53, 58, 890279), datetime.datetime(2024, 11, 21, 8, 53, 58, 890279))]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2024-11-21 16:53:58.895 | ERROR    | app.api.v1.context:create_conversation:26 - 创建会话失败: 500: Database error: 会话ID已存在
