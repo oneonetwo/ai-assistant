@@ -107,3 +107,24 @@ async def get_all_conversations(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         )
+
+@router.delete("/conversations/{session_id}", status_code=status.HTTP_200_OK)
+async def delete_conversation(
+    session_id: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """删除指定会话及其所有消息"""
+    try:
+        success = await context_service.delete_conversation(db, session_id)
+        if not success:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="会话不存在"
+            )
+        return {"message": "会话已删除"}
+    except DatabaseError as e:
+        app_logger.error(f"删除会话失败: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )

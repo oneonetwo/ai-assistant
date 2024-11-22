@@ -105,4 +105,24 @@ async def get_all_conversations(db: AsyncSession) -> List[Conversation]:
         return result.scalars().all()
     except Exception as e:
         app_logger.error(f"获取所有会话失败: {str(e)}")
-        raise DatabaseError(detail="获取会话列表失败") 
+        raise DatabaseError(detail="获取会话列表失败")
+
+async def delete_conversation(
+    db: AsyncSession,
+    session_id: str
+) -> bool:
+    """删除指定会话及其所有消息"""
+    try:
+        # 查找会话
+        conversation = await get_conversation(db, session_id)
+        if not conversation:
+            return False
+        
+        # 由于设置了 CASCADE，删除会话时会自动删除相关消息
+        await db.delete(conversation)
+        await db.commit()
+        
+        return True
+    except Exception as e:
+        app_logger.error(f"删除会话失败: {str(e)}")
+        raise DatabaseError(detail="删除会话失败") 

@@ -49,21 +49,66 @@ const filteredConversations = computed(() => {
   })
 })
 
+// 处理会话删除
+async function handleDeleteConversation(conv: { id: string, title: string }) {
+  try {
+    // await showDialog({
+    //   title: '删除会话',
+    //   message: `确定要删除 "${conv.title}" 吗？`,
+    //   showCancelButton: true
+    // })
+    await chatStore.deleteConversation(conv.id)
+    
+    showToast({
+      type: 'success',
+      message: '删除成功'
+    })
+  } catch (error) {
+    if (error?.['cancel']) return // 用户取消删除
+    
+    showToast({
+      type: 'fail',
+      message: '删除失败'
+    })
+  }
+}
+
 // 显示更多操作菜单
-function showMoreActions(conv: Conversation) {
+function showMoreActions(conv: { id: string, title: string }) {
   showDialog({
     title: '会话操作',
-    message: '请选择要执行的操作',
+    message: `选择要对 "${conv.title}" 执行的操作`,
     showCancelButton: true,
-    confirmButtonText: '导出会话',
+    confirmButtonText: '清空消息',
     cancelButtonText: '删除会话',
-    onConfirm: () => {
-      showExportDialog.value = true
-    },
-    onCancel: () => {
-      handleDeleteConversation(conv.id)
-    }
+    onConfirm: () => handleClearConversation(conv),
+    onCancel: () => handleDeleteConversation(conv)
   })
+}
+
+// 清空会话消息
+async function handleClearConversation(conv: { id: string, title: string }) {
+  try {
+    // await showDialog({
+    //   title: '清空会话',
+    //   message: `确定要清空 "${conv.title}" 的所有消息吗？`,
+    //   showCancelButton: true
+    // })
+    
+    await chatStore.clearConversation(conv.id)
+    
+    showToast({
+      type: 'success',
+      message: '清空成功'
+    })
+  } catch (error) {
+    if (error?.['cancel']) return // 用户取消清空
+    
+    showToast({
+      type: 'fail',
+      message: '清空失败'
+    })
+  }
 }
 
 // 添加获取会话详情的方法

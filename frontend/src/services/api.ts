@@ -36,6 +36,15 @@ export class ConversationAPI {
   }
 
   /**
+   * 删除会话
+   * @param sessionId - 会话ID
+   */
+  static async deleteConversation(sessionId: string) {
+    const response = await request.delete(`${API_BASE_URL}/context/conversations/${sessionId}`)
+    return response
+  }
+
+  /**
    * 清除会话上下文
    * @param sessionId - 会话ID
    */

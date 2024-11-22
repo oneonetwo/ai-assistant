@@ -84,6 +84,9 @@ export const useChatStore = defineStore('chat', () => {
     retry?: boolean
     messageId?: string
   } = {}) {
+    console.log('sendMessage', content, options)
+    console.log('currentConversation.value', currentConversation.value)
+    console.log('currentConversationId.value', currentConversationId.value)
     if (!currentConversationId.value) {
       throw new Error('未选择会话')
     }
@@ -210,12 +213,6 @@ export const useChatStore = defineStore('chat', () => {
   // 删除会话
   async function deleteConversation(id: string) {
     try {
-      await showDialog({
-        title: '删除会话',
-        message: '确定要删除这个会话吗？',
-        showCancelButton: true
-      })
-
       // 如果删除的是当前会话，切换到其他会话
       if (currentConversationId.value === id) {
         const otherConv = conversations.value.find(conv => conv.id !== id)
@@ -223,7 +220,7 @@ export const useChatStore = defineStore('chat', () => {
       }
       
       conversations.value = conversations.value.filter(conv => conv.id !== id)
-      
+
       await ConversationAPI.deleteConversation(id)
       
       showToast({
@@ -279,15 +276,58 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
-  // 添加更新会话的���法
-  function updateConversation(id: string, conversation: any) {
-    console.log('updateconsetion', id, 'conversation',conversation)
-    const index = conversations.value.findIndex(conv => conv.id === id)
-    if (index !== -1) {
+  /**
+   * 更新会话信息
+   * @param id - 会话ID
+   * @param conversation - 服务器返回的会话数据
+   */
+  function updateConversation(id: string, conversation: {
+    session_id?: string
+    title?: string
+    messages?: any[]
+    created_at?: string
+    model?: string
+  }) {
+    try {
+      const index = conversations.value.findIndex(conv => conv.id === id)
+      if (index === -1) {
+        console.warn(`Conversation with id ${id} not found`)
+        return
+      }
+
+      // 转换服务器数据格式为本地格式
+      const updatedConversation = {
+        id: conversation.session_id || conversations.value[index].id,
+        title: conversation.title || conversations.value[index].title,
+        messages: conversation.messages?.map(msg => ({
+          id: msg.id || Date.now().toString(),
+          role: msg.role as 'user' | 'assistant',
+          content: msg.content,
+          timestamp: msg.timestamp || Date.now(),
+          status: msg.status || 'success',
+          error: msg.error,
+          quote: msg.quote
+        })) || conversations.value[index].messages,
+        lastTime: conversation.created_at || conversations.value[index].lastTime,
+        model: conversation.model || conversations.value[index].model
+      }
+
+      // 更新会话
       conversations.value[index] = {
         ...conversations.value[index],
-        ...conversation
+        ...updatedConversation
       }
+
+      // 如果更新的是当前会话，确保 currentConversationId 也是最新的
+      if (currentConversationId.value === id && conversation.session_id) {
+        currentConversationId.value = conversation.session_id
+      }
+    } catch (error) {
+      console.error('Failed to update conversation:', error)
+      showToast({
+        type: 'fail',
+        message: '更新会话失败'
+      })
     }
   }
 
