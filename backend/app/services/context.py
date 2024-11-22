@@ -91,4 +91,14 @@ async def clear_context(
         return True
     except Exception as e:
         app_logger.error(f"清除上下文失败: {str(e)}")
-        raise DatabaseError(detail="清除上下文失败") 
+        raise DatabaseError(detail="清除上下文失败")
+
+async def get_all_conversations(db: AsyncSession) -> List[Conversation]:
+    """获取所有会话"""
+    try:
+        query = select(Conversation).order_by(desc(Conversation.updated_at))
+        result = await db.execute(query)
+        return result.scalars().all()
+    except Exception as e:
+        app_logger.error(f"获取所有会话失败: {str(e)}")
+        raise DatabaseError(detail="获取会话列表失败") 

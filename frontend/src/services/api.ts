@@ -15,7 +15,7 @@ export class ConversationAPI {
     const response = await request.post(`${API_BASE_URL}/context/conversations`, {
       title
     })
-    return response.data
+    return response
   }
 
   /**
@@ -24,7 +24,7 @@ export class ConversationAPI {
    */
   static async getConversation(sessionId: string) {
     const response = await request.get(`${API_BASE_URL}/context/conversations/${sessionId}`)
-    return response.data
+    return response
   }
 
   /**
@@ -32,7 +32,7 @@ export class ConversationAPI {
    */
   static async getConversations() {
     const response = await request.get(`${API_BASE_URL}/context/conversations`)
-    return response.data
+    return response
   }
 
   /**
@@ -41,7 +41,7 @@ export class ConversationAPI {
    */
   static async clearContext(sessionId: string) {
     const response = await request.delete(`${API_BASE_URL}/context/conversations/${sessionId}/context`)
-    return response.data
+    return response
   }
 }
 
@@ -70,60 +70,57 @@ export class ChatClient {
       onEnd?: (fullText: string) => void
       onError?: (error: Error) => void
     } = {}
-  ) {
+  ): Promise<void> {
     const { onStart = () => {}, onChunk = () => {}, onEnd = () => {}, onError = () => {} } = callbacks
 
-    const eventSource = new EventSource(
-      `${this.baseUrl}/${this.sessionId}/stream`
-    )
-
-    let fullText = ''
-
-    // 处理服务器发送的事件
-    eventSource.onmessage = (event) => {
-      try {
-        const response = JSON.parse(event.data)
-        
-        switch (response.type) {
-          case 'start':
-            onStart()
-            break
-            
-          case 'chunk':
-            fullText += response.data.content
-            onChunk(response.data.content, fullText)
-            break
-            
-          case 'end':
-            onEnd(response.data.full_text)
-            eventSource.close()
-            break
-            
-          case 'error':
-            onError(new Error(response.data.message))
-            eventSource.close()
-            break
-        }
-      } catch (error) {
-        onError(error as Error)
-        eventSource.close()
-      }
-    }
-
-    // 处理连接错误
-    eventSource.onerror = (error) => {
-      onError(error as Error)
-      eventSource.close()
-    }
-
-    // 发送用户消息
     try {
-      const response = await request.post(`${this.baseUrl}/${this.sessionId}/stream`, {
+      // 首先发送 POST 请求初始化流
+      await request.post(`${this.baseUrl}/${this.sessionId}/stream`, {
         message
       })
-      return response.data
+
+      // 然后建立 SSE 连接
+      const url = new URL(
+        `${window.location.origin}/api${this.baseUrl}/${this.sessionId}/stream`
+      )
+      
+      const eventSource = new EventSource(url.toString())
+      let fullText = ''
+
+      eventSource.onmessage = (event) => {
+        try {
+          const response = JSON.parse(event.data)
+          
+          switch (response.type) {
+            case 'start':
+              onStart()
+              break
+              
+            case 'chunk':
+              fullText += response.data.content
+              onChunk(response.data.content, fullText)
+              break
+              
+            case 'end':
+              onEnd(fullText)
+              eventSource.close()
+              break
+              
+            case 'error':
+              throw new Error(response.data.message)
+          }
+        } catch (error) {
+          eventSource.close()
+          onError(error as Error)
+        }
+      }
+
+      eventSource.onerror = (error) => {
+        eventSource.close()
+        onError(error as Error)
+      }
+
     } catch (error) {
-      eventSource.close()
       onError(error as Error)
     }
   }

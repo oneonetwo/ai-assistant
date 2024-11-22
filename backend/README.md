@@ -85,9 +85,9 @@
 ## API文档
 
 ### 会话管理
+- GET /api/v1/context/conversations - 获取所有会话列表
 - POST /api/v1/context/conversations - 创建新会话
 - GET /api/v1/context/conversations/{session_id} - 获取会话信息
-- POST /api/v1/context/conversations/{session_id}/messages - 获取会话消息
 - DELETE /api/v1/context/conversations/{session_id}/context - 清除会话上下文
 
 ### 聊天功能

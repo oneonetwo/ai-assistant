@@ -10,6 +10,7 @@ from app.models.schemas import (
 from app.services import context as context_service
 from app.core.logging import app_logger
 from app.services.exceptions import DatabaseError
+from typing import List
 
 router = APIRouter(prefix="/context", tags=["context"])
 
@@ -87,6 +88,21 @@ async def clear_context(
         return {"message": "上下文已清除"}
     except DatabaseError as e:
         app_logger.error(f"清除上下文失败: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
+@router.get("/conversations", response_model=List[ConversationResponse])
+async def get_all_conversations(
+    db: AsyncSession = Depends(get_db)
+):
+    """获取所有会话列表"""
+    try:
+        conversations = await context_service.get_all_conversations(db)
+        return conversations
+    except DatabaseError as e:
+        app_logger.error(f"获取会话列表失败: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)

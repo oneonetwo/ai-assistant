@@ -23,3 +23,8 @@
 [parameters: ('string', datetime.datetime(2024, 11, 21, 8, 53, 58, 890279), datetime.datetime(2024, 11, 21, 8, 53, 58, 890279))]
 (Background on this error at: https://sqlalche.me/e/20/gkpj)
 2024-11-21 16:53:58.895 | ERROR    | app.api.v1.context:create_conversation:26 - 创建会话失败: 500: Database error: 会话ID已存在
+2024-11-22 11:13:50.218 | ERROR    | app.services.ai_client:generate_stream_response:44 - AI流式响应生成失败: object Stream can't be used in 'await' expression
+2024-11-22 11:13:50.219 | ERROR    | app.services.chat:process_stream_chat:102 - 处理流式聊天请求失败: 503: API error: AI服务调用失败: object Stream can't be used in 'await' expression
+2024-11-22 11:20:03.987 | ERROR    | app.services.ai_client:generate_stream_response:44 - AI流式响应生成失败: object Stream can't be used in 'await' expression
+2024-11-22 11:20:03.988 | ERROR    | app.services.chat:process_stream_chat:102 - 处理流式聊天请求失败: 503: API error: AI服务调用失败: object Stream can't be used in 'await' expression
+2024-11-22 12:56:55.740 | ERROR    | app.services.chat:process_stream_chat:102 - 处理流式聊天请求失败: 'AIClient' object has no attribute 'generate_stream_response'

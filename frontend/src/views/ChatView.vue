@@ -45,8 +45,7 @@ function handleQuote(message: Message) {
 async function handleSend(content: string) {
   if (!content.trim()) return
   
-  await chatStore.sendMessage({
-    content,
+  await chatStore.sendMessage(content, {
     quote: quotedMessage.value || undefined
   })
   

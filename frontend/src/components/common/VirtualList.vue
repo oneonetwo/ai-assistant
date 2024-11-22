@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watchEffect } from 'vue'
+import { ref, computed, onMounted, watchEffect, nextTick } from 'vue'
 import { useElementSize, useScroll } from '@vueuse/core'
 
 interface Props {

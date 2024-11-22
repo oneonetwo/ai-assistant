@@ -72,7 +72,7 @@ function showMoreActions(conv: Conversation) {
       <van-button 
         block 
         class="new-chat-btn"
-        @click="createNewSession"
+        @click="chatStore.createNewConversation"
       >
         <template #icon>
           <van-icon name="plus" />

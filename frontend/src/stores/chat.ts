@@ -25,7 +25,7 @@ export const useChatStore = defineStore('chat', () => {
     try {
       isLoading.value = true
       const data = await ConversationAPI.getConversations()
-      
+      console.log('data', data)
       conversations.value = data.map((conv: any) => ({
         id: conv.session_id,
         title: conv.title || '新会话',

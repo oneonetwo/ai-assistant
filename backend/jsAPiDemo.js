@@ -112,6 +112,29 @@ class ConversationAPI {
             handleError(error);
         }
     }
+
+    /**
+     * 获取所有会话列表
+     * @returns {Promise<Array>} 返回会话列表
+     */
+    static async getAllConversations() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/context/conversations`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            if (!response.ok) {
+                throw await response.json();
+            }
+            
+            return await response.json();
+        } catch (error) {
+            handleError(error);
+        }
+    }
 }
 
 /**
@@ -125,7 +148,7 @@ class ChatClient {
      */
     constructor(sessionId) {
         this.sessionId = sessionId;
-        this.baseUrl = `${API_BASE_URL}/chat`;
+        this.baseUrl = '/api/v1/chat';
     }
 
     /**
@@ -143,46 +166,8 @@ class ChatClient {
         onEnd = () => {},
         onError = () => {}
     } = {}) {
-        const eventSource = new EventSource(
-            `${this.baseUrl}/${this.sessionId}/stream`
-        );
-
-        let fullText = '';
-
-        // 处理服务器发送的事件
-        eventSource.onmessage = (event) => {
-            const response = JSON.parse(event.data);
-            
-            switch (response.type) {
-                case 'start':
-                    onStart();
-                    break;
-                    
-                case 'chunk':
-                    fullText += response.data.content;
-                    onChunk(response.data.content, fullText);
-                    break;
-                    
-                case 'end':
-                    onEnd(response.data.full_text);
-                    eventSource.close();
-                    break;
-                    
-                case 'error':
-                    onError(new Error(response.data.message));
-                    eventSource.close();
-                    break;
-            }
-        };
-
-        // 处理连接错误
-        eventSource.onerror = (error) => {
-            onError(error);
-            eventSource.close();
-        };
-
-        // 发送用户消息
         try {
+            // 1. 首先发送消息
             const response = await fetch(`${this.baseUrl}/${this.sessionId}/stream`, {
                 method: 'POST',
                 headers: {
@@ -195,8 +180,47 @@ class ChatClient {
                 const error = await response.json();
                 throw new Error(error.detail);
             }
+
+            // 2. 创建 EventSource 连接
+            const eventSource = new EventSource(
+                `${this.baseUrl}/${this.sessionId}/stream`
+            );
+
+            let fullText = '';
+
+            // 3. 处理服务器发送的事件
+            eventSource.onmessage = (event) => {
+                const response = JSON.parse(event.data);
+                
+                switch (response.type) {
+                    case 'start':
+                        onStart();
+                        break;
+                        
+                    case 'chunk':
+                        fullText = response.data.full_text;
+                        onChunk(response.data.content, fullText);
+                        break;
+                        
+                    case 'end':
+                        onEnd(response.data.full_text);
+                        eventSource.close();
+                        break;
+                        
+                    case 'error':
+                        onError(new Error(response.data.message));
+                        eventSource.close();
+                        break;
+                }
+            };
+
+            // 4. 处理连接错误
+            eventSource.onerror = (error) => {
+                onError(error);
+                eventSource.close();
+            };
+
         } catch (error) {
-            eventSource.close();
             onError(error);
         }
     }
@@ -245,6 +269,24 @@ async function startChatting() {
         
     } catch (error) {
         console.error('操作失败:', error);
+    }
+}
+
+// 使用示例
+async function listAllConversations() {
+    try {
+        const conversations = await ConversationAPI.getAllConversations();
+        console.log('所有会话列表:', conversations);
+        
+        // 可以遍历处理每个会话
+        conversations.forEach(conversation => {
+            console.log('会话ID:', conversation.session_id);
+            console.log('创建时间:', conversation.created_at);
+            console.log('更新时间:', conversation.updated_at);
+        });
+        
+    } catch (error) {
+        console.error('获取会话列表失败:', error);
     }
 }
 
