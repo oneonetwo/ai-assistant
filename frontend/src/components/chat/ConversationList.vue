@@ -2,8 +2,9 @@
 import { ref, computed } from 'vue'
 import { useChatStore } from '@/stores/chat'
 import { useThemeStore } from '@/stores/theme'
-import { showDialog } from 'vant'
+import { showDialog, showToast } from 'vant'
 import ExportDialog from './ExportDialog.vue'
+import { ConversationAPI } from '@/services/api'
 
 const chatStore = useChatStore()
 const themeStore = useThemeStore()
@@ -64,6 +65,25 @@ function showMoreActions(conv: Conversation) {
     }
   })
 }
+
+// 添加获取会话详情的方法
+async function handleSessionClick(conv: { id: string }) {
+  try {
+    // 先切换当前会话 ID
+    chatStore.currentConversationId = conv.id
+    
+    // 获取最新的会话数据
+    const conversation = await ConversationAPI.getConversation(conv.id)
+    
+    // 更新 store 中的会话数据
+    chatStore.updateConversation(conv.id, conversation)
+  } catch (error) {
+    showToast({
+      type: 'fail',
+      message: '获取会话数据失败'
+    })
+  }
+}
 </script>
 
 <template>
@@ -95,7 +115,7 @@ function showMoreActions(conv: Conversation) {
         :key="conv.id"
         class="session-item"
         :class="{ active: conv.id === chatStore.currentConversationId }"
-        @click="chatStore.currentConversationId = conv.id"
+        @click="handleSessionClick(conv)"
       >
         <div class="session-icon">
           <van-icon name="chat-o" />

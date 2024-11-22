@@ -279,6 +279,18 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
+  // 添加更新会话的���法
+  function updateConversation(id: string, conversation: any) {
+    console.log('updateconsetion', id, 'conversation',conversation)
+    const index = conversations.value.findIndex(conv => conv.id === id)
+    if (index !== -1) {
+      conversations.value[index] = {
+        ...conversations.value[index],
+        ...conversation
+      }
+    }
+  }
+
   return {
     conversations,
     currentConversationId,
@@ -292,6 +304,7 @@ export const useChatStore = defineStore('chat', () => {
     retryMessage,
     deleteConversation,
     clearConversation,
-    renameConversation
+    renameConversation,
+    updateConversation
   }
 })

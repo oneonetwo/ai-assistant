@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 Base = declarative_base()
 
@@ -12,6 +14,9 @@ class Conversation(Base):
     created_at = Column(DateTime, default=datetime.utcnow)  # 创建时间
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 更新时间
 
+    # 添加与 Message 的关系
+    messages = relationship("Message", back_populates="conversation", lazy="selectin")
+
 class Message(Base):
     __tablename__ = "messages"
     
@@ -20,3 +25,6 @@ class Message(Base):
     role = Column(String(20))  # 消息角色（user/assistant）
     content = Column(Text)  # 消息内容
     created_at = Column(DateTime, default=datetime.utcnow)  # 创建时间 
+
+    # 添加与 Conversation 的关系
+    conversation = relationship("Conversation", back_populates="messages")

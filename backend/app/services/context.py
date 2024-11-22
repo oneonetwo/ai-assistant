@@ -7,6 +7,7 @@ from app.core.config import settings
 from app.services.exceptions import DatabaseError
 from app.core.logging import app_logger
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import joinedload
 
 async def create_conversation(
     db: AsyncSession,
@@ -35,8 +36,11 @@ async def get_conversation(
     db: AsyncSession,
     session_id: str
 ) -> Optional[Conversation]:
-    """获取指定会话ID的对话"""
-    query = select(Conversation).where(Conversation.session_id == session_id)
+    """获取指定会话ID的对话及其消息"""
+    query = (
+        select(Conversation)
+        .where(Conversation.session_id == session_id)
+    )
     result = await db.execute(query)
     return result.scalar_one_or_none()
 
