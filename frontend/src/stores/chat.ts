@@ -12,20 +12,19 @@ export const useChatStore = defineStore('chat', () => {
   const error = ref<string | null>(null)
 
   // 计算属性
-  const currentConversation = computed(() => 
-    conversations.value.find(conv => conv.id === currentConversationId.value)
-  )
+  const currentConversation = computed(() => {
+    return conversations.value.find(conv => conv.id === currentConversationId.value)
+  })
 
-  const currentMessages = computed(() => 
-    currentConversation.value?.messages || []
-  )
+  const currentMessages = computed(() => {
+    return currentConversation.value?.messages || []
+  })
 
   // 初始化聊天
   async function initializeChat() {
     try {
       isLoading.value = true
       const data = await ConversationAPI.getConversations()
-      console.log('data', data)
       conversations.value = data.map((conv: any) => ({
         id: conv.session_id,
         title: conv.title || '新会话',
@@ -130,21 +129,33 @@ export const useChatStore = defineStore('chat', () => {
         onStart: () => {
           userMessage.status = 'success'
         },
-        onChunk: (chunk, fullText) => {
-          assistantMessage.content = fullText
+        onChunk: (chunk: string) => {
+          // Find the message in the conversation
+          const messageIndex = conversation.messages.findIndex(msg => msg.id === assistantMessage.id)
+          if (messageIndex !== -1) {
+            // Create a new message object with updated content
+            const updatedMessage = {
+              ...conversation.messages[messageIndex],
+              content: conversation.messages[messageIndex].content + chunk
+            }
+            // Replace the message in the array
+            conversation.messages.splice(messageIndex, 1, updatedMessage)
+          }
         },
-        onEnd: (fullText) => {
+        onEnd: () => {
+          // 更新消息状态
           assistantMessage.status = 'success'
+          // 更新会话时间
           conversation.lastTime = new Date().toISOString()
         },
-        onError: (error) => {
+        onError: (error: Error) => {
           assistantMessage.status = 'error'
           assistantMessage.error = error.message
           throw error
         }
       })
 
-    } catch (error) {
+    } catch (error: any) {
       if (error.name === 'AbortError') {
         console.log('请求已取消')
         return

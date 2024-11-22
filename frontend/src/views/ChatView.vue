@@ -19,7 +19,9 @@ const inputText = ref('')
 const MESSAGE_HEIGHT = 100
 const containerRef = ref<HTMLElement>()
 const { list: visibleMessages } = useVirtualList(
-  computed(() => chatStore.currentMessages),
+  computed(() => {
+    return chatStore.currentMessages
+  }),
   {
     itemHeight: MESSAGE_HEIGHT,
     overscan: 5
