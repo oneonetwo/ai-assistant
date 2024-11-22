@@ -1,5 +1,12 @@
 # AI 聊天助手后端
 Python 3.10.7 
+FastAPI 2.4.0
+SQLAlchemy 2.0.30
+Alembic 1.11.1  
+Pydantic 2.5.2
+# 启动项目
+uvicorn app.main:app --reload    
+
 ## 项目结构 
 ├── app/
 │ ├── init.py
