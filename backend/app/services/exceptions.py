@@ -26,6 +26,14 @@ class NotFoundError(ServiceError):
     """资源不存在错误"""
     def __init__(self, detail: str):
         super().__init__(
-            detail=f"Not found: {detail}",
+            detail=detail,
             status_code=status.HTTP_404_NOT_FOUND
+        )
+
+class APIError(ServiceError):
+    """API调用相关错误"""
+    def __init__(self, detail: str):
+        super().__init__(
+            detail=f"API error: {detail}",
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE
         ) 

@@ -54,7 +54,8 @@ async def add_message(
         db_message = Message(
             conversation_id=conversation_id,
             role=message.role,
-            content=message.content
+            content=message.content,
+            parent_message_id=message.parent_message_id
         )
         db.add(db_message)
         await db.commit()
@@ -69,21 +70,28 @@ async def get_context_messages(
     conversation_id: int,
     limit: int = settings.MAX_CONTEXT_TURNS
 ) -> List[Message]:
-    """获取对话上下文消息，按问答对组织"""
-    query = select(Message)\
-        .where(Message.conversation_id == conversation_id)\
-        .order_by(desc(Message.created_at))\
-        .limit(limit * 2)  # 获取更多消息以确保完整的问答对
-    
+    """获取对话上下文消息，并按问答对组织"""
+    query = (
+        select(Message)
+        .where(Message.conversation_id == conversation_id)
+        .order_by(desc(Message.created_at))
+        .limit(limit * 2)  # 获取足够的消息以确保完整的问答对
+    )
     result = await db.execute(query)
     messages = list(reversed(result.scalars().all()))
     
-    # 组织成问答对
+    # 组织消息，确保问答对的完整性
     organized_messages = []
-    for i in range(0, len(messages), 2):
-        if i + 1 < len(messages):
-            # 添加用户问题和AI回答
-            organized_messages.extend([messages[i], messages[i + 1]])
+    current_user_message = None
+    
+    for message in messages:
+        if message.role == "user":
+            current_user_message = message
+        elif message.role == "assistant" and current_user_message:
+            # 确保是对应的问答对
+            if message.parent_message_id == current_user_message.id:
+                organized_messages.extend([current_user_message, message])
+                current_user_message = None
     
     return organized_messages
 

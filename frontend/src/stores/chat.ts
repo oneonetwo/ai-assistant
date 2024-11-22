@@ -130,9 +130,12 @@ export const useChatStore = defineStore('chat', () => {
       await chatClient.streamChat(content, {
         signal: abortController.signal,
         onStart: () => {
+          console.log('start >>>>>>>>>>>')
+
           userMessage.status = 'success'
         },
         onChunk: (chunk: string) => {
+          console.log('onChunk>>>>>>>>>>>', chunk)
           // Find the message in the conversation
           const messageIndex = conversation.messages.findIndex(msg => msg.id === assistantMessage.id)
           if (messageIndex !== -1) {
@@ -146,12 +149,14 @@ export const useChatStore = defineStore('chat', () => {
           }
         },
         onEnd: () => {
+          console.log('onEnd>>>>>>>>>>>',)
           // 更新消息状态
           assistantMessage.status = 'success'
           // 更新会话时间
           conversation.lastTime = new Date().toISOString()
         },
         onError: (error: Error) => {
+          console.log('onError>>>>>>>>>>>', error)
           assistantMessage.status = 'error'
           assistantMessage.error = error.message
           throw error
