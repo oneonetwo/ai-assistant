@@ -7,7 +7,6 @@ import router from './router'
 // 导入样式
 import 'vant/lib/index.css'
 import './styles/index.scss'
-import './styles/theme.scss'
 
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)

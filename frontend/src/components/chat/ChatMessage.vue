@@ -1,66 +1,91 @@
 <template>
-  <div 
-    class="message" 
-    :class="[
-      `message-${message.role}`,
-      { 'message-sending': message.status === 'sending' }
-    ]"
-  >
-    <div class="message-avatar">
-      <van-image
-        :src="message.role === 'user' ? '/avatar-user.png' : '/avatar-ai.png'"
-        width="30"
-        height="30"
-        radius="4"
-      />
-    </div>
-
-    <div class="message-wrapper">
-      <!-- 引用消息 -->
-      <MessageQuote 
-        v-if="message.quote"
-        :message="message.quote"
-        class="message-quote"
-      />
-
-      <!-- 消息内容 -->
-      <div class="message-bubble">
-        <div 
-          class="message-content markdown-body"
-          v-html="formattedContent"
-        />
-        
-        <!-- 消息状态 -->
-        <div v-if="message.status" class="message-status">
-          <van-loading v-if="message.status === 'sending'" size="16" />
-          <van-icon 
-            v-else-if="message.status === 'error'" 
-            name="warning-o"
-            class="error"
-          />
-        </div>
-      </div>
+  <div class="message" :class="{ 'message-ai': message.role === 'assistant' }">
+    <div class="message-content">
+      <div class="markdown-body" v-html="renderedContent"></div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { Message } from '@/types/chat'
-import { marked } from 'marked'
-import MessageQuote from './MessageQuote.vue'
+import MarkdownIt from 'markdown-it'
+import hljs from 'highlight.js'
 
-const props = defineProps<{
-  message: Message
-}>()
+interface Props {
+  message: {
+    id: string
+    role: 'user' | 'assistant'
+    content: string
+    timestamp: number
+    status: string
+  }
+}
 
-// 格式化消息内容
-const formattedContent = computed(() => {
-  console.log('格式化消息内容', props.message)
-  if (!props.message.content) return ''
-  return marked(props.message.content, {
-    breaks: true,
-    gfm: true
-  })
+const props = defineProps<Props>()
+
+// 配置 markdown-it
+const md = new MarkdownIt({
+  html: true,
+  breaks: true,
+  linkify: true,
+  highlight: function (str: string, lang: string) {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        const highlighted = hljs.highlight(str, { 
+          language: lang,
+          ignoreIllegals: true 
+        }).value
+        
+        return `
+          <div class="code-block">
+            <div class="code-header">
+              <span class="language">${lang}</span>
+              <button class="copy-button" onclick="navigator.clipboard.writeText(\`${str.replace(/`/g, '\\`')}\`)">
+                复制代码
+              </button>
+            </div>
+            <pre><code class="hljs language-${lang}">${highlighted}</code></pre>
+          </div>`
+      } catch (__) {
+        console.log('highlight error:', __)
+      }
+    }
+    return `<pre><code>${md.utils.escapeHtml(str)}</code></pre>`
+  }
+})
+
+// 渲染 Markdown 内容
+const renderedContent = computed(() => {
+  if (!props.message?.content) return ''
+  return md.render(props.message.content)
 })
 </script>
+
+<style lang="scss">
+
+.message {
+  padding: 16px;
+  
+  &-ai {
+    background: var(--van-background-2);
+  }
+  
+  &-content {
+    max-width: 800px;
+    margin: 0 auto;
+    
+    .markdown-body {
+      font-size: 15px;
+      line-height: 1.6;
+      
+      p {
+        margin: 8px 0;
+      }
+      
+      pre {
+        margin: 16px 0;
+      }
+    }
+  }
+}
+</style>

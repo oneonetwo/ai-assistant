@@ -1,1 +1,17 @@
-@use 'variable' as *;
+@import './variable.scss';
+
+@import './theme.scss';
+
+@import './highlight.scss';
+
+@import './global.scss';
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  &[data-theme="dark"] {
+    color-scheme: dark;
+  }
+}
