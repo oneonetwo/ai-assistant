@@ -13,7 +13,6 @@ async def process_chat(
     user_message: str
 ) -> Dict[str, str]:
     """处理普通聊天请求"""
-    # 获取会话
     conversation = await get_conversation(db, session_id)
     if not conversation:
         raise NotFoundError(detail=f"会话 {session_id} 不存在，请先创建会话")
@@ -21,7 +20,7 @@ async def process_chat(
     try:
         # 保存用户消息
         user_msg = MessageCreate(role="user", content=user_message)
-        await add_message(db, conversation.id, user_msg)
+        saved_user_msg = await add_message(db, conversation.id, user_msg)
 
         # 获取上下文消息
         context_messages = await get_context_messages(
@@ -39,8 +38,12 @@ async def process_chat(
         # 生成AI回复
         ai_response = await ai_client.generate_response(messages)
 
-        # 保存AI回复
-        ai_msg = MessageCreate(role="assistant", content=ai_response)
+        # 保存AI回复，并关联到用户消息
+        ai_msg = MessageCreate(
+            role="assistant", 
+            content=ai_response,
+            parent_message_id=saved_user_msg.id  # 设置父消息ID
+        )
         await add_message(db, conversation.id, ai_msg)
 
         return {

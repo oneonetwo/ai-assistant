@@ -69,13 +69,23 @@ async def get_context_messages(
     conversation_id: int,
     limit: int = settings.MAX_CONTEXT_TURNS
 ) -> List[Message]:
-    """获取对话上下文消息"""
+    """获取对话上下文消息，按问答对组织"""
     query = select(Message)\
         .where(Message.conversation_id == conversation_id)\
         .order_by(desc(Message.created_at))\
-        .limit(limit)
+        .limit(limit * 2)  # 获取更多消息以确保完整的问答对
+    
     result = await db.execute(query)
-    return list(reversed(result.scalars().all()))
+    messages = list(reversed(result.scalars().all()))
+    
+    # 组织成问答对
+    organized_messages = []
+    for i in range(0, len(messages), 2):
+        if i + 1 < len(messages):
+            # 添加用户问题和AI回答
+            organized_messages.extend([messages[i], messages[i + 1]])
+    
+    return organized_messages
 
 async def clear_context(
     db: AsyncSession,

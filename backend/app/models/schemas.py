@@ -7,6 +7,7 @@ import re
 class MessageBase(BaseModel):
     content: str = Field(..., description="消息内容")
     role: str = Field(..., description="消息角色", pattern="^(user|assistant)$")
+    parent_message_id: Optional[int] = Field(None, description="父消息ID")
 
 class MessageCreate(MessageBase):
     pass
@@ -14,6 +15,7 @@ class MessageCreate(MessageBase):
 class MessageResponse(MessageBase):
     id: int
     created_at: datetime
+    parent_message_id: Optional[int] = None
     
     class Config:
         from_attributes = True

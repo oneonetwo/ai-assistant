@@ -22,9 +22,11 @@ class Message(Base):
     
     id = Column(Integer, primary_key=True, index=True)  # 消息ID
     conversation_id = Column(Integer, ForeignKey("conversations.id"))  # 关联的对话ID
+    parent_message_id = Column(Integer, ForeignKey("messages.id"), nullable=True)
     role = Column(String(20))  # 消息角色（user/assistant）
     content = Column(Text)  # 消息内容
     created_at = Column(DateTime, default=datetime.utcnow)  # 创建时间 
 
     # 添加与 Conversation 的关系
     conversation = relationship("Conversation", back_populates="messages")
+    parent_message = relationship("Message", remote_side=[id], backref="child_messages")
