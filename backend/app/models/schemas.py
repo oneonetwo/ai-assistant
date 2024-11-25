@@ -22,12 +22,14 @@ class MessageResponse(MessageBase):
 
 class ConversationBase(BaseModel):
     session_id: str = Field(..., description="会话ID")
+    name: Optional[str] = Field(None, description="会话名称")
 
 class ConversationCreate(BaseModel):
     session_id: Optional[str] = Field(
         default_factory=lambda: str(uuid.uuid4()),
         description="会话ID，如果不提供则自动生成UUID"
     )
+    name: Optional[str] = Field(None, description="会话名称")
 
     @field_validator('session_id')
     def validate_session_id(cls, v):
@@ -50,6 +52,9 @@ class ConversationResponse(ConversationBase):
     
     class Config:
         from_attributes = True
+
+class ConversationUpdate(BaseModel):
+    name: str = Field(..., description="新的会话名称", max_length=100)
 
 class ChatRequest(BaseModel):
     message: str = Field(..., description="用户消息")

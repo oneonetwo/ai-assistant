@@ -39,15 +39,17 @@ async function handleDeleteConversation(conv: { id: string }) {
 }
 
 // 重命名会话
-async function handleRenameConversation(conv: { id: string, title: string }) {
-  const newTitle = window.prompt('请输入新的会话名称:', conv.title)
-  if (!newTitle) return
+async function handleRenameConversation(conv: { id: string, name: string }) {
+  const newName = window.prompt('请输入新的会话名称:', conv.name)
+  if (!newName || newName === conv.name) return
   
   try {
-    await chatStore.renameConversation(conv.id, newTitle)
-    showToast('重命名成功')
+    await chatStore.renameConversation(conv.id, newName)
   } catch (error) {
-    showToast('重命名失败')
+    showToast({
+      type: 'fail',
+      message: '重命名失败'
+    })
   }
 }
 </script>
@@ -61,7 +63,7 @@ async function handleRenameConversation(conv: { id: string, title: string }) {
       @click="handleSessionClick(conv)"
     >
       <div class="session-content">
-        <div class="session-title">{{ conv.title || '新会话' }}</div>
+        <div class="session-title">{{ conv.name || '新会话' }}</div>
         <div class="session-preview">{{ getPreviewText(conv.messages) }}</div>
       </div>
       

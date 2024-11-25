@@ -5,7 +5,8 @@ from app.models.schemas import (
     ConversationCreate,
     ConversationResponse,
     MessageCreate,
-    MessageResponse
+    MessageResponse,
+    ConversationUpdate
 )
 from app.services import context as context_service
 from app.core.logging import app_logger
@@ -124,6 +125,32 @@ async def delete_conversation(
         return {"message": "会话已删除"}
     except DatabaseError as e:
         app_logger.error(f"删除会话失败: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
+@router.patch("/conversations/{session_id}", response_model=ConversationResponse)
+async def update_conversation(
+    session_id: str,
+    update_data: ConversationUpdate,
+    db: AsyncSession = Depends(get_db)
+):
+    """更新会话信息"""
+    try:
+        conversation = await context_service.update_conversation_name(
+            db,
+            session_id,
+            update_data.name
+        )
+        if not conversation:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="会话不存在"
+            )
+        return conversation
+    except DatabaseError as e:
+        app_logger.error(f"更新会话失败: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)

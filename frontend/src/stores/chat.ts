@@ -28,7 +28,7 @@ export const useChatStore = defineStore('chat', () => {
       const data = await ConversationAPI.getConversations()
       conversations.value = data.map((conv: any) => ({
         id: conv.session_id,
-        title: conv.title || '新会话',
+        name: conv.name || '新会话',
         messages: conv.messages || [],
         lastTime: conv.created_at,
         model: conv.model || 'gpt-3.5-turbo'
@@ -37,7 +37,7 @@ export const useChatStore = defineStore('chat', () => {
       if (conversations.value.length > 0) {
         currentConversationId.value = conversations.value[0].id
       } else {
-        await createNewConversation()
+        // await createNewConversation()
       }
     } catch (error) {
       showToast({
@@ -51,14 +51,14 @@ export const useChatStore = defineStore('chat', () => {
   }
 
   // 创建新会话
-  async function createNewConversation(title = '新会话') {
+  async function createNewConversation(name = '新会话') {
     try {
       isLoading.value = true
-      const { session_id } = await ConversationAPI.createConversation(title)
+      const { session_id } = await ConversationAPI.createConversation(name)
       
       const newConversation: Conversation = {
         id: session_id,
-        title,
+        name,
         messages: [],
         lastTime: new Date().toISOString(),
         model: 'gpt-3.5-turbo'
@@ -237,7 +237,7 @@ export const useChatStore = defineStore('chat', () => {
   async function clearConversation(id: string) {
     try {
       await showDialog({
-        title: '清空会话',
+        name: '清空会话',
         message: '确定要清空这个会话的所有消息吗？',
         showCancelButton: true
       })
@@ -264,11 +264,33 @@ export const useChatStore = defineStore('chat', () => {
   }
 
   // 重命名会话
-  async function renameConversation(id: string, title: string) {
+  async function renameConversation(id: string, name: string) {
     const conversation = conversations.value.find(conv => conv.id === id)
-    if (conversation) {
-      conversation.title = title
-      // TODO: 调用重命名 API
+    if (!conversation) return
+
+    const originalName = conversation.name
+
+    try {
+      // 乐观更新
+      conversation.name = name
+      
+      // 调用重命名API
+      await ConversationAPI.updateConversation(id, name)
+      
+      showToast({
+        type: 'success',
+        message: '重命名成功'
+      })
+    } catch (error) {
+      // 发生错误时恢复原名称
+      conversation.name = originalName
+      
+      showToast({
+        type: 'fail',
+        message: '重命名失败'
+      })
+      
+      throw error
     }
   }
 
@@ -279,7 +301,7 @@ export const useChatStore = defineStore('chat', () => {
    */
   function updateConversation(id: string, conversation: {
     session_id?: string
-    title?: string
+    name?: string
     messages?: any[]
     created_at?: string
     model?: string
@@ -294,7 +316,7 @@ export const useChatStore = defineStore('chat', () => {
       // 转换服务器数据格式为本地格式
       const updatedConversation = {
         id: conversation.session_id || conversations.value[index].id,
-        title: conversation.title || conversations.value[index].title,
+        name: conversation.name || conversations.value[index].name,
         messages: conversation.messages?.map(msg => ({
           id: msg.id || Date.now().toString(),
           role: msg.role as 'user' | 'assistant',
@@ -331,7 +353,7 @@ export const useChatStore = defineStore('chat', () => {
   async function createNewChat() {
     const conversation: Conversation = {
       id: Date.now().toString(),
-      title: '新会话',
+      name: '新会话',
       messages: [],
       lastTime: new Date().toISOString()
     }

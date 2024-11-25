@@ -11,6 +11,7 @@ class Conversation(Base):
     
     id = Column(Integer, primary_key=True, index=True)  # 对话ID
     session_id = Column(String(64), unique=True, index=True)  # 会话ID
+    name = Column(String(100), nullable=True)  # 新增name字段
     created_at = Column(DateTime, default=datetime.utcnow)  # 创建时间
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 更新时间
 

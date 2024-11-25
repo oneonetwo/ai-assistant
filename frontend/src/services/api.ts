@@ -52,6 +52,18 @@ export class ConversationAPI {
     const response = await request.delete(`${API_BASE_URL}/context/conversations/${sessionId}/context`)
     return response
   }
+
+  /**
+   * 更新会话信息
+   * @param sessionId - 会话ID
+   * @param name - 新的会话标题
+   */
+  static async updateConversation(sessionId: string, name: string) {
+    const response = await request.patch(`${API_BASE_URL}/context/conversations/${sessionId}`, {
+      name
+    })
+    return response
+  }
 }
 
 /**

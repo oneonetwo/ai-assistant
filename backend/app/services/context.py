@@ -143,4 +143,23 @@ async def delete_conversation(
         return True
     except Exception as e:
         app_logger.error(f"删除会话失败: {str(e)}")
-        raise DatabaseError(detail="删除会话失败") 
+        raise DatabaseError(detail="删除会话失败")
+
+async def update_conversation_name(
+    db: AsyncSession,
+    session_id: str,
+    name: str
+) -> Optional[Conversation]:
+    """更新会话名称"""
+    try:
+        conversation = await get_conversation(db, session_id)
+        if not conversation:
+            return None
+            
+        conversation.name = name
+        await db.commit()
+        await db.refresh(conversation)
+        return conversation
+    except Exception as e:
+        app_logger.error(f"更新会话名称失败: {str(e)}")
+        raise DatabaseError(detail="更新会话名称失败") 
