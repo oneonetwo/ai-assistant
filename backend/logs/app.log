@@ -56,3 +56,18 @@
 2024-11-22 20:45:23.301 | ERROR    | app.services.chat:process_stream_chat:171 - 处理流式聊天失败: 503: API error: 未找到相关的用户消息
 2024-11-22 20:46:16.558 | WARNING  | app.services.chat:process_stream_chat:122 - 未找到用户消息: conversation_id=32
 2024-11-22 20:46:16.559 | ERROR    | app.services.chat:process_stream_chat:147 - 处理流式聊天失败: 503: API error: 未找到相关的用户消息
+2024-11-25 17:35:29.562 | ERROR    | app.utils.cache:init:23 - Redis连接失败: module 'aioredis' has no attribute 'create_redis_pool'
+2024-11-25 17:36:28.040 | ERROR    | app.utils.cache:init:23 - Redis连接失败: module 'aioredis' has no attribute 'create_redis_pool'
+2024-11-25 17:42:50.156 | ERROR    | app.utils.cache:init:23 - Redis连接失败: module 'aioredis' has no attribute 'create_redis_pool'
+2024-11-25 17:47:17.266 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 17:47:33.363 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 17:47:54.376 | ERROR    | app.utils.cache:init:31 - Redis连接失败: Error Multiple exceptions: [Errno 10061] Connect call failed ('::1', 6379, 0, 0), [Errno 10061] Connect call failed ('127.0.0.1', 6379) connecting to localhost:6379.
+2024-11-25 17:48:43.708 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 17:52:17.776 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 17:56:33.590 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 17:57:03.348 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 17:57:05.038 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 17:57:22.838 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 17:57:24.479 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 17:57:33.600 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 18:02:06.527 | INFO     | app.utils.cache:close:37 - Redis连接已关闭

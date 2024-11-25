@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 from typing import Optional
+from pathlib import Path
 
 class Settings(BaseSettings):
     # API配置
@@ -35,6 +36,18 @@ class Settings(BaseSettings):
     MAX_CONTEXT_TURNS: int
     MAX_TOKEN_LENGTH: int
 
+    # 文件存储配置
+    UPLOAD_DIR: Path = Path("static/uploads")
+    MAX_UPLOAD_SIZE: int = 10 * 1024 * 1024  # 10MB
+    ALLOWED_DOCUMENT_TYPES: set = {
+        "text/plain", "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/epub+zip", "text/markdown"
+    }
+    ALLOWED_IMAGE_TYPES: set = {
+        "image/jpeg", "image/png", "image/webp", "image/gif"
+    }
+
     def get_database_url(self, async_url: bool = True) -> str:
         """获取数据库URL
         
@@ -43,6 +56,13 @@ class Settings(BaseSettings):
         """
         driver = "aiomysql" if async_url else "pymysql"
         return f"mysql+{driver}://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # 确保上传目录存在
+        self.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+        (self.UPLOAD_DIR / "documents").mkdir(exist_ok=True)
+        (self.UPLOAD_DIR / "images").mkdir(exist_ok=True)
 
     class Config:
         env_file = ".env"

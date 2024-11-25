@@ -13,19 +13,18 @@ from alembic import context
 from app.core.config import settings
 from app.db.models import Base
 
-# 获取alembic配置
+# this is the Alembic Config object
 config = context.config
 
-# 设置日志
-if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+# 从settings获取数据库URL（使用同步URL）
+sync_db_url = settings.get_database_url(async_url=False)
+config.set_main_option("sqlalchemy.url", sync_db_url)
 
-# 设置目标元数据
+# 设置metadata
 target_metadata = Base.metadata
 
 def run_migrations_offline() -> None:
-    """离线运行迁移"""
-    url = settings.get_database_url(async_url=False)
+    url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -37,10 +36,8 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 def run_migrations_online() -> None:
-    """在线运行迁移"""
-    # 这里直接从配置中获取数据库URL
     configuration = config.get_section(config.config_ini_section)
-    configuration["sqlalchemy.url"] = settings.get_database_url(async_url=False)
+    configuration["sqlalchemy.url"] = sync_db_url
     
     connectable = engine_from_config(
         configuration,

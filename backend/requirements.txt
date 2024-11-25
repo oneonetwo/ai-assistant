@@ -1,40 +1,55 @@
-# Webæ¡†æž¶å’Œç›¸å…³ä¾èµ–
+# Web¿ò¼ÜºÍÏà¹ØÒÀÀµ
 fastapi>=0.110.0
 uvicorn[standard]>=0.27.1
 python-multipart>=0.0.9
 
-# æ•°æ®éªŒè¯å’Œé…ç½®
+# Êý¾ÝÑéÖ¤ºÍÅäÖÃ
 pydantic>=2.6.3
 pydantic-settings>=2.2.1
 python-dotenv>=1.0.1
 
-# æ•°æ®åº“ç›¸å…³
+# Êý¾Ý¿âÏà¹Ø
 sqlalchemy>=2.0.27
 alembic>=1.13.1
 aiomysql>=0.2.0
 pymysql>=1.1.0
 
-# ç¼“å­˜
-redis>=5.0.1
+# »º´æ
+redis>=4.2.0
 aioredis>=2.0.1
 
-# AIæ¨¡åž‹å®¢æˆ·ç«¯
+# AIÄ£ÐÍ¿Í»§¶Ë
 openai>=1.12.0
 httpx>=0.27.0
 
-# æ—¥å¿—
+# ÈÕÖ¾
 loguru>=0.7.2
 
-# å·¥å…·åŒ…
-python-jose[cryptography]>=3.3.0  # JWTç›¸å…³
-passlib[bcrypt]>=1.7.4  # å¯†ç å“ˆå¸Œ
-python-dateutil>=2.8.2  # æ—¥æœŸå¤„ç†
-email-validator>=2.1.0  # é‚®ä»¶éªŒè¯
+# ¹¤¾ß°ü
+python-jose[cryptography]>=3.3.0  # JWTÏà¹Ø
+passlib[bcrypt]>=1.7.4  # ÃÜÂë¹þÏ£
+python-dateutil>=2.8.2  # ÈÕÆÚ´¦Àí
+email-validator>=2.1.0  # ÓÊ¼þÑéÖ¤
 
-# å¼€å‘å·¥å…·
-black>=24.2.0  # ä»£ç æ ¼å¼åŒ–
-isort>=5.13.2  # importæŽ’åº
-flake8>=7.0.0  # ä»£ç æ£€æŸ¥
-pytest>=8.0.2  # æµ‹è¯•æ¡†æž¶
-pytest-asyncio>=0.23.5  # å¼‚æ­¥æµ‹è¯•æ”¯æŒ
-pytest-cov>=4.1.0  # æµ‹è¯•è¦†ç›–çŽ‡
+# ¿ª·¢¹¤¾ß
+black>=24.2.0  # ´úÂë¸ñÊ½»¯
+isort>=5.13.2  # importÅÅÐò
+flake8>=7.0.0  # ´úÂë¼ì²é
+pytest>=8.0.2  # ²âÊÔ¿ò¼Ü
+pytest-asyncio>=0.23.5  # Òì²½²âÊÔÖ§³Ö
+pytest-cov>=4.1.0  # ²âÊÔ¸²¸ÇÂÊ
+
+# ÎÄ¼þ´¦Àí
+python-magic>=0.4.27
+python-docx>=0.8.11
+PyPDF2>=3.0.0
+EbookLib>=0.18
+markdown>=3.4
+pillow>=10.0.0
+
+# ÎÄ¼þ´æ´¢
+aiofiles>=23.1.0
+python-multipart>=0.0.9
+
+# OCRÖ§³Ö
+pytesseract>=0.3.10

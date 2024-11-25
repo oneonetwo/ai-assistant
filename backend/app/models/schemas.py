@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, field_validator
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from datetime import datetime
 import uuid
 import re
@@ -62,3 +62,36 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     session_id: str = Field(..., description="会话ID")
     response: str = Field(..., description="AI回复") 
+
+class DocumentAnalysisResponse(BaseModel):
+    file_id: str
+    original_name: str
+    analysis: str
+
+class MultiDocumentAnalysisResponse(BaseModel):
+    individual_analyses: List[Dict[str, Any]]
+    comparison_analysis: str
+
+class AnalysisRecord(BaseModel):
+    id: int
+    file_id: str
+    analysis_type: str
+    result: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True 
+
+class ImageMetadata(BaseModel):
+    format: str
+    mode: str
+    size: tuple[int, int]
+    width: int
+    height: int
+
+class ImageAnalysisResponse(BaseModel):
+    file_id: str
+    original_name: str
+    metadata: ImageMetadata
+    analysis: str
+    extracted_text: Optional[str] = None 

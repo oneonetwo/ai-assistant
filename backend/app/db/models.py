@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, BigInteger
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 from sqlalchemy.orm import relationship
@@ -31,3 +31,25 @@ class Message(Base):
     # 添加与 Conversation 的关系
     conversation = relationship("Conversation", back_populates="messages")
     parent_message = relationship("Message", remote_side=[id], backref="child_messages")
+
+class File(Base):
+    __tablename__ = "files"
+    
+    id = Column(Integer, primary_key=True)
+    file_id = Column(String(64), unique=True, index=True)
+    original_name = Column(String(255))
+    file_path = Column(String(512))
+    file_type = Column(String(50))  # document/image
+    mime_type = Column(String(100))
+    file_size = Column(BigInteger)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    user_session_id = Column(String(64), index=True)
+
+class AnalysisRecord(Base):
+    __tablename__ = "analysis_records"
+    
+    id = Column(Integer, primary_key=True)
+    file_id = Column(String(64), ForeignKey("files.file_id"))
+    analysis_type = Column(String(50))  # document/image/text
+    result = Column(Text)
+    created_at = Column(DateTime, default=datetime.utcnow)
