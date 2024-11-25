@@ -29,7 +29,8 @@ export default defineConfig(({ mode }) => {
         scss: {
           sassOptions: {
             outputStyle: 'compressed'
-          }
+          },
+          additionalData: `@use "@/styles/mixins.scss" as *;`
         }
       }
     },

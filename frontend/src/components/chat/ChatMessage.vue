@@ -1,91 +1,146 @@
 <template>
-  <div class="message" :class="{ 'message-ai': message.role === 'assistant' }">
-    <div class="message-content">
-      <div class="markdown-body" v-html="renderedContent"></div>
+  <div class="message" :class="message.role">
+    <div class="avatar">
+      {{ message.role === 'assistant' ? 'AI' : '你' }}
+    </div>
+    <div class="content">
+      <div class="bubble">
+        <div class="markdown-body" v-html="renderedContent" />
+      </div>
+      <Transition name="fade">
+        <div v-if="showActions" class="actions">
+          <van-button size="mini" @click="$emit('quote', message)">
+            <template #icon><svg-icon name="quote" /></template>
+            引用
+          </van-button>
+          <van-button size="mini" @click="handleCopy">
+            <template #icon><svg-icon name="copy" /></template>
+            复制
+          </van-button>
+          <van-button size="mini" @click="$emit('edit', message)">
+            <template #icon><svg-icon name="edit" /></template>
+            编辑
+          </van-button>
+        </div>
+      </Transition>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
+import { computed, watch } from 'vue'
 
-interface Props {
+
+
+const props = defineProps<{
   message: {
     id: string
     role: 'user' | 'assistant'
     content: string
-    timestamp: number
-    status: string
   }
-}
+}>()
 
-const props = defineProps<Props>()
-
-// 配置 markdown-it
 const md = new MarkdownIt({
-  html: true,
-  breaks: true,
-  linkify: true,
-  highlight: function (str: string, lang: string) {
+  highlight: function (str, lang) {
     if (lang && hljs.getLanguage(lang)) {
       try {
-        const highlighted = hljs.highlight(str, { 
-          language: lang,
-          ignoreIllegals: true 
-        }).value
-        
-        return `
-          <div class="code-block">
-            <div class="code-header">
-              <span class="language">${lang}</span>
-              <button class="copy-button" onclick="navigator.clipboard.writeText(\`${str.replace(/`/g, '\\`')}\`)">
-                复制代码
-              </button>
-            </div>
-            <pre><code class="hljs language-${lang}">${highlighted}</code></pre>
-          </div>`
-      } catch (__) {
-        console.log('highlight error:', __)
-      }
+        return hljs.highlight(str, { language: lang }).value
+      } catch (__) {}
     }
-    return `<pre><code>${md.utils.escapeHtml(str)}</code></pre>`
+    return '' // 使用默认的转义
   }
 })
 
-// 渲染 Markdown 内容
 const renderedContent = computed(() => {
-  if (!props.message?.content) return ''
   return md.render(props.message.content)
+})
+
+//  监听message
+watch(() => props.message, () => {
+  console.log('message>>>>>>>>>>>', props.message)
 })
 </script>
 
-<style lang="scss">
-
+<style lang="scss" scoped>
 .message {
-  padding: 16px;
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  animation: fade-in 0.3s var(--message-animation-timing);
   
-  &-ai {
-    background: var(--van-background-2);
-  }
-  
-  &-content {
-    max-width: 800px;
-    margin: 0 auto;
+  &.user {
+    flex-direction: row-reverse;
     
-    .markdown-body {
-      font-size: 15px;
-      line-height: 1.6;
+    .content {
+      align-items: flex-end;
       
-      p {
-        margin: 8px 0;
+      .bubble {
+        background: var(--chat-user-bg);
+        color: var(--chat-user-text);
+        border-radius: var(--chat-border-radius) 0 var(--chat-border-radius) var(--chat-border-radius);
       }
       
-      pre {
-        margin: 16px 0;
+      .actions {
+        justify-content: flex-end;
       }
     }
   }
+  
+  .content {
+    flex: 1;
+    max-width: 85%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    
+    .bubble {
+      padding: 12px 16px;
+      background: var(--chat-ai-bg);
+      color: var(--chat-ai-text);
+      border-radius: 0 var(--chat-border-radius) var(--chat-border-radius) var(--chat-border-radius);
+      word-break: break-word;
+      
+      :deep(.markdown-body) {
+        font-size: 14px;
+        line-height: 1.6;
+        
+        pre {
+          margin: 12px 0;
+          padding: 12px;
+          border-radius: 4px;
+          background: var(--code-background);
+          overflow-x: auto;
+          
+          code {
+            font-family: var(--van-font-family-code);
+            font-size: 13px;
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity var(--message-animation-duration) var(--message-animation-timing);
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

@@ -1,6 +1,7 @@
 export interface Message {
   id: string
   role: 'user' | 'assistant'
+  parent_message_id?: string
   content: string
   timestamp: number
   status?: 'sending' | 'success' | 'error'

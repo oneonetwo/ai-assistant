@@ -1,0 +1,67 @@
+// 基础变量
+$max-width: 48rem;
+$header-height: 3rem;
+$sidebar-width: 260px;
+$radius-sm: 0.375rem;
+$radius-md: 0.5rem;
+$radius-lg: 0.75rem;
+
+// 间距
+$spacing-xs: 0.5rem;
+$spacing-sm: 0.75rem;
+$spacing-md: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 2rem;
+
+// 字体大小
+$font-size-xs: 0.75rem;
+$font-size-sm: 0.875rem;
+$font-size-md: 1rem;
+$font-size-lg: 1.125rem;
+$font-size-xl: 1.25rem;
+
+// 动画
+$transition-normal: all 0.3s ease;
+$bounce-timing: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+// 导出为 CSS 变量
+:root {
+  --max-width: #{$max-width};
+  --header-height: #{$header-height};
+  --sidebar-width: #{$sidebar-width};
+  --radius-sm: #{$radius-sm};
+  --radius-md: #{$radius-md};
+  --radius-lg: #{$radius-lg};
+  
+  --spacing-xs: #{$spacing-xs};
+  --spacing-sm: #{$spacing-sm};
+  --spacing-md: #{$spacing-md};
+  --spacing-lg: #{$spacing-lg};
+  --spacing-xl: #{$spacing-xl};
+  
+  --font-size-xs: #{$font-size-xs};
+  --font-size-sm: #{$font-size-sm};
+  --font-size-md: #{$font-size-md};
+  --font-size-lg: #{$font-size-lg};
+  --font-size-xl: #{$font-size-xl};
+  
+  --transition-normal: #{$transition-normal};
+  --bounce-timing: #{$bounce-timing};
+  
+  // 布局
+  --sidebar-width: 300px;
+  --header-height: 60px;
+  --footer-height: 60px;
+  
+  // 颜色
+  --primary-color: var(--van-primary-color);
+  --success-color: var(--van-success-color);
+  --warning-color: var(--van-warning-color);
+  --danger-color: var(--van-danger-color);
+  
+  // 消息样式
+  --user-msg-bg: var(--van-background-2);
+  --ai-msg-bg: var(--van-background);
+  --ai-avatar-bg: var(--van-primary-color);
+  --ai-avatar-color: #fff;
+} 

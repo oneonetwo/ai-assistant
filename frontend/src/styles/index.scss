@@ -1,10 +1,11 @@
-@import './variable.scss';
+@use './variable.scss' as *;
+@use './variables.scss' as *;
+@use './mixins.scss' as *; 
+@use './theme.scss' as *;
+@use './highlight.scss' as *;
+@use './global.scss' as *;
 
-@import './theme.scss';
 
-@import './highlight.scss';
-
-@import './global.scss';
 
 :root {
   color-scheme: dark;

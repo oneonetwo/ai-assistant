@@ -2,6 +2,17 @@
 import { ref } from 'vue'
 import { showToast } from 'vant'
 
+interface Message {
+  id: string
+  role: 'user' | 'assistant'
+  content: string
+  error?: string
+  quote?: {
+    code: string
+    language: string
+  }
+}
+
 const props = defineProps<{
   message: Message
   show: boolean
@@ -29,37 +40,32 @@ function handleSave() {
 <template>
   <van-popup
     :show="show"
-    @update:show="$emit('update:show', $event)"
     position="bottom"
     :style="{ height: '50%' }"
+    round
+    closeable
+    @update:show="$emit('update:show', $event)"
   >
     <div class="message-editor">
       <div class="editor-header">
-        <span>编辑消息</span>
-        <van-button 
-          plain 
-          size="small"
-          @click="$emit('update:show', false)"
-        >
-          取消
-        </van-button>
+        <span class="title">编辑消息</span>
       </div>
       
       <div class="editor-content">
         <van-field
           v-model="editContent"
           type="textarea"
-          rows="6"
+          rows="10"
           autosize
-          maxlength="2000"
-          show-word-limit
+          placeholder="请输入消息内容"
         />
       </div>
       
       <div class="editor-footer">
-        <van-button
-          block
+        <van-button 
+          block 
           type="primary"
+          :loading="loading"
           @click="handleSave"
         >
           保存
@@ -74,24 +80,30 @@ function handleSave() {
   height: 100%;
   display: flex;
   flex-direction: column;
-}
-
-.editor-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--van-padding-sm);
-  border-bottom: 1px solid var(--van-border-color);
-}
-
-.editor-content {
-  flex: 1;
-  padding: var(--van-padding-sm);
-  overflow-y: auto;
-}
-
-.editor-footer {
-  padding: var(--van-padding-sm);
-  border-top: 1px solid var(--van-border-color);
+  padding: 16px;
+  
+  .editor-header {
+    text-align: center;
+    margin-bottom: 16px;
+    
+    .title {
+      font-size: 16px;
+      font-weight: 500;
+    }
+  }
+  
+  .editor-content {
+    flex: 1;
+    overflow-y: auto;
+    
+    :deep(.van-field__control) {
+      height: 100%;
+      resize: none;
+    }
+  }
+  
+  .editor-footer {
+    margin-top: 16px;
+  }
 }
 </style> 

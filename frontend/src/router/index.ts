@@ -7,35 +7,41 @@ import { useChatStore } from '@/stores/chat'
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    name: 'chat',
-    component: ChatView,
-    meta: {
-      title: 'AI 助手'
-    }
-  },
-  {
-    path: '/share/:id',
-    name: 'share',
-    component: () => import('@/views/ShareView.vue'),
-    meta: {
-      title: '分享对话'
-    }
-  },
-  {
-    path: '/snippets',
-    name: 'snippets',
-    component: () => import('@/views/SnippetsView.vue'),
-    meta: {
-      title: '代码片段'
-    }
-  },
-  {
-    path: '/settings',
-    name: 'settings', 
-    component: () => import('@/views/SettingsView.vue'),
-    meta: {
-      title: '设置'
-    }
+    component: () => import('@/components/layout/ChatLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'chat',
+        component: ChatView,
+        meta: {
+          title: 'AI 助手'
+        }
+      },
+      {
+        path: '/share/:id',
+        name: 'share',
+        component: () => import('@/views/ShareView.vue'),
+        meta: {
+          title: '分享对话'
+        }
+      },
+      {
+        path: '/snippets',
+        name: 'snippets',
+        component: () => import('@/views/SnippetsView.vue'),
+        meta: {
+          title: '代码片段'
+        }
+      },
+      {
+        path: '/settings',
+        name: 'settings',
+        component: () => import('@/views/SettingsView.vue'),
+        meta: {
+          title: '设置'
+        }
+      }
+    ]
   },
   {
     path: '/:pathMatch(.*)*',

@@ -1,353 +1,135 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
 import { useChatStore } from '@/stores/chat'
-import { useThemeStore } from '@/stores/theme'
+import { storeToRefs } from 'pinia'
 import { showDialog, showToast } from 'vant'
-import ExportDialog from './ExportDialog.vue'
-import { ConversationAPI } from '@/services/api'
 
 const chatStore = useChatStore()
-const themeStore = useThemeStore()
-const editingId = ref<string | null>(null)
-const editingTitle = ref('')
-const searchKeyword = ref('')
-const showExportDialog = ref(false)
+const { conversations, currentConversationId } = storeToRefs(chatStore)
 
-function startEditing(conv: { id: string; title: string }) {
-  editingId.value = conv.id
-  editingTitle.value = conv.title
+// 格式化预览文本
+function getPreviewText(messages: any[]) {
+  if (!messages?.length) return '暂无消息'
+  const lastMessage = messages[messages.length - 1]
+  return lastMessage.content.slice(0, 50) + (lastMessage.content.length > 50 ? '...' : '')
 }
 
-function handleTitleSubmit() {
-  if (editingId.value) {
-    chatStore.updateConversationTitle(editingId.value, editingTitle.value)
-    editingId.value = null
-  }
-}
-
-function handleTitleKeydown(event: KeyboardEvent) {
-  if (event.key === 'Enter') {
-    event.preventDefault()
-    handleTitleSubmit()
-  } else if (event.key === 'Escape') {
-    editingId.value = null
-  }
-}
-
-// 过滤会话列表
-const filteredConversations = computed(() => {
-  if (!searchKeyword.value) return chatStore.conversations
-  
-  const keyword = searchKeyword.value.toLowerCase()
-  return chatStore.conversations.filter(conv => {
-    // 搜索标题
-    if (conv.title.toLowerCase().includes(keyword)) return true
-    // 搜索消息内容
-    return conv.messages.some(msg => 
-      msg.content.toLowerCase().includes(keyword)
-    )
-  })
-})
-
-// 处理会话删除
-async function handleDeleteConversation(conv: { id: string, title: string }) {
-  try {
-    // await showDialog({
-    //   title: '删除会话',
-    //   message: `确定要删除 "${conv.title}" 吗？`,
-    //   showCancelButton: true
-    // })
-    await chatStore.deleteConversation(conv.id)
-    
-    showToast({
-      type: 'success',
-      message: '删除成功'
-    })
-  } catch (error) {
-    if (error?.['cancel']) return // 用户取消删除
-    
-    showToast({
-      type: 'fail',
-      message: '删除失败'
-    })
-  }
-}
-
-// 显示更多操作菜单
-function showMoreActions(conv: { id: string, title: string }) {
-  showDialog({
-    title: '会话操作',
-    message: `选择要对 "${conv.title}" 执行的操作`,
-    showCancelButton: true,
-    confirmButtonText: '清空消息',
-    cancelButtonText: '删除会话',
-    onConfirm: () => handleClearConversation(conv),
-    onCancel: () => handleDeleteConversation(conv)
-  })
-}
-
-// 清空会话消息
-async function handleClearConversation(conv: { id: string, title: string }) {
-  try {
-    // await showDialog({
-    //   title: '清空会话',
-    //   message: `确定要清空 "${conv.title}" 的所有消息吗？`,
-    //   showCancelButton: true
-    // })
-    
-    await chatStore.clearConversation(conv.id)
-    
-    showToast({
-      type: 'success',
-      message: '清空成功'
-    })
-  } catch (error) {
-    if (error?.['cancel']) return // 用户取消清空
-    
-    showToast({
-      type: 'fail',
-      message: '清空失败'
-    })
-  }
-}
-
-// 添加获取会话详情的方法
+// 处理会话点击
 async function handleSessionClick(conv: { id: string }) {
   try {
-    // 先切换当前会话 ID
     chatStore.currentConversationId = conv.id
-    
-    // 获取最新的会话数据
-    const conversation = await ConversationAPI.getConversation(conv.id)
-    
-    // 更新 store 中的会话数据
-    chatStore.updateConversation(conv.id, conversation)
   } catch (error) {
-    showToast({
-      type: 'fail',
-      message: '获取会话数据失败'
+    showToast('加载会话失败')
+  }
+}
+
+// 删除会话
+async function handleDeleteConversation(conv: { id: string }) {
+  try {
+    await showDialog({
+      title: '删除会话',
+      message: '确定要删除这个会话吗？',
+      showCancelButton: true
     })
+    
+    await chatStore.deleteConversation(conv.id)
+    showToast('删除成功')
+  } catch (error) {
+    // 用户取消或删除失败
+  }
+}
+
+// 重命名会话
+async function handleRenameConversation(conv: { id: string, title: string }) {
+  const newTitle = window.prompt('请输入新的会话名称:', conv.title)
+  if (!newTitle) return
+  
+  try {
+    await chatStore.renameConversation(conv.id, newTitle)
+    showToast('重命名成功')
+  } catch (error) {
+    showToast('重命名失败')
   }
 }
 </script>
 
 <template>
   <div class="conversation-list">
-    <div class="header">
-      <van-button 
-        block 
-        class="new-chat-btn"
-        @click="chatStore.createNewConversation"
-      >
-        <template #icon>
-          <van-icon name="plus" />
-        </template>
-        新建会话
-      </van-button>
-    </div>
-
-    <div class="search-bar">
-      <van-search
-        v-model="searchKeyword"
-        placeholder="搜索会话历史"
-        shape="round"
-      />
-    </div>
-
-    <div class="sessions">
-      <div
-        v-for="conv in filteredConversations"
-        :key="conv.id"
-        class="session-item"
-        :class="{ active: conv.id === chatStore.currentConversationId }"
-        @click="handleSessionClick(conv)"
-      >
-        <div class="session-icon">
-          <van-icon name="chat-o" />
-        </div>
-        <div class="session-info">
-          <div class="session-title">{{ conv.title || '新会话' }}</div>
-          <div class="session-preview">
-            {{ conv.messages[conv.messages.length - 1]?.content.slice(0, 30) || '暂无消息' }}
-          </div>
-        </div>
-        <div class="session-actions">
-          <van-button
-            size="mini"
-            icon="ellipsis"
-            @click.stop="showMoreActions(conv)"
-          />
-        </div>
+    <div v-for="conv in conversations" 
+      :key="conv.id"
+      class="session-item"
+      :class="{ active: conv.id === currentConversationId }"
+      @click="handleSessionClick(conv)"
+    >
+      <div class="session-content">
+        <div class="session-title">{{ conv.title || '新会话' }}</div>
+        <div class="session-preview">{{ getPreviewText(conv.messages) }}</div>
       </div>
-    </div>
-
-    <div class="footer">
-      <van-button
-        block
-        class="theme-toggle"
-        @click="themeStore.toggleTheme"
-      >
-        <template #icon>
-          <van-icon :name="themeStore.isDark ? 'sunny-o' : 'moon-o'" />
-        </template>
-        {{ themeStore.isDark ? '浅色模式' : '深色模式' }}
-      </van-button>
+      
+      <div class="session-actions">
+        <van-button 
+          size="mini"
+          icon="edit"
+          @click.stop="handleRenameConversation(conv)"
+        />
+        <van-button
+          size="mini"
+          icon="delete"
+          @click.stop="handleDeleteConversation(conv)"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .conversation-list {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  background: var(--van-background);
-  border-right: 1px solid var(--van-border-color);
-}
+  padding: 8px;
 
-.header {
-  padding: 0.75rem;
-  border-bottom: 1px solid var(--van-border-color);
-}
-
-.new-chat-btn {
-  height: 2.75rem;
-  border: 1px solid var(--van-border-color);
-  border-radius: var(--radius-md);
-  background: var(--van-background);
-  color: var(--van-text-color);
-  font-size: 0.875rem;
-  
-  &:hover {
-    background: var(--van-active-color);
-  }
-  
-  :deep(.van-icon) {
-    font-size: 1rem;
-  }
-}
-
-.search-bar {
-  padding: 0.5rem;
-  border-bottom: 1px solid var(--van-border-color);
-  
-  :deep(.van-search) {
-    padding: 0;
-    background: transparent;
-  }
-  
-  :deep(.van-search__content) {
-    background: var(--van-active-color);
-  }
-}
-
-.sessions {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0.5rem;
-}
-
-.session-item {
-  display: flex;
-  align-items: center;
-  padding: 0.75rem;
-  margin-bottom: 0.25rem;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: var(--transition-normal);
-  
-  &:hover {
-    background: var(--van-active-color);
-    
-    .session-actions {
-      opacity: 1;
-    }
-  }
-  
-  &.active {
-    background: var(--van-primary-color-light);
-    
-    .session-icon {
-      color: var(--van-primary-color);
-    }
-  }
-}
-
-.session-icon {
-  width: 1.5rem;
-  height: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 0.75rem;
-  color: var(--van-text-color-2);
-  
-  :deep(.van-icon) {
-    font-size: 1.25rem;
-  }
-}
-
-.session-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.session-title {
-  font-size: 0.875rem;
-  font-weight: 500;
-  margin-bottom: 0.25rem;
-  color: var(--van-text-color);
-}
-
-.session-preview {
-  font-size: 0.75rem;
-  color: var(--van-text-color-2);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.session-actions {
-  opacity: 0;
-  transition: var(--transition-normal);
-  
-  :deep(.van-button) {
-    color: var(--van-text-color-2);
-    background: transparent;
-    border: none;
+  .session-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 4px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
     
     &:hover {
-      color: var(--van-text-color);
+      background: var(--van-active-color);
     }
-  }
-}
-
-.footer {
-  padding: 0.75rem;
-  border-top: 1px solid var(--van-border-color);
-}
-
-.theme-toggle {
-  height: 2.75rem;
-  border: 1px solid var(--van-border-color);
-  border-radius: var(--radius-md);
-  background: var(--van-background);
-  color: var(--van-text-color);
-  font-size: 0.875rem;
-  
-  &:hover {
-    background: var(--van-active-color);
-  }
-  
-  :deep(.van-icon) {
-    font-size: 1rem;
-  }
-}
-
-// 移动端适配
-@media (max-width: 768px) {
-  .session-actions {
-    opacity: 1;
+    
+    &.active {
+      background: var(--van-active-color);
+    }
+    
+    .session-content {
+      flex: 1;
+      min-width: 0;
+      
+      .session-title {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 4px;
+        @include text-ellipsis;
+      }
+      
+      .session-preview {
+        font-size: 12px;
+        color: var(--van-text-color-2);
+        @include text-ellipsis;
+      }
+    }
+    
+    .session-actions {
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    
+    &:hover .session-actions {
+      opacity: 1;
+    }
   }
 }
 </style> 

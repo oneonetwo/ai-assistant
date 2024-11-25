@@ -1,28 +1,26 @@
 import { defineStore } from 'pinia'
-import { ref, watch } from 'vue'
 
-export const useThemeStore = defineStore('theme', () => {
-  const isDark = ref(true)
+export const useThemeStore = defineStore('theme', {
+  state: () => ({
+    isDark: true
+  }),
   
-  // 监听系统主题变化
-  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-  function updateTheme(e: MediaQueryListEvent | MediaQueryList) {
-    // isDark.value = e.matches
-    document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light')
-  }
+  actions: {
+    toggleTheme() {
+      this.isDark = !this.isDark
+      this.applyTheme()
+    },
+
+    applyTheme() {
+      // 更新 document 的 data-theme 属性
+      document.documentElement.setAttribute('data-theme', this.isDark ? 'dark' : 'light')
+    },
+
+    // 初始化主题
+    initTheme() {
+      this.applyTheme()
+    }
+  },
   
-  // 初始化主题
-  updateTheme(mediaQuery)
-  mediaQuery.addEventListener('change', updateTheme)
-  
-  // 手动切换主题
-  function toggleTheme() {
-    isDark.value = !isDark.value
-    document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light')
-  }
-  
-  return {
-    isDark,
-    toggleTheme
-  }
+  persist: true
 }) 

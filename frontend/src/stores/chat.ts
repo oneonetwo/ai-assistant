@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { showToast, showDialog } from 'vant'
 import { ConversationAPI, ChatClient } from '@/services/api'
 import type { Message, Conversation, MessageStatus } from '@/types/chat'
+import { generateUUID } from '@/utils/generateUUID'
 
 export const useChatStore = defineStore('chat', () => {
   // 状态
@@ -114,7 +115,8 @@ export const useChatStore = defineStore('chat', () => {
 
       // 创建助手消息占位
       const assistantMessage: Message = {
-        id: Date.now().toString(),
+        id: generateUUID(),
+        parent_message_id: userMessage.id,
         role: 'assistant',
         content: '',
         timestamp: Date.now(),
@@ -135,21 +137,10 @@ export const useChatStore = defineStore('chat', () => {
           userMessage.status = 'success'
         },
         onChunk: (chunk: string) => {
-          console.log('onChunk>>>>>>>>>>>', chunk)
-          // Find the message in the conversation
-          const messageIndex = conversation.messages.findIndex(msg => msg.id === assistantMessage.id)
-          if (messageIndex !== -1) {
-            // Create a new message object with updated content
-            const updatedMessage = {
-              ...conversation.messages[messageIndex],
-              content: conversation.messages[messageIndex].content + chunk
-            }
-            // Replace the message in the array
-            conversation.messages.splice(messageIndex, 1, updatedMessage)
-          }
+          updateMessageContent(currentConversationId.value!, assistantMessage.id, chunk)
         },
         onEnd: () => {
-          console.log('onEnd>>>>>>>>>>>',)
+          console.log('onEnd>>>>>>>>>>>')
           // 更新消息状态
           assistantMessage.status = 'success'
           // 更新会话时间
@@ -336,6 +327,35 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
+  // 新建会话
+  async function createNewChat() {
+    const conversation: Conversation = {
+      id: Date.now().toString(),
+      title: '新会话',
+      messages: [],
+      lastTime: new Date().toISOString()
+    }
+    
+    conversations.value.unshift(conversation)
+    currentConversationId.value = conversation.id
+  }
+
+  // 添加新的 action
+  function updateMessageContent(conversationId: string, messageId: string, content: string) {
+    const conversation = conversations.value.find(conv => conv.id === conversationId)
+    if (!conversation) return
+
+    const messageIndex = conversation.messages.findIndex(msg => msg.id === messageId)
+    if (messageIndex === -1) return
+
+    // 创建新的消息数组并更新内容
+    conversation.messages = conversation.messages.map((msg, index) => 
+      index === messageIndex 
+        ? { ...msg, content: msg.content + content }
+        : msg
+    )
+  }
+
   return {
     conversations,
     currentConversationId,
@@ -350,6 +370,7 @@ export const useChatStore = defineStore('chat', () => {
     deleteConversation,
     clearConversation,
     renameConversation,
-    updateConversation
+    updateConversation,
+    createNewChat
   }
 })
