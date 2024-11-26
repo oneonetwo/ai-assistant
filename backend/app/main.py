@@ -1,10 +1,12 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.logging import setup_logging
 from app.db.database import engine
 from app.db.models import Base
-from app.api.v1 import context, chat, image_analysis, document_analysis
+from app.api.v1 import context, chat, image_analysis, document_analysis, upload
 from app.middleware.upload import validate_upload_size
 from app.utils.cache import cache_manager
 
@@ -37,8 +39,21 @@ setup_logging()
 # 添加中间件
 app.middleware("http")(validate_upload_size)
 
+# 添加静态文件服务
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# 添加CORS中间件
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # 注册路由
 app.include_router(context.router, prefix=settings.API_V1_PREFIX)
 app.include_router(chat.router, prefix=settings.API_V1_PREFIX)
 app.include_router(image_analysis.router, prefix=settings.API_V1_PREFIX)
 app.include_router(document_analysis.router, prefix=settings.API_V1_PREFIX)
+app.include_router(upload.router, prefix="/api/v1")

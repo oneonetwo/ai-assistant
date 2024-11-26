@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.database import get_db
 from app.services.image_service import image_service
 from app.services.file_service import file_service
-from app.models.schemas import ImageAnalysisResponse
+from app.models.schemas import ImageAnalysisResponse, ImageAnalysisRequest
 from app.middleware.upload import require_file_type
 from app.core.config import settings
 from pathlib import Path
@@ -12,32 +12,20 @@ from pathlib import Path
 router = APIRouter(prefix="/image-analysis", tags=["image-analysis"])
 
 @router.post("/analyze", response_model=ImageAnalysisResponse)
-@require_file_type(*settings.ALLOWED_IMAGE_TYPES)
 async def analyze_image(
-    file: UploadFile = File(...),
-    query: Optional[str] = None,
-    extract_text: bool = Query(False, description="是否提取图片中的文字"),
-    system_prompt: Optional[str] = None,
-    session_id: str = Query(..., description="用户会话ID"),
+    request: ImageAnalysisRequest,
     db: AsyncSession = Depends(get_db)
 ):
     """分析图片"""
     try:
-        # 保存文件
-        saved_file = await file_service.save_file(
-            file=file,
-            file_type="image",
-            db=db,
-            session_id=session_id
-        )
-        
         # 分析图片
-        result = await image_service.analyze_image(
+        result = await image_service.analyze_image_from_url(
             db=db,
-            file_id=saved_file.file_id,
-            query=query,
-            extract_text=extract_text,
-            system_prompt=system_prompt
+            image_url=request.url,
+            query=request.query,
+            extract_text=request.extract_text,
+            system_prompt=request.system_prompt,
+            session_id=request.session_id
         )
         
         return ImageAnalysisResponse(**result)

@@ -9,6 +9,15 @@ import json
 import asyncio
 from contextlib import asynccontextmanager
 from tenacity import retry, stop_after_attempt, wait_exponential
+import redis.asyncio as redis
+
+# 初始化 Redis 客户端
+redis_client = redis.Redis(
+    host=settings.REDIS_HOST,
+    port=settings.REDIS_PORT,
+    db=settings.REDIS_DB,
+    decode_responses=True
+)
 
 class AIClient:
     """通义千问API客户端增强版"""
@@ -22,6 +31,21 @@ class AIClient:
         self._active_streams = {}
         self._initialized_sessions = set()
         self._response_cache = cache_manager.get_cache('ai_responses')
+        self.initialized_sessions = set()
+        self.api_key = settings.QWEN_API_KEY
+        self.api_url = settings.QWEN_API_URL
+        self.api_timeout = settings.QWEN_API_TIMEOUT
+        self.redis_client = redis_client
+
+    def is_session_initialized(self, session_id: str) -> bool:
+        """检查会话是否已初始化"""
+        return session_id in self.initialized_sessions
+
+    async def init_session(self, session_id: str):
+        """初始化会话"""
+        if not self.is_session_initialized(session_id):
+            # 可以在这里添加任何必要的会话初始化逻辑
+            self.initialized_sessions.add(session_id)
 
     @retry(
         stop=stop_after_attempt(3),
@@ -205,7 +229,7 @@ class AIClient:
 
     async def analyze_image(
         self,
-        image_base64: str,
+        image_url: str,
         query: str,
         system_prompt: Optional[str] = None,
         extracted_text: Optional[str] = None,
@@ -216,7 +240,7 @@ class AIClient:
             # 构建消息内容
             content = [
                 {"type": "text", "text": f"分析要求：{query}"},
-                {"type": "image", "image": image_base64}
+                {"type": "image_url", "image_url": image_url}
             ]
 
             if extracted_text:
@@ -250,6 +274,46 @@ class AIClient:
         except Exception as e:
             app_logger.error(f"图片分析失败: {str(e)}")
             raise APIError(f"图片分析失败: {str(e)}")
+
+    async def initialize_stream(self, session_id: str, messages: List[Dict[str, str]]):
+        """初始化流式响应"""
+        try:
+            # 清理现有的流
+            await self.cleanup_stream(session_id)
+            
+            # 创建新的流式响应
+            stream = await self._make_api_call(
+                messages=messages,
+                stream=True
+            )
+            
+            # 存储流
+            self._active_streams[session_id] = stream
+            
+        except Exception as e:
+            app_logger.error(f"初始化流式响应失败: {str(e)}")
+            raise APIError(f"初始化流式响应失败: {str(e)}")
+
+    async def get_stream_response(self, session_id: str) -> AsyncGenerator[str, None]:
+        """获取流式响应"""
+        try:
+            stream = self._active_streams.get(session_id)
+            if not stream:
+                raise APIError("未找到活动的流式响应")
+            
+            async for chunk in stream:
+                if chunk.choices[0].delta.content is not None:
+                    yield chunk.choices[0].delta.content
+                
+        except Exception as e:
+            app_logger.error(f"获取流式响应失败: {str(e)}")
+            raise APIError(f"获取流式响应失败: {str(e)}")
+        
+    async def cleanup_stream(self, session_id: str):
+        """清理指定会话的流"""
+        if session_id in self._active_streams:
+            # 从活动流中移除
+            del self._active_streams[session_id]
 
 # 创建全局AI客户端实例
 ai_client = AIClient() 

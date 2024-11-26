@@ -10,6 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 import base64
 import io
+from app.core.config import settings
+import aiohttp
 
 class ImageService:
     """图片处理服务"""
@@ -27,7 +29,7 @@ class ImageService:
     def _process_image_worker(self, file_path: Path) -> Tuple[str, Dict[str, Any]]:
         """图片处理工作函数"""
         with Image.open(file_path) as img:
-            # 获取图片元数据
+            # 获��图片元数据
             metadata = {
                 "format": img.format,
                 "mode": img.mode,
@@ -145,6 +147,47 @@ class ImageService:
         except Exception as e:
             app_logger.error(f"图片分析失败: {str(e)}")
             raise
+
+    async def analyze_image_from_url(
+        self,
+        db: AsyncSession,
+        image_url: str,
+        query: Optional[str] = None,
+        extract_text: bool = False,
+        system_prompt: Optional[str] = None,
+        session_id: str = None
+    ) -> Dict[str, Any]:
+        """从URL分析图片内容"""
+        try:
+            # 构建分析提示
+            if not query:
+                query = "请描述这张图片的内容，包括主要对象、场景、活动和其他显著特征。"
+                
+            if not system_prompt:
+                system_prompt = """你是一个专业的图片分析助手。请仔细分析图片内容，提供准确、详细的描述。
+                分析应该包括：
+                1. 图片主要内容
+                2. 重要细节
+                3. 场景或背景
+                4. 整体氛围或风格
+                请用清晰的语言描述你的观察。"""
+            
+            # 直接使用URL调用AI进行分析
+            analysis_result = await ai_client.analyze_image(
+                image_url=image_url,
+                query=query,
+                system_prompt=system_prompt
+            )
+            
+            return {
+                "url": image_url,
+                "analysis": analysis_result,
+                "extracted_text": None
+            }
+
+        except Exception as e:
+            app_logger.error(f"从URL分析图片失败: {str(e)}")
+            raise ValueError(f"图片分析失败: {str(e)}")
 
 # 创建图片服务实例
 image_service = ImageService() 

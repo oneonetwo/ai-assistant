@@ -7,37 +7,27 @@ from app.services.file_service import file_service
 from app.models.schemas import (
     DocumentAnalysisResponse,
     MultiDocumentAnalysisResponse,
+    DocumentAnalysisRequest,
 )
 from app.middleware.upload import require_file_type
 from app.core.config import settings
 
 router = APIRouter(prefix="/document-analysis", tags=["document-analysis"])
 
-@router.post("/analyze-file", response_model=DocumentAnalysisResponse)
-@require_file_type(*settings.ALLOWED_DOCUMENT_TYPES)
-async def analyze_file(
-    file: UploadFile = File(...),
-    query: Optional[str] = None,
-    system_prompt: Optional[str] = None,
-    session_id: str = Query(..., description="用户会话ID"),
+@router.post("/analyze", response_model=DocumentAnalysisResponse)
+async def analyze_document(
+    request: DocumentAnalysisRequest,
     db: AsyncSession = Depends(get_db)
 ):
-    """分析单个文件"""
+    """分析文档"""
     try:
-        # 保存文件
-        saved_file = await file_service.save_file(
-            file=file,
-            file_type="document",
-            db=db,
-            session_id=session_id
-        )
-        
         # 分析文档
-        result = await document_service.analyze_document(
+        result = await document_service.analyze_document_from_url(
             db=db,
-            file_id=saved_file.file_id,
-            query=query,
-            system_prompt=system_prompt
+            document_url=request.url,
+            query=request.query,
+            system_prompt=request.system_prompt,
+            session_id=request.session_id
         )
         
         return DocumentAnalysisResponse(**result)

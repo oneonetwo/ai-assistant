@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { showToast, showDialog } from 'vant'
-import { ConversationAPI, ChatClient } from '@/services/api'
+import { ConversationAPI, ChatClient, ChatAPI } from '@/services/api'
 import type { Message, Conversation, MessageStatus } from '@/types/chat'
 import { generateUUID } from '@/utils/generateUUID'
+import { uploadToOSS } from '@/utils/oss'
 
 export const useChatStore = defineStore('chat', () => {
   // 状态
@@ -20,6 +21,12 @@ export const useChatStore = defineStore('chat', () => {
   const currentMessages = computed(() => {
     return currentConversation.value?.messages || []
   })
+
+  // 添加文件相关状态
+  const uploadingFiles = ref<Map<string, {
+    progress: number
+    controller: AbortController
+  }>>(new Map())
 
   // 初始化聊天
   async function initializeChat() {
@@ -378,6 +385,124 @@ export const useChatStore = defineStore('chat', () => {
     )
   }
 
+  // 发送带文件的消息（支持图片和其他文件）
+  async function sendMessageWithFile(
+    content: string,
+    file: File,
+    options: {
+      onProgress?: (progress: number) => void
+      signal?: AbortSignal
+      systemPrompt?: string
+      extractText?: boolean
+    } = {}
+  ) {
+    if (!currentConversationId.value) {
+      throw new Error('未选择会话')
+    }
+
+    const conversation = currentConversation.value
+    if (!conversation) return
+
+    const messageId = generateUUID()
+    const isImage = file.type.startsWith('image/')
+
+    try {
+      // 创建用户消息
+      const userMessage: Message = {
+        id: messageId,
+        role: 'user',
+        content,
+        timestamp: Date.now(),
+        status: 'sending',
+        file: {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          url: URL.createObjectURL(file)
+        }
+      }
+      
+      // 添加到上传队列
+      uploadingFiles.value.set(messageId, {
+        progress: 0,
+        controller: new AbortController()
+      })
+      
+      conversation.messages.push(userMessage)
+
+      // 先上传到 OSS
+      const fileUrl = await uploadToOSS(file, {
+        onProgress: (progress) => {
+          updateFileProgress(messageId, progress)
+          options.onProgress?.(progress)
+        },
+        signal: options.signal
+      })
+
+      // 更新文件 URL
+      userMessage.file!.url = fileUrl
+
+      // 根据文件类型调用不同的 API
+      const response = isImage 
+        ? await ChatAPI.sendImageMessage(
+            currentConversationId.value,
+            content,
+            fileUrl,
+            {
+              systemPrompt: options.systemPrompt,
+              extractText: options.extractText
+            }
+          )
+        : await ChatAPI.sendFileMessage(
+            currentConversationId.value,
+            content,
+            fileUrl,
+            file.name,
+            file.type,
+            {
+              systemPrompt: options.systemPrompt
+            }
+          )
+
+      // 更新消息状态
+      userMessage.status = 'success'
+      updateConversation(currentConversationId.value, {
+        messages: [...conversation.messages, response.data]
+      })
+
+    } catch (error) {
+      console.error(`发送${isImage ? '图片' : '文件'}消息失败:`, error)
+      const message = error.message === '上传已取消' 
+        ? '上传已取消' 
+        : `发送${isImage ? '图片' : '文件'}消息失败`
+      showToast({
+        type: 'fail',
+        message
+      })
+      throw error
+    } finally {
+      // 清理上传状态
+      uploadingFiles.value.delete(messageId)
+    }
+  }
+
+  // 添加文件上传进度更新方法
+  function updateFileProgress(messageId: string, progress: number) {
+    const fileUpload = uploadingFiles.value.get(messageId)
+    if (fileUpload) {
+      fileUpload.progress = progress
+    }
+  }
+
+  // 添加取消上传方法
+  function cancelFileUpload(messageId: string) {
+    const fileUpload = uploadingFiles.value.get(messageId)
+    if (fileUpload) {
+      fileUpload.controller.abort()
+      uploadingFiles.value.delete(messageId)
+    }
+  }
+
   return {
     conversations,
     currentConversationId,
@@ -393,6 +518,9 @@ export const useChatStore = defineStore('chat', () => {
     clearConversation,
     renameConversation,
     updateConversation,
-    createNewChat
+    createNewChat,
+    sendMessageWithFile,
+    updateFileProgress,
+    cancelFileUpload
   }
 })

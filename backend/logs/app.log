@@ -71,3 +71,99 @@
 2024-11-25 17:57:24.479 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-11-25 17:57:33.600 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-11-25 18:02:06.527 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 18:34:12.386 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 18:34:23.092 | ERROR    | app.api.v1.chat:init_stream_chat:89 - 初始化流式聊天失败: 'AIClient' object has no attribute 'is_session_initialized'
+2024-11-25 18:34:49.061 | ERROR    | app.api.v1.chat:init_stream_chat:89 - 初始化流式聊天失败: 'AIClient' object has no attribute 'is_session_initialized'
+2024-11-25 18:36:22.268 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 18:37:46.051 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 18:38:05.374 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 18:38:07.055 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 18:38:12.197 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 18:38:38.800 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 18:38:43.585 | ERROR    | app.api.v1.chat:init_stream_chat:93 - 初始化流式聊天失败: 'AIClient' object has no attribute 'cleanup_stream'
+2024-11-25 18:39:23.933 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 18:39:25.613 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 18:40:01.450 | ERROR    | app.services.chat:process_stream_chat:147 - 处理流式聊天失败: 'AIClient' object has no attribute 'get_stream_response'
+2024-11-25 18:40:17.711 | ERROR    | app.services.chat:process_stream_chat:147 - 处理流式聊天失败: 'AIClient' object has no attribute 'get_stream_response'
+2024-11-25 18:42:21.931 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 18:42:23.787 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 19:34:07.668 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 19:34:09.513 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 19:34:12.647 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 19:34:14.358 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 19:34:37.800 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 19:34:39.523 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 19:45:31.308 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 19:45:33.017 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 19:45:44.089 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 19:53:06.157 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 19:53:29.490 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 19:53:31.188 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 20:10:43.631 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 20:10:45.376 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 20:11:01.630 | ERROR    | app.services.image_service:analyze_image:146 - 图片分析失败: name 'settings' is not defined
+2024-11-25 20:11:01.631 | ERROR    | app.api.v1.chat:image_chat:236 - 图片聊天处理失败: name 'settings' is not defined
+2024-11-25 20:12:47.937 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 20:12:49.865 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 20:13:00.015 | ERROR    | app.services.ai_client:_make_api_call:74 - API调用失败: Error code: 400 - {'error': {'code': 'invalid_value', 'param': "'messages.[0].content[1].type'", 'message': "Invalid value: image. Supported values are: 'text','image_url','video_url' and 'video'.", 'type': 'invalid_request_error'}, 'request_id': 'chatcmpl-fda311ff-ad88-96de-ab55-a5c689e545a5'}
+2024-11-25 20:13:04.057 | ERROR    | app.services.ai_client:_make_api_call:74 - API调用失败: Error code: 400 - {'error': {'code': 'invalid_value', 'param': "'messages.[0].content[1].type'", 'message': "Invalid value: image. Supported values are: 'text','image_url','video_url' and 'video'.", 'type': 'invalid_request_error'}, 'request_id': 'chatcmpl-f05cf144-c8a3-9945-a728-4a5eca7dc00c'}
+2024-11-25 20:13:08.104 | ERROR    | app.services.ai_client:_make_api_call:74 - API调用失败: Error code: 400 - {'error': {'code': 'invalid_value', 'param': "'messages.[0].content[1].type'", 'message': "Invalid value: image. Supported values are: 'text','image_url','video_url' and 'video'.", 'type': 'invalid_request_error'}, 'request_id': 'chatcmpl-483d9cf7-e553-9e6f-9837-33dff605a694'}
+2024-11-25 20:13:08.105 | ERROR    | app.services.ai_client:analyze_image:275 - 图片分析失败: RetryError[<Future at 0x1edcaed7b80 state=finished raised APIError>]
+2024-11-25 20:13:08.106 | ERROR    | app.services.image_service:analyze_image:147 - 图片分析失败: 503: API error: 图片分析失败: RetryError[<Future at 0x1edcaed7b80 state=finished raised APIError>]
+2024-11-25 20:13:08.106 | ERROR    | app.api.v1.chat:image_chat:236 - 图片聊天处理失败: 503: API error: 图片分析失败: RetryError[<Future at 0x1edcaed7b80 state=finished raised APIError>]
+2024-11-25 20:13:16.140 | ERROR    | app.services.ai_client:_make_api_call:74 - API调用失败: Error code: 400 - {'error': {'code': 'invalid_value', 'param': "'messages.[0].content[1].type'", 'message': "Invalid value: image. Supported values are: 'text','image_url','video_url' and 'video'.", 'type': 'invalid_request_error'}, 'request_id': 'chatcmpl-0f6e4541-918f-9c3d-9f43-6db43c52cc11'}
+2024-11-25 20:13:20.187 | ERROR    | app.services.ai_client:_make_api_call:74 - API调用失败: Error code: 400 - {'error': {'code': 'invalid_value', 'param': "'messages.[0].content[1].type'", 'message': "Invalid value: image. Supported values are: 'text','image_url','video_url' and 'video'.", 'type': 'invalid_request_error'}, 'request_id': 'chatcmpl-52088fe5-ac82-9fc8-a1fc-8b60cfd02cb5'}
+2024-11-25 20:13:24.222 | ERROR    | app.services.ai_client:_make_api_call:74 - API调用失败: Error code: 400 - {'error': {'code': 'invalid_value', 'param': "'messages.[0].content[1].type'", 'message': "Invalid value: image. Supported values are: 'text','image_url','video_url' and 'video'.", 'type': 'invalid_request_error'}, 'request_id': 'chatcmpl-f0b2757b-f510-9358-9219-0875e23c6f6a'}
+2024-11-25 20:13:24.224 | ERROR    | app.services.ai_client:analyze_image:275 - 图片分析失败: RetryError[<Future at 0x1edcaedd9c0 state=finished raised APIError>]
+2024-11-25 20:13:24.224 | ERROR    | app.services.image_service:analyze_image:147 - 图片分析失败: 503: API error: 图片分析失败: RetryError[<Future at 0x1edcaedd9c0 state=finished raised APIError>]
+2024-11-25 20:13:24.225 | ERROR    | app.api.v1.chat:image_chat:236 - 图片聊天处理失败: 503: API error: 图片分析失败: RetryError[<Future at 0x1edcaedd9c0 state=finished raised APIError>]
+2024-11-25 20:14:47.217 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 20:14:48.906 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 20:19:06.923 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 20:19:08.888 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 20:19:10.310 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 20:19:12.035 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 20:19:17.378 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 20:19:19.178 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 20:20:04.533 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 20:20:06.288 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 20:20:11.526 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 20:20:13.258 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 13:09:27.663 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:25:01.926 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:25:04.199 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:25:06.023 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:25:07.856 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:25:10.182 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:25:11.945 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:25:13.680 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:25:16.615 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:25:18.415 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:25:21.742 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:25:23.530 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:25:25.297 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:25:32.348 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:26:29.261 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:34:09.931 | ERROR    | app.services.file_service:save_file:70 - 文件保存失败: 400: 不支持的文件类型: application/octet-stream
+2024-11-26 14:34:09.932 | ERROR    | app.api.v1.chat:image_chat:274 - 图片聊天处理失败: 500: 文件保存失败: 400: 不支持的文件类型: application/octet-stream
+2024-11-26 14:36:52.266 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:36:54.221 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:36:56.152 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:36:57.963 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:36:59.805 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:37:12.630 | ERROR    | app.api.v1.chat:image_chat:286 - 图片聊天处理失败: 400: 无效的图片格式
+2024-11-26 14:38:40.003 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:38:41.799 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:46:54.856 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:46:56.737 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:46:58.548 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:47:39.985 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:47:41.855 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:47:45.687 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:47:47.533 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:47:49.350 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:49:48.472 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:49:50.363 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:49:58.014 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:49:59.799 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 15:03:24.261 | INFO     | app.utils.cache:close:37 - Redis连接已关闭

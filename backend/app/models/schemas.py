@@ -95,3 +95,42 @@ class ImageAnalysisResponse(BaseModel):
     metadata: ImageMetadata
     analysis: str
     extracted_text: Optional[str] = None 
+
+class ImageChatRequest(BaseModel):
+    """图片聊天请求模型"""
+    message: str
+    image: str  # base64编码的图片
+    system_prompt: Optional[str] = None
+    extract_text: Optional[bool] = False
+
+class ImageChatResponse(BaseModel):
+    """图片聊天响应模型"""
+    analysis: str
+    extracted_text: Optional[str] = None
+
+class FileChatRequest(BaseModel):
+    """带文件的聊天请求模型"""
+    message: str
+    file: str  # base64编码的文件
+    file_name: str
+    file_type: str  # image/document
+    system_prompt: Optional[str] = None
+
+class FileChatResponse(BaseModel):
+    """带文件的聊天响应模型"""
+    session_id: str
+    response: str
+    file_id: Optional[str] = None
+
+class ImageAnalysisRequest(BaseModel):
+    url: str
+    query: Optional[str] = None
+    extract_text: bool = False
+    system_prompt: Optional[str] = None
+    session_id: str
+
+class DocumentAnalysisRequest(BaseModel):
+    url: str
+    query: Optional[str] = None
+    system_prompt: Optional[str] = None
+    session_id: str

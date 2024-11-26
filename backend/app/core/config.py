@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings
-from typing import Optional
+from typing import Optional, List
 from pathlib import Path
 
 class Settings(BaseSettings):
@@ -21,9 +21,9 @@ class Settings(BaseSettings):
     DB_NAME: str
 
     # Redis配置
-    REDIS_HOST: str
-    REDIS_PORT: int
-    REDIS_DB: int
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+    REDIS_DB: int = 0
     REDIS_PASSWORD: Optional[str] = None
     REDIS_PREFIX: str
 
@@ -44,9 +44,15 @@ class Settings(BaseSettings):
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "application/epub+zip", "text/markdown"
     }
-    ALLOWED_IMAGE_TYPES: set = {
-        "image/jpeg", "image/png", "image/webp", "image/gif"
-    }
+    ALLOWED_IMAGE_TYPES: List[str] = [
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+        "image/bmp",
+        "image/tiff",
+        "application/octet-stream"  # 临时添加，用于处理某些客户端的图片上传
+    ]
 
     def get_database_url(self, async_url: bool = True) -> str:
         """获取数据库URL

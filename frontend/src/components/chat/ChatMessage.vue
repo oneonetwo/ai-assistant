@@ -4,6 +4,27 @@
       {{ message.role === 'assistant' ? 'AI' : '你' }}
     </div>
     <div class="content">
+      <div v-if="message.file" class="file-preview">
+        <div v-if="isImage(message.file.type)">
+          <img 
+            :src="message.file.url" 
+            :alt="message.file.name"
+            @click="handleImageClick"
+          >
+          <ImagePreview
+            ref="imagePreviewRef"
+            :src="message.file.url"
+          />
+        </div>
+        <div v-else class="file-info">
+          <svg-icon :name="getFileIcon(message.file.type)" />
+          <span>{{ message.file.name }}</span>
+          <van-button size="mini" @click="downloadFile(message.file)">
+            下载
+          </van-button>
+        </div>
+      </div>
+
       <div class="bubble">
         <div class="markdown-body" v-html="renderedContent" />
       </div>
@@ -31,14 +52,19 @@
 import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
 import { computed, watch } from 'vue'
-
-
+import ImagePreview from './ImagePreview.vue'
+import { ref } from 'vue'
 
 const props = defineProps<{
   message: {
     id: string
     role: 'user' | 'assistant'
     content: string
+    file: {
+      url: string
+      name: string
+      type: string
+    }
   }
 }>()
 
@@ -61,6 +87,31 @@ const renderedContent = computed(() => {
 watch(() => props.message, () => {
   console.log('message>>>>>>>>>>>', props.message)
 })
+
+const isImage = (fileType: string) => fileType.startsWith('image/')
+
+const getFileIcon = (fileType: string) => {
+  if (fileType.startsWith('image/')) return 'image'
+  if (fileType === 'application/pdf') return 'pdf'
+  if (fileType === 'text/plain') return 'txt'
+  if (fileType.includes('word')) return 'doc'
+  return 'file'
+}
+
+const downloadFile = (file: { url: string, name: string }) => {
+  const link = document.createElement('a')
+  link.href = file.url
+  link.download = file.name
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
+const imagePreviewRef = ref()
+
+const handleImageClick = () => {
+  imagePreviewRef.value?.open()
+}
 </script>
 
 <style lang="scss" scoped>
@@ -142,5 +193,45 @@ watch(() => props.message, () => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.file-preview {
+  margin: 8px 0;
+  max-width: 300px;
+
+  img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s;
+
+    &:hover {
+      transform: scale(1.02);
+    }
+  }
+
+  .file-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--van-background-2);
+    border-radius: 8px;
+    border: 1px solid var(--van-border-color);
+
+    .svg-icon {
+      width: 24px;
+      height: 24px;
+      color: var(--van-primary-color);
+    }
+
+    span {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
 }
 </style>

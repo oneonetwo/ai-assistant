@@ -1,3 +1,11 @@
+export interface FileInfo {
+  name: string
+  type: string
+  url: string
+  size: number
+  uploadProgress?: number
+}
+
 export interface Message {
   id: string
   role: 'user' | 'assistant'
@@ -7,6 +15,7 @@ export interface Message {
   status?: 'sending' | 'success' | 'error'
   error?: string
   quote?: Message
+  file?: FileInfo
 }
 
 export interface Conversation {

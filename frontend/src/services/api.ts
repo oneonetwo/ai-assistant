@@ -8,12 +8,12 @@ const API_BASE_URL = '/api/v1'
 export class ConversationAPI {
   /**
    * 创建新会话
-   * @param title - 会话标题
+   * @param name - 会话标题
    * @returns Promise<{ session_id: string }>
    */
-  static async createConversation(title = '新会话') {
+  static async createConversation(name = '新会话') {
     const response = await request.post(`${API_BASE_URL}/context/conversations`, {
-      title
+      name: name
     })
     return response
   }
@@ -45,7 +45,7 @@ export class ConversationAPI {
   }
 
   /**
-   * 清除会话上下文
+   * 清除会话上���
    * @param sessionId - 会话ID
    */
   static async clearContext(sessionId: string) {
@@ -143,6 +143,67 @@ export class ChatClient {
 
     } catch (error) {
       onError(error as Error)
+    }
+  }
+}
+
+/**
+ * 聊天相关 API 类
+ */
+export class ChatAPI {
+  /**
+   * 发送带图片的消息并获取AI分析
+   */
+  static async sendImageMessage(
+    sessionId: string,
+    message: string,
+    imageUrl: string,
+    options: {
+      systemPrompt?: string
+      extractText?: boolean
+    } = {}
+  ) {
+    try {
+      const payload = {
+        message,
+        image: imageUrl,
+        system_prompt: options.systemPrompt || '你是一个专业的图像分析助手',
+        extract_text: options.extractText || false
+      }
+
+      return request.post(`${API_BASE_URL}/chat/${sessionId}/image`, payload)
+    } catch (error) {
+      console.error('发送图片消息失败:', error)
+      throw error
+    }
+  }
+
+  /**
+   * 发送带文件的消息并获取AI回复
+   */
+  static async sendFileMessage(
+    sessionId: string,
+    message: string,
+    fileUrl: string,
+    fileName: string,
+    fileType: string,
+    options: {
+      systemPrompt?: string
+    } = {}
+  ) {
+    try {
+      const payload = {
+        message,
+        file: fileUrl,
+        file_name: fileName,
+        file_type: fileType,
+        system_prompt: options.systemPrompt || '你是一个专业的文件分析助手'
+      }
+
+      return request.post(`${API_BASE_URL}/chat/${sessionId}/file`, payload)
+    } catch (error) {
+      console.error('发送文件消息失败:', error)
+      throw error
     }
   }
 } 
