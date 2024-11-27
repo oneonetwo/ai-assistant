@@ -288,3 +288,4 @@
 2024-11-27 11:50:41.777 | ERROR    | app.services.document_service:extract_text:44 - 文本提取失败: 'str' object has no attribute 'suffix'
 2024-11-27 11:58:41.779 | ERROR    | app.services.document_service:extract_text:44 - 文本提取失败: 'str' object has no attribute 'suffix'
 2024-11-27 12:16:24.836 | ERROR    | app.services.document_service:extract_text:44 - 文本提取失败: 'str' object has no attribute 'suffix'
+2024-11-27 15:10:30.260 | ERROR    | app.services.document_service:extract_text:44 - 文本提取失败: 'str' object has no attribute 'suffix'

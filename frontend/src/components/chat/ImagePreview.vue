@@ -1,5 +1,6 @@
 <template>
   <van-image-preview
+    class="file-preview"
     v-model:show="show"
     :images="[props.src]"
     :closeable="true"
@@ -30,3 +31,6 @@ defineExpose({
   }
 })
 </script> 
+<style lang="scss" scoped>
+
+</style>

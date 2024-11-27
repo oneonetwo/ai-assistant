@@ -194,11 +194,12 @@ const handleImageClick = () => {
 
 .file-preview {
   margin: 8px 0;
-  max-width: 300px;
+  max-width: 100px;
+  max-height: 100px;
 
   img {
-    width: 100%;
-    height: auto;
+    max-width: 100%;
+    max-height: 100%;
     border-radius: 8px;
     cursor: pointer;
     transition: transform 0.2s;
