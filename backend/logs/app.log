@@ -283,3 +283,8 @@
 2024-11-27 11:41:21.654 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-11-27 11:41:31.115 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
 2024-11-27 11:41:32.974 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 11:41:34.959 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 11:41:43.541 | ERROR    | app.services.document_service:extract_text:44 - 文本提取失败: 'str' object has no attribute 'suffix'
+2024-11-27 11:50:41.777 | ERROR    | app.services.document_service:extract_text:44 - 文本提取失败: 'str' object has no attribute 'suffix'
+2024-11-27 11:58:41.779 | ERROR    | app.services.document_service:extract_text:44 - 文本提取失败: 'str' object has no attribute 'suffix'
+2024-11-27 12:16:24.836 | ERROR    | app.services.document_service:extract_text:44 - 文本提取失败: 'str' object has no attribute 'suffix'

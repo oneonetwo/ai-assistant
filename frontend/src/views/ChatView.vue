@@ -7,25 +7,14 @@ import LoadingMessage from '@/components/chat/LoadingMessage.vue'
 import MessageSkeleton from '@/components/chat/MessageSkeleton.vue'
 import MessageQuote from '@/components/chat/MessageQuote.vue'
 import ConversationList from '@/components/chat/ConversationList.vue'
-import { useVirtualList } from '@vueuse/core'
 import WelcomeScreen from '@/components/chat/WelcomeScreen.vue'
 
 const chatStore = useChatStore()
+const containerRef = ref<HTMLElement | null>(null)
 const inputRef = ref<InstanceType<typeof ChatInput>>()
 const quotedMessage = ref<Message | null>(null)
 const isInitialLoading = ref(true)
 const inputText = ref('')
-
-// 虚拟列表配置
-const MESSAGE_HEIGHT = 100
-const containerRef = ref<HTMLElement>()
-const { list: visibleMessages, containerProps, wrapperProps } = useVirtualList(
-  computed(() => chatStore.currentMessages),
-  {
-    itemHeight: MESSAGE_HEIGHT,
-    overscan: 5
-  }
-)
 
 onMounted(async () => {
   try {
@@ -128,6 +117,24 @@ async function handleFeatureSelect(tag: { id: number, label: string, prompt: str
     console.error('处理功能标签失败:', error)
   }
 }
+
+// 监听消息变化
+watch(() => chatStore.currentMessages, (messages) => {
+  if (isAtBottom.value || messages.length === 1) {
+    nextTick(() => {
+      scrollToBottom()
+    })
+  }
+}, { deep: true })
+
+// 监听加载状态变化
+watch(() => chatStore.isLoading, (newVal, oldVal) => {
+  if (oldVal && !newVal && isAtBottom.value) {
+    nextTick(() => {
+      scrollToBottom()
+    })
+  }
+})
 </script>
 
 <template>
@@ -139,21 +146,18 @@ async function handleFeatureSelect(tag: { id: number, label: string, prompt: str
     <div v-else class="chat-container">
       <div 
         ref="containerRef"
-        class="message-container" 
-        v-bind="containerProps"
+        class="message-container"
       >
-        <div v-bind="wrapperProps">
-          <template v-if="!isInitialLoading">
-            <ChatMessage
-              v-for="{ index, data } in visibleMessages"
-              :key="data.id"
-              :message="data"
-              :show-actions="true"
-              @quote="handleQuote"
-            />
-          </template>
-          <MessageSkeleton v-else />
-        </div>
+        <template v-if="!isInitialLoading">
+          <ChatMessage
+            v-for="message in chatStore.currentMessages"
+            :key="message.id"
+            :message="message"
+            :show-actions="true"
+            @quote="handleQuote"
+          />
+        </template>
+        <MessageSkeleton v-else />
       </div>
 
       <div class="input-wrapper">
@@ -201,7 +205,7 @@ async function handleFeatureSelect(tag: { id: number, label: string, prompt: str
   flex: 1;
   overflow-y: auto;
   padding: 20px;
-  padding-bottom: 100px; // 为底部输入区域留出空间
+  padding-bottom: 300px; // 为底部输入区域留出空间
 }
 
 .input-wrapper {

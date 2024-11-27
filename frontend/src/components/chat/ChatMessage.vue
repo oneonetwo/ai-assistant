@@ -83,10 +83,7 @@ const renderedContent = computed(() => {
   return md.render(props.message.content)
 })
 
-//  监听message
-watch(() => props.message, () => {
-  console.log('message>>>>>>>>>>>', props.message)
-})
+
 
 const isImage = (fileType: string) => fileType.startsWith('image/')
 
