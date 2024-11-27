@@ -168,3 +168,13 @@
 2024-11-26 14:49:59.799 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-11-26 15:03:24.261 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
 2024-11-26 19:57:23.568 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 09:09:20.716 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 09:22:30.516 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 09:24:28.638 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 09:24:49.233 | ERROR    | app.services.ai_client:_make_api_call:75 - API调用失败: openai.resources.chat.completions.AsyncCompletions.create() got multiple values for keyword argument 'model'
+2024-11-27 09:24:53.240 | ERROR    | app.services.ai_client:_make_api_call:75 - API调用失败: openai.resources.chat.completions.AsyncCompletions.create() got multiple values for keyword argument 'model'
+2024-11-27 09:24:57.229 | ERROR    | app.services.ai_client:_make_api_call:75 - API调用失败: openai.resources.chat.completions.AsyncCompletions.create() got multiple values for keyword argument 'model'
+2024-11-27 09:24:57.229 | ERROR    | app.services.ai_client:analyze_image:279 - 图片分析失败: RetryError[<Future at 0x19a8a192e30 state=finished raised APIError>]
+2024-11-27 09:24:57.230 | ERROR    | app.services.image_service:analyze_image_from_url:189 - 从URL分析图片失败: 503: API error: 图片分析失败: RetryError[<Future at 0x19a8a192e30 state=finished raised APIError>]
+2024-11-27 09:24:57.230 | ERROR    | app.api.v1.chat:image_chat:221 - 图片聊天处理失败: 图片分析失败: 503: API error: 图片分析失败: RetryError[<Future at 0x19a8a192e30 state=finished raised APIError>]
+2024-11-27 09:25:58.903 | INFO     | app.utils.cache:close:37 - Redis连接已关闭

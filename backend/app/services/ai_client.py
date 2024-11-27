@@ -28,6 +28,7 @@ class AIClient:
             timeout=settings.QWEN_API_TIMEOUT
         )
         self.model = "qwen-plus"
+        self.vision_model = "qwen-vl-plus"
         self._active_streams = {}
         self._initialized_sessions = set()
         self._response_cache = cache_manager.get_cache('ai_responses')
@@ -57,12 +58,16 @@ class AIClient:
         stream: bool = False,
         temperature: float = 0.7,
         max_tokens: int = 2000,
+        model: Optional[str] = None,
         **kwargs
     ) -> Any:
         """统一的API调用方法，支持重试"""
         try:
+            # 如果没有指定model，使用默认的self.model
+            model = model or self.model
+            
             response = await self.client.chat.completions.create(
-                model=self.model,
+                model=model,
                 messages=messages,
                 stream=stream,
                 temperature=temperature,
@@ -239,8 +244,8 @@ class AIClient:
         try:
             # 构建消息内容
             content = [
-                {"type": "text", "text": f"分析要求：{query}"},
-                {"type": "image_url", "image_url": image_url}
+                {"type": "text", "text": query},
+                {"type": "image_url", "image_url": {"url": image_url}}
             ]
 
             if extracted_text:
@@ -261,8 +266,11 @@ class AIClient:
                 if cached_response:
                     return cached_response
 
-            # 生成新响应
-            response = await self._make_api_call(messages)
+            # 使用 qwen-vl-plus 模型，通过参数传递而不是kwargs
+            response = await self._make_api_call(
+                messages=messages,
+                model=self.vision_model  # 使用类属性中定义的视觉模型
+            )
             result = response.choices[0].message.content
 
             # 缓存响应
