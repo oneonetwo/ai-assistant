@@ -12,6 +12,9 @@ from app.services.ai_client import ai_client
 from app.db.models import File, AnalysisRecord
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+import aiohttp
+import io
+from docx import Document
 
 class DocumentService:
     """文档处理服务"""
@@ -19,10 +22,29 @@ class DocumentService:
     async def extract_text(self, file_path: str) -> str:
         """从文件中提取文本"""
         try:
-            # 如果是URL，直接返回URL内容
+            # 处理远程URL
             if file_path.startswith(('http://', 'https://')):
-                # 对于远程文档，我们直接返回URL，让AI服务处理
-                return f"文档URL: {file_path}\n请直接访问此URL获取文档内容进行分析。"
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(file_path) as response:
+                        if response.status != 200:
+                            return f"无法访问文档URL: {file_path}"
+                        
+                        # 读取文件内容
+                        file_content = await response.read()
+                        
+                        # 根据文件类型处理
+                        if file_path.endswith('.docx'):
+                            # 将二进制内容转换为文档对象
+                            doc = Document(io.BytesIO(file_content))
+                            # 提取所有段落的文本
+                            text = '\n'.join([paragraph.text for paragraph in doc.paragraphs])
+                            return text
+                        elif file_path.endswith('.pdf'):
+                            return await self._extract_pdf_text_from_bytes(file_content)
+                        elif file_path.endswith('.txt'):
+                            return file_content.decode('utf-8')
+                        else:
+                            return f"不支持的远程文件类型: {file_path}"
 
             # 本地文件处理逻辑
             path = Path(file_path)
@@ -196,6 +218,49 @@ class DocumentService:
         except Exception as e:
             app_logger.error(f"多文档分析失败: {str(e)}")
             raise
+
+    async def _extract_pdf_text_from_bytes(self, file_content: bytes) -> str:
+        """从二进制内容中提取PDF文本"""
+        try:
+            # 使用线程池执行同步操作
+            loop = asyncio.get_event_loop()
+            return await loop.run_in_executor(None, self._pdf_extract_worker_from_bytes, file_content)
+        except Exception as e:
+            raise ValueError(f"PDF文本提取失败: {str(e)}")
+
+    def _pdf_extract_worker_from_bytes(self, file_content: bytes) -> str:
+        """PDF文本提取工作函数(二进制版本)"""
+        text = []
+        pdf = PdfReader(io.BytesIO(file_content))
+        for page in pdf.pages:
+            text.append(page.extract_text())
+        return '\n'.join(text)
+
+    async def extract_text_from_url(self, url: str) -> str:
+        """从URL中提取文本内容"""
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as response:
+                    if response.status != 200:
+                        raise ValueError(f"无法访问文档URL: {url}")
+                    
+                    # 读取文件内容
+                    file_content = await response.read()
+                    
+                    # 根据URL后缀处理不同类型的文件
+                    if url.lower().endswith('.docx'):
+                        doc = Document(io.BytesIO(file_content))
+                        paragraphs = []
+                        for paragraph in doc.paragraphs:
+                            if paragraph.text.strip():  # 只添加非空段落
+                                paragraphs.append(paragraph.text)
+                        return '\n'.join(paragraphs)
+                    else:
+                        raise ValueError(f"不支持的文件类型: {url}")
+                    
+        except Exception as e:
+            app_logger.error(f"从URL提取文本失败: {str(e)}")
+            raise ValueError(f"从URL提取文本失败: {str(e)}")
 
 # 创建文档服务实例
 document_service = DocumentService()

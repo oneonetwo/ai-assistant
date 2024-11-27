@@ -302,3 +302,15 @@
 2024-11-27 16:10:24.657 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
 2024-11-27 16:10:26.515 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-11-27 16:10:28.339 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 16:16:33.561 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 16:16:35.488 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 16:17:53.123 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 16:17:54.955 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 16:20:24.139 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 16:20:25.964 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 16:20:36.542 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 16:20:38.608 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 16:23:49.052 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 16:23:50.924 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 16:23:52.681 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 16:24:06.170 | INFO     | app.utils.cache:close:37 - Redis连接已关闭

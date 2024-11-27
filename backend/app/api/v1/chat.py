@@ -30,6 +30,9 @@ from typing import List, Dict, Any
 import base64
 from io import BytesIO
 import imghdr
+import aiohttp
+import io
+from docx import Document
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -543,7 +546,8 @@ async def stream_file_chat(
             extracted_text = None
             if message_content["file_type"] == "document":
                 if file_record.file_path.startswith(('http://', 'https://')):
-                    extracted_text = file_record.file_path  # 直接使用URL
+                    # 使用document_service提取远程文件内容
+                    extracted_text = await document_service.extract_text_from_url(file_record.file_path)
                 else:
                     extracted_text = await document_service.extract_text(file_record.file_path)
             elif message_content["file_type"] == "image" and extract_text:
