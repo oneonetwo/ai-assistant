@@ -649,3 +649,4 @@ file_path
 2024-11-27 21:00:42.437 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
 2024-11-27 21:00:44.291 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-11-27 21:00:45.107 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 21:00:47.043 | INFO     | app.utils.cache:init:29 - Redis连接成功
