@@ -127,12 +127,12 @@ async def get_all_conversations(
                     file = file_result.scalar_one_or_none()
                     if file:
                         file_info = {
-                            "file_id": file.file_id,
-                            "original_name": file.original_name,
-                            "file_type": file.file_type,
-                            "file_path": file.file_path,
+                            "id": file.file_id,
+                            "name": file.original_name,
+                            "type": file.file_type,
+                            "url": file.file_path,
                             "mime_type": file.mime_type,
-                            "file_size": file.file_size,
+                            "size": file.file_size,
                             "created_at": file.created_at.isoformat() if file.created_at else None
                         }
 

@@ -19,13 +19,16 @@ class BaseResponse(BaseModel):
     message: str = "success"
 
 class FileResponse(BaseModel):
-    file_id: str
-    original_name: str
-    file_type: str
-    file_path: str
+    id: str
+    name: str
+    type: str
+    url: str
     mime_type: Optional[str] = None
-    file_size: Optional[int] = None
+    size: Optional[int] = None
     created_at: Optional[str] = None
+
+    class Config:
+        from_attributes = True
 
 class MessageResponse(BaseModel):
     id: int
@@ -45,6 +48,9 @@ class MessageResponse(BaseModel):
             file=FileResponse(**file_info) if file_info else None,
             created_at=message.created_at.isoformat() if message.created_at else None
         )
+
+    class Config:
+        from_attributes = True
 
 class ConversationBase(BaseModel):
     session_id: str = Field(..., description="会话ID")
