@@ -36,15 +36,15 @@ class Message(Base):
 class File(Base):
     __tablename__ = "files"
     
-    id = Column(Integer, primary_key=True)
-    file_id = Column(String(64), unique=True, index=True)
-    original_name = Column(String(255))
-    file_path = Column(String(512))
-    file_type = Column(String(50))  # document/image
-    mime_type = Column(String(100))
-    file_size = Column(BigInteger)
+    id = Column(Integer, primary_key=True, index=True)
+    file_id = Column(String, unique=True, index=True)
+    original_name = Column(String)
+    file_path = Column(String)
+    file_type = Column(String)  # image/document
+    mime_type = Column(String, nullable=True)
+    file_size = Column(Integer, nullable=True)
+    user_session_id = Column(String, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
-    user_session_id = Column(String(64), index=True)
 
 class AnalysisRecord(Base):
     __tablename__ = "analysis_records"

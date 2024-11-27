@@ -41,12 +41,17 @@ const emit = defineEmits<{
 
 async function handleTagClick(tag: typeof featureTags[0]) {
   try {
-    // 先创建新会话
-    await chatStore.createNewConversation()
+    const currentConversation = chatStore.currentConversation
+    
+    // 只有在没有当前会话时才创建新会话
+    if (!currentConversation) {
+      await chatStore.createNewConversation()
+    }
+    
     // 发送选择事件
     emit('select', tag)
   } catch (error) {
-    console.error('创建会话失败:', error)
+    console.error('处理标签点击失败:', error)
   }
 }
 </script>

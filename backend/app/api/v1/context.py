@@ -12,6 +12,11 @@ from app.services import context as context_service
 from app.core.logging import app_logger
 from app.services.exceptions import DatabaseError
 from typing import List
+from sqlalchemy import select
+from sqlalchemy.orm import joinedload
+from app.db.models import Conversation, File
+from sqlalchemy import desc
+import json
 
 router = APIRouter(prefix="/context", tags=["context"])
 
@@ -100,9 +105,57 @@ async def get_all_conversations(
 ):
     """获取所有会话列表"""
     try:
-        conversations = await context_service.get_all_conversations(db)
-        return conversations
-    except DatabaseError as e:
+        # 获取所有会话及其关联的消息和文件
+        stmt = (
+            select(Conversation)
+            .options(joinedload(Conversation.messages))
+            .order_by(desc(Conversation.updated_at))
+        )
+        result = await db.execute(stmt)
+        conversations = result.unique().scalars().all()
+        
+        # 转换响应格式
+        response_conversations = []
+        for conv in conversations:
+            messages = []
+            for msg in conv.messages:
+                # 如果消息有关联文件，获取文件信息
+                file_info = None
+                if msg.file_id:
+                    try:
+                        content_dict = json.loads(msg.content)
+                        if isinstance(content_dict, dict) and "file_id" in content_dict:
+                            file_stmt = select(File).where(File.file_id == content_dict["file_id"])
+                            file_result = await db.execute(file_stmt)
+                            file = file_result.scalar_one_or_none()
+                            if file:
+                                file_info = {
+                                    "name": file.original_name,
+                                    "type": content_dict.get("file_type", "unknown"),
+                                    "size": file.file_size,
+                                    "url": file.file_path
+                                }
+                    except json.JSONDecodeError:
+                        pass
+
+                # 使用 MessageResponse 的 from_db_model 方法创建消息响应
+                message = MessageResponse.from_db_model(msg, file_info)
+                messages.append(message)
+            
+            # 构建会话响应
+            conv_response = ConversationResponse(
+                session_id=conv.session_id,
+                name=conv.name,
+                id=conv.id,
+                created_at=conv.created_at,
+                updated_at=conv.updated_at,
+                messages=messages
+            )
+            response_conversations.append(conv_response)
+        
+        return response_conversations
+        
+    except Exception as e:
         app_logger.error(f"获取会话列表失败: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

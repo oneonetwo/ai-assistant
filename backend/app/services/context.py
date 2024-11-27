@@ -83,45 +83,27 @@ async def get_context_messages(
     
     if limit:
         query = query.limit(limit)
-        
+    
     result = await db.execute(query)
     rows = result.all()
     
     messages = []
-    for message, file in rows:
+    for row in rows:
+        message = row[0]
+        file = row[1]
+        
         file_info = None
         if file:
             file_info = {
-                "name": file.original_name,
-                "type": file.file_type,
-                "size": file.file_size,
-                "url": file.file_path  # 直接使用file_path作为URL
+                "file_id": file.file_id,
+                "original_name": file.original_name,
+                "file_type": file.file_type,
+                "file_path": file.file_path
             }
-            
-        try:
-            # 尝试解析JSON内容
-            content = message.content
-            if message.role == "user":
-                try:
-                    content_dict = json.loads(content)
-                    if isinstance(content_dict, dict):
-                        content = content_dict.get("message", content)
-                except json.JSONDecodeError:
-                    pass
-            
-            messages.append(MessageResponse(
-                id=message.id,
-                role=message.role,
-                content=content,
-                file=file_info,
-                created_at=message.created_at.isoformat() if message.created_at else None
-            ))
-            
-        except Exception as e:
-            app_logger.error(f"处理消息失败: {str(e)}")
-            continue
+        
+        messages.append(MessageResponse.from_db_model(message, file_info))
     
-    return messages
+    return list(reversed(messages))
 
 async def clear_context(
     db: AsyncSession,

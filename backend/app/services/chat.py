@@ -7,10 +7,11 @@ from app.core.config import settings
 from app.core.logging import app_logger
 from app.services.exceptions import NotFoundError, APIError
 from sqlalchemy import select, and_, desc
-from app.db.models import Message
+from app.db.models import Message, File
 import json
 from pathlib import Path
 import aiofiles
+import aiohttp
 
 async def process_chat(
     db: AsyncSession,
@@ -96,7 +97,7 @@ async def initialize_stream_chat(
         # 添加当前用户消息
         messages.append({"role": "user", "content": user_message})
 
-        # 初始化流式响应
+        # 初始化流响应
         await ai_client.initialize_stream(session_id, messages)
 
     except Exception as e:
@@ -119,7 +120,7 @@ async def process_stream_chat(
         # 发送开始事件
         yield f"data: {json.dumps({'type': 'start', 'data': {}}, ensure_ascii=False)}\n\n"
 
-        # 使用新的数据库会话来获取最后的用户消息
+        # 使用新的据库会话来获取最后的用户消息
         last_user_message = await get_last_user_message(db, conversation.id)
         if not last_user_message:
             app_logger.warning(f"未找到用户消息: conversation_id={conversation.id}")
@@ -216,16 +217,11 @@ async def init_image_stream_chat(
         raise NotFoundError(detail=f"会话 {session_id} 不存在")
 
     try:
-        # 保存用户消息到数据库，参考文件聊天的格式
+        # 保存用户消息到数据库
         user_msg = MessageCreate(
             role="user",
-            content=json.dumps({
-                "message": message,
-                "file_id": file_id,
-                "file_type": "image",
-                "image_url": image_url
-            }),
-            file_id=file_id
+            content=message,     # 只存储纯文本消息
+            file_id=file_id      # 文件ID存储在专门的字段中
         )
         saved_user_msg = await add_message(db, conversation.id, user_msg)
 
@@ -238,15 +234,19 @@ async def init_image_stream_chat(
 
         # 转换为AI客户端所需格式
         messages = []
-        for msg in context_messages[:-1]:  # 排除最后一条消息
-            try:
-                content = json.loads(msg.content)
-                if isinstance(content, dict):
-                    messages.append({"role": msg.role, "content": content.get("message", msg.content)})
-                else:
-                    messages.append({"role": msg.role, "content": msg.content})
-            except json.JSONDecodeError:
-                messages.append({"role": msg.role, "content": msg.content})
+        for msg in context_messages[:-1]:  # 排除最后条消息
+            message_data = {"role": msg.role, "content": msg.content}
+            if msg.file_id:  # 如果消息有关联文件，添加文件信息
+                # 获取文件信息
+                file_query = select(File).where(File.file_id == msg.file_id)
+                result = await db.execute(file_query)
+                file_record = result.scalar_one_or_none()
+                if file_record and file_record.file_type == "image":
+                    message_data["content"] = [
+                        {"type": "text", "text": msg.content},
+                        {"type": "image_url", "image_url": {"url": file_record.file_path}}
+                    ]
+            messages.append(message_data)
 
         # 添加当前用户消息，使用正确的Vision API格式
         messages.append({
@@ -273,7 +273,8 @@ async def init_file_stream_chat(
     session_id: str,
     message: str,
     file_id: str,
-    file_type: str
+    file_type: str,
+    file_text: str
 ) -> None:
     """初始化流式文件聊天"""
     conversation = await get_conversation(db, session_id)
@@ -284,11 +285,8 @@ async def init_file_stream_chat(
         # 保存用户消息到数据库
         user_msg = MessageCreate(
             role="user",
-            content=json.dumps({
-                "message": message,
-                "file_id": file_id,
-                "file_type": file_type
-            })
+            content=message,
+            file_id=file_id
         )
         saved_user_msg = await add_message(db, conversation.id, user_msg)
 
@@ -300,18 +298,29 @@ async def init_file_stream_chat(
         )
 
         # 转换为AI客户端所需格式
-        messages = [
-            {"role": msg.role, "content": msg.content}
-            for msg in context_messages
-        ]
-        
-        # 添加当前用户消息
-        messages.append({
-            "role": "user",
-            "content": message,
-            "file_id": file_id,
-            "file_type": file_type
-        })
+        messages = []
+        for msg in context_messages[:-1]:  # 排除最后一条消息
+            message_data = {"role": msg.role, "content": msg.content}
+            messages.append(message_data)
+
+        # 添加当前用户消息，包含文件内容
+        if file_type == "image":
+            file_query = select(File).where(File.file_id == file_id)
+            result = await db.execute(file_query)
+            file_record = result.scalar_one_or_none()
+            messages.append({
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": message},
+                    {"type": "image_url", "image_url": {"url": file_record.file_path}}
+                ]
+            })
+        else:
+            # 对于文档类型，将文件内容添加到消息中
+            messages.append({
+                "role": "user",
+                "content": f"{message}\n\n文档内容：\n{file_text}"
+            })
 
         # 初始化流式响应
         model = ai_client.vision_model if file_type == "image" else ai_client.model
@@ -325,23 +334,63 @@ async def init_file_stream_chat(
         app_logger.error(f"初始化流式文件聊天失败: {str(e)}")
         raise APIError(detail=f"初始化流式文件聊天失败: {str(e)}")
 
-async def extract_text(self, file_path: str) -> str:
+@staticmethod
+async def extract_text(file_path: str) -> str:
     """从文件中提取文本"""
     try:
-        # 如果是URL，直接返回URL
+        # 如果是URL，尝试下载文件内容
         if file_path.startswith(('http://', 'https://')):
-            return file_path
+            async with aiohttp.ClientSession() as session:
+                async with session.get(file_path) as response:
+                    if response.status == 200:
+                        file_content = await response.read()
+                        if file_path.endswith('.docx'):
+                            from docx import Document
+                            import io
+                            doc = Document(io.BytesIO(file_content))
+                            return '\n'.join([paragraph.text for paragraph in doc.paragraphs])
+                        return await response.text()
+                    else:
+                        return f"无法访问文件: {response.status}"
 
         # 获取文件后缀
         suffix = Path(file_path).suffix.lower()
         
-        if suffix in ['.txt']:
+        # Word文档处理
+        if suffix in ['.doc', '.docx']:
+            try:
+                from docx import Document
+                import asyncio
+                
+                # 使用线程池执行同步操作
+                loop = asyncio.get_event_loop()
+                return await loop.run_in_executor(None, lambda: '\n'.join(
+                    [paragraph.text for paragraph in Document(file_path).paragraphs]
+                ))
+            except Exception as e:
+                app_logger.error(f"Word文档处理失败: {str(e)}")
+                return f"Word文档处理失败: {str(e)}"
+                
+        # 文本文件处理
+        elif suffix in ['.txt', '.md']:
             async with aiofiles.open(file_path, 'r', encoding='utf-8') as f:
                 return await f.read()
-        elif suffix in ['.pdf']:
-            return await self._extract_pdf_text(file_path)
-        elif suffix in ['.doc', '.docx']:
-            return await self._extract_doc_text(file_path)
+                
+        # PDF文件处理
+        elif suffix == '.pdf':
+            try:
+                from pypdf import PdfReader
+                import asyncio
+                
+                # 使用线程池执行同步操作
+                loop = asyncio.get_event_loop()
+                return await loop.run_in_executor(None, lambda: '\n'.join(
+                    [page.extract_text() for page in PdfReader(file_path).pages]
+                ))
+            except Exception as e:
+                app_logger.error(f"PDF文件处理失败: {str(e)}")
+                return f"PDF文件处理失败: {str(e)}"
+        
         else:
             return f"不支持的文件类型: {suffix}"
 

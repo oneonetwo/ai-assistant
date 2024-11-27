@@ -391,3 +391,127 @@
 2024-11-27 18:40:22.044 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-11-27 18:44:35.856 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
 2024-11-27 18:44:37.767 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:53:16.787 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:53:18.688 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:53:20.496 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:53:37.996 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:54:31.395 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:54:37.552 | ERROR    | app.api.v1.context:get_all_conversations:150 - 获取会话列表失败: The unique() method must be invoked on this Result, as it contains results that include joined eager loads against collections
+2024-11-27 18:54:37.635 | ERROR    | app.api.v1.context:get_all_conversations:150 - 获取会话列表失败: The unique() method must be invoked on this Result, as it contains results that include joined eager loads against collections
+2024-11-27 18:55:18.022 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:55:19.865 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:57:00.573 | ERROR    | app.services.document_service:extract_text_from_url:262 - 从URL提取文本失败: 不支持的文件类型: https://ai-assistant-wen.oss-cn-beijing.aliyuncs.com/chat/uploads/1732705019975-3ad47e4c-9a5c-40c2-bb97-7ca8fc21a834.txt
+2024-11-27 18:57:45.238 | ERROR    | app.services.document_service:extract_text_from_url:262 - 从URL提取文本失败: 不支持的文件类型: https://ai-assistant-wen.oss-cn-beijing.aliyuncs.com/chat/uploads/1732705064669-120884cc-3926-4881-b323-56b5be1d9314.txt
+2024-11-27 18:59:36.648 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:59:38.531 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:00:00.940 | ERROR    | app.services.document_service:extract_text_from_url:262 - 从URL提取文本失败: 不支持的文件类型: https://ai-assistant-wen.oss-cn-beijing.aliyuncs.com/chat/uploads/1732705200126-d3735012-edc6-44f9-9566-df3511faa6c5.txt
+2024-11-27 19:01:41.456 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:01:43.327 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:22:08.756 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:22:10.650 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:22:12.468 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:23:02.744 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:23:04.570 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:23:06.358 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:23:28.886 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:23:30.962 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:28:04.403 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:28:06.363 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:28:08.233 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:28:09.930 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:28:27.754 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:30:39.168 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:30:41.043 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:30:51.912 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:30:53.748 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:31:04.515 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:31:06.332 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:39:32.261 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:39:34.206 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:39:36.031 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:42:16.176 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:42:18.008 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:42:34.900 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:42:36.685 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:42:39.414 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:42:41.261 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:43:25.891 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:43:27.752 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:43:29.608 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:44:22.644 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:44:26.518 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:47:58.559 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:48:00.402 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:53:25.132 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:53:27.021 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:53:45.333 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:53:47.181 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:53:56.342 | ERROR    | app.services.chat:init_image_stream_chat:267 - 初始化流式图片聊天失败: 'MessageResponse' object has no attribute 'file_id'
+2024-11-27 19:53:56.343 | ERROR    | app.api.v1.chat:init_image_stream_chat:369 - 初始化流式图片聊天失败: 503: API error: 初始化流式图片聊天失败: 'MessageResponse' object has no attribute 'file_id'
+2024-11-27 19:54:56.840 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:56:28.086 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:56:35.900 | ERROR    | app.services.chat:init_image_stream_chat:267 - 初始化流式图片聊天失败: name 'File' is not defined
+2024-11-27 19:56:35.901 | ERROR    | app.api.v1.chat:init_image_stream_chat:369 - 初始化流式图片聊天失败: 503: API error: 初始化流式图片聊天失败: name 'File' is not defined
+2024-11-27 19:57:20.061 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:57:21.904 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:57:30.263 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:57:32.102 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:57:37.539 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:57:39.343 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:03:25.692 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:03:27.556 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:03:36.107 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:03:37.924 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:04:22.711 | INFO     | app.services.chat:process_stream_chat:177 - 成功保存AI回复消息: conversation_id=19, parent_message_id=83, content_preview=看起来您提到要分析的文件并没有成功上传或显示。如果您能尝试重新上传文件，或者提供文件的具体内容（如文本内容或图片描述），我将能够更好地帮助您进行分析。请告诉我更多细节！...
+2024-11-27 20:07:35.423 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:07:37.288 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:09:10.381 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:09:12.330 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:09:28.774 | ERROR    | app.api.v1.chat:stream_file_chat:535 - 处理文件分析流失败: 400: 会话未初始化，请先调用初始化接口
+2024-11-27 20:09:46.972 | ERROR    | app.api.v1.chat:stream_file_chat:535 - 处理文件分析流失败: 400: 会话未初始化，请先调用初始化接口
+2024-11-27 20:11:00.176 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:11:02.173 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:13:21.483 | ERROR    | app.api.v1.chat:handle_file_stream_chat:507 - 初始化流式文件聊天失败: (pymysql.err.DataError) (1406, "Data too long for column 'file_type' at row 1")
+[SQL: INSERT INTO files (file_id, original_name, file_path, file_type, mime_type, file_size, user_session_id, created_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)]
+[parameters: ('a02fd4df-ba1b-4485-b78c-625f8e08fb5c', 'ai赋能.docx', 'https://ai-assistant-wen.oss-cn-beijing.aliyuncs.com/chat/uploads/1732709601376-b3b0f7e6-a01c-40a3-a1a9-877cc645167f.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 0, 'd43f43bb-9491-4ba9-9cdd-4cb6c6552d04', datetime.datetime(2024, 11, 27, 12, 13, 21, 482669))]
+(Background on this error at: https://sqlalche.me/e/20/9h9h)
+2024-11-27 20:13:40.528 | ERROR    | app.api.v1.chat:handle_file_stream_chat:507 - 初始化流式文件聊天失败: (pymysql.err.DataError) (1406, "Data too long for column 'file_type' at row 1")
+[SQL: INSERT INTO files (file_id, original_name, file_path, file_type, mime_type, file_size, user_session_id, created_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)]
+[parameters: ('2e4f9b8f-7eca-40ed-bb39-a08de736cf53', 'ai赋能.docx', 'https://ai-assistant-wen.oss-cn-beijing.aliyuncs.com/chat/uploads/1732709620461-ba5dc702-d821-44e3-bf25-5bdc82881594.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 0, 'd43f43bb-9491-4ba9-9cdd-4cb6c6552d04', datetime.datetime(2024, 11, 27, 12, 13, 40, 527933))]
+(Background on this error at: https://sqlalche.me/e/20/9h9h)
+2024-11-27 20:18:33.065 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:18:34.948 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:18:45.414 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:18:47.309 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:18:53.049 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:18:54.925 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:23:18.073 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:23:19.931 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:23:41.057 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:23:42.877 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:24:01.013 | ERROR    | app.api.v1.chat:handle_file_stream_chat:513 - 处理文件流式聊天失败: extract_text() missing 1 required positional argument: 'file_path'
+2024-11-27 20:24:12.530 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:24:14.334 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:24:31.529 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:24:33.392 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:24:52.397 | ERROR    | app.api.v1.chat:handle_file_stream_chat:513 - 处理文件流式聊天失败: extract_text() missing 1 required positional argument: 'file_path'
+2024-11-27 20:25:34.007 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:25:35.910 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:25:49.290 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:25:51.149 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:26:13.074 | ERROR    | app.api.v1.chat:handle_file_stream_chat:508 - 处理文件流式聊天失败: 'content' is an invalid keyword argument for File
+2024-11-27 20:27:45.528 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:27:47.409 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:28:00.323 | ERROR    | app.services.chat:init_file_stream_chat:334 - 初始化流式文件聊天失败: 'File' object has no attribute 'content'
+2024-11-27 20:28:00.324 | ERROR    | app.api.v1.chat:handle_file_stream_chat:516 - 处理文件流式聊天失败: 503: API error: 初始化流式文件聊天失败: 'File' object has no attribute 'content'
+2024-11-27 20:30:28.275 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:30:30.135 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:34:19.106 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:34:20.993 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:34:55.690 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:34:57.510 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:36:49.135 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:36:51.003 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:37:09.235 | ERROR    | app.services.chat:extract_text:384 - 文本提取失败: 'utf-8' codec can't decode byte 0x91 in position 15: invalid start byte
+2024-11-27 20:38:03.473 | ERROR    | app.services.chat:extract_text:384 - 文本提取失败: 'utf-8' codec can't decode byte 0x91 in position 15: invalid start byte
+2024-11-27 20:39:17.484 | INFO     | app.utils.cache:close:37 - Redis连接已关闭

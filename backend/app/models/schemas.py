@@ -3,6 +3,7 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime
 import uuid
 import re
+import json
 
 class MessageBase(BaseModel):
     content: str = Field(..., description="消息内容")
@@ -13,13 +14,37 @@ class MessageBase(BaseModel):
 class MessageCreate(MessageBase):
     pass
 
-class MessageResponse(MessageBase):
+class BaseResponse(BaseModel):
+    code: int = 200
+    message: str = "success"
+
+class FileResponse(BaseModel):
+    file_id: str
+    original_name: str
+    file_type: str
+    file_path: str
+    mime_type: Optional[str] = None
+    file_size: Optional[int] = None
+    created_at: Optional[str] = None
+
+class MessageResponse(BaseModel):
     id: int
-    created_at: datetime
-    parent_message_id: Optional[int] = None
-    
-    class Config:
-        from_attributes = True
+    role: str
+    content: str
+    file_id: Optional[str] = None
+    file: Optional[FileResponse] = None
+    created_at: Optional[str] = None
+
+    @classmethod
+    def from_db_model(cls, message: "Message", file_info: Optional[Dict] = None):
+        return cls(
+            id=message.id,
+            role=message.role,
+            content=message.content,
+            file_id=message.file_id,
+            file=FileResponse(**file_info) if file_info else None,
+            created_at=message.created_at.isoformat() if message.created_at else None
+        )
 
 class ConversationBase(BaseModel):
     session_id: str = Field(..., description="会话ID")
@@ -135,34 +160,3 @@ class DocumentAnalysisRequest(BaseModel):
     query: Optional[str] = None
     system_prompt: Optional[str] = None
     session_id: str
-class FileResponse(BaseModel):
-    name: str
-    type: str
-    size: int
-    url: str
-
-class MessageResponse(BaseModel):
-    id: int
-    role: str
-    content: str
-    file: Optional[FileResponse] = None
-    created_at: Optional[str] = None
-
-    @classmethod
-    def from_db_model(cls, message: "Message", file_info: Optional[Dict] = None):
-        content = message.content
-        try:
-            # 尝试解析JSON内容
-            content_dict = json.loads(content)
-            if isinstance(content_dict, dict):
-                content = content_dict.get("message", content)
-        except json.JSONDecodeError:
-            pass
-
-        return cls(
-            id=message.id,
-            role=message.role,
-            content=content,
-            file=FileResponse(**file_info) if file_info else None,
-            created_at=message.created_at.isoformat() if message.created_at else None
-        )

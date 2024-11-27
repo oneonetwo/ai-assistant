@@ -120,7 +120,7 @@ async def init_stream_chat(
             detail=str(e)
         )
     except Exception as e:
-        app_logger.error(f"初始化流式聊天失败: {str(e)}")
+        app_logger.error(f"初始化流式聊失败: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="初始化流式聊天失败"
@@ -372,21 +372,15 @@ async def init_image_stream_chat(
             detail=str(e)
         )
 
-@router.get("/{session_id}/image/stream")
+@router.get("/{session_id}/image/stream",
+    summary="获取图片分析流式响应",
+    description="获取图片分析的SSE流式响应")
 async def stream_image_chat(
     session_id: str,
     db: AsyncSession = Depends(get_db)
 ):
-    """获取图片分析的SSE流式响应"""
     async def generate_stream():
         try:
-            # 验证会话是否已初始化
-            if not ai_client.is_session_initialized(session_id):
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="会话未初始化，请先调用初始化接口"
-                )
-
             conversation = await get_conversation(db, session_id)
             if not conversation:
                 raise NotFoundError("会话不存在")
@@ -395,12 +389,18 @@ async def stream_image_chat(
             last_message = await get_last_user_message(db, conversation.id)
             if not last_message:
                 raise NotFoundError("未找到用户消息")
-
-            # 解析消息内容
-            message_content = json.loads(last_message.content)
             
+            # 获取文件信息
+            file_query = select(File).where(File.file_id == last_message.file_id)
+            result = await db.execute(file_query)
+            file_record = result.scalar_one_or_none()
+            
+            if not file_record:
+                raise NotFoundError("图片文件不存在")
+
+            # 生成AI响应流
             full_response = ""
-            async for chunk in ai_client.get_stream(session_id):
+            async for chunk in ai_client.get_stream_response(session_id):
                 full_response += chunk
                 chunk_data = {
                     'type': 'chunk',
@@ -429,6 +429,7 @@ async def stream_image_chat(
             yield f"data: {json.dumps(end_data, ensure_ascii=False)}\n\n"
 
         except Exception as e:
+            app_logger.error(f"处理图片分析流失败: {str(e)}")
             error_data = {
                 'type': 'error',
                 'data': {
@@ -439,16 +440,124 @@ async def stream_image_chat(
 
     return StreamingResponse(
         generate_stream(),
-        media_type="text/event-stream",
-        headers={
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
-            'X-Accel-Buffering': 'no'
-        }
-    ) 
+        media_type="text/event-stream"
+    )
 
 @router.post("/{session_id}/file/stream")
-async def init_file_stream_chat(
+async def handle_file_stream_chat(
+    session_id: str,
+    request: FileChatRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    try:
+        # 初始化会话（如果需要）
+        if not ai_client.is_session_initialized(session_id):
+            await ai_client.init_session(session_id)
+
+        # 验证session_id格式
+        try:
+            uuid.UUID(session_id)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="无效的会话ID格式"
+            )
+
+        # 获取会话
+        conversation = await get_conversation(db, session_id)
+        if not conversation:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="会话不存在"
+            )
+
+        # 从文件URL提取文本
+        file_text = await chat_service.extract_text(request.file)
+
+        # 简化文件类型
+        simplified_file_type = "document"  # 默认为文档类型
+        if request.file_type.startswith('image/'):
+            simplified_file_type = "image"
+        elif request.file_type.startswith('video/'):
+            simplified_file_type = "video"
+        elif request.file_type.startswith('audio/'):
+            simplified_file_type = "audio"
+
+        # 创建文件记录
+        file_id = str(uuid.uuid4())
+        file_record = File(
+            file_id=file_id,
+            original_name=request.file_name,
+            file_path=request.file,
+            file_type=simplified_file_type,
+            mime_type=request.file_type,
+            file_size=0,
+            user_session_id=session_id
+        )
+        db.add(file_record)
+        await db.commit()
+
+        # 初始化流式聊天
+        await chat_service.init_file_stream_chat(
+            db=db,
+            session_id=session_id,
+            message=request.message,
+            file_id=file_id,
+            file_type=simplified_file_type,
+            file_text=file_text
+        )
+
+        return {
+            "status": "initialized",
+            "file_id": file_id
+        }
+
+    except Exception as e:
+        app_logger.error(f"处理文件流式聊天失败: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
+@router.get("/{session_id}/file/stream",
+    summary="获取文件分析流式响应",
+    description="获取文件分析的SSE流式响应")
+async def stream_file_chat(
+    session_id: str,
+    db: AsyncSession = Depends(get_db)
+):
+    try:
+        # 验证会话是否已初始化
+        if not ai_client.is_session_initialized(session_id):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="会话未初始化，请先调用初始化接口"
+            )
+
+        return StreamingResponse(
+            chat_service.process_stream_chat(db, session_id),
+            media_type="text/event-stream",
+            headers={
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+                'X-Accel-Buffering': 'no',
+                'Content-Type': 'text/event-stream',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type',
+            }
+        )
+    except Exception as e:
+        app_logger.error(f"处理文件分析流失败: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
+@router.post("/{session_id}/file/stream",
+    summary="处理文件流式聊天",
+    description="处理文件流式聊天请求并返回流式响应")
+async def handle_file_stream_chat(
     session_id: str,
     request: FileChatRequest,
     db: AsyncSession = Depends(get_db)
@@ -471,15 +580,15 @@ async def init_file_stream_chat(
                 detail="会话不存在"
             )
 
-        # 直接创建文件记录，使用远程URL
+        # 创建文件记录
         file_id = str(uuid.uuid4())
         file_record = File(
             file_id=file_id,
             original_name=request.file_name,
-            file_path=request.file,  # 直接使用远程URL
-            file_type="document",    # 简化文件类型
+            file_path=request.file,
+            file_type=request.file_type,
             mime_type=request.file_type,
-            file_size=0,  # 远程文件不需要记录大小
+            file_size=0,
             user_session_id=session_id
         )
         db.add(file_record)
@@ -491,119 +600,18 @@ async def init_file_stream_chat(
             session_id=session_id,
             message=request.message,
             file_id=file_id,
-            file_type="document"
+            file_type=request.file_type
         )
 
-        return {
-            "status": "initialized",
-            "file_id": file_id
-        }
+        # 返回流式响应
+        return StreamingResponse(
+            chat_service.process_stream_chat(db, session_id),
+            media_type="text/event-stream"
+        )
 
     except Exception as e:
-        app_logger.error(f"初始化流式文件聊天失败: {str(e)}")
+        app_logger.error(f"处理文件流式聊天失败: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
-        )
-
-@router.get("/{session_id}/file/stream",
-    summary="获取文件分析流式响应",
-    description="获取文件分析的SSE流式响应")
-async def stream_file_chat(
-    session_id: str,
-    db: AsyncSession = Depends(get_db)
-):
-    """
-    取文件分析流式响应
-    
-    - **session_id**: 会话ID
-    """
-    async def generate_stream():
-        try:
-            conversation = await get_conversation(db, session_id)
-            if not conversation:
-                raise NotFoundError("会话不存在")
-
-            # 获取最后一条用户消息
-            last_message = await get_last_user_message(db, conversation.id)
-            if not last_message:
-                raise NotFoundError("未找到用户消息")
-
-            # 解析消息内容
-            message_content = json.loads(last_message.content)
-            
-            # 获取文件信息
-            file_query = select(File).where(File.file_id == message_content["file_id"])
-            result = await db.execute(file_query)
-            file_record = result.scalar_one_or_none()
-            
-            if not file_record:
-                raise NotFoundError("文件不存在")
-
-            # 处理文件内容
-            extracted_text = None
-            if message_content["file_type"] == "document":
-                if file_record.file_path.startswith(('http://', 'https://')):
-                    # 使用document_service提取远程文件内容
-                    extracted_text = await document_service.extract_text_from_url(file_record.file_path)
-                else:
-                    extracted_text = await document_service.extract_text(file_record.file_path)
-            elif message_content["file_type"] == "image" and extract_text:
-                extracted_text = await image_service.extract_text(file_record.file_path)
-
-            full_response = ""
-            async for chunk in ai_client.analyze_file_stream(
-                file_id=message_content["file_id"],
-                query=message_content["message"],
-                file_type=message_content["file_type"],
-                extracted_text=extracted_text
-            ):
-                full_response += chunk
-                chunk_data = {
-                    'type': 'chunk',
-                    'data': {
-                        'content': chunk,
-                        'full_text': full_response
-                    }
-                }
-                yield f"data: {json.dumps(chunk_data, ensure_ascii=False)}\n\n"
-
-            # 保存AI响应
-            ai_msg = MessageCreate(
-                role="assistant",
-                content=full_response,
-                parent_message_id=last_message.id
-            )
-            await add_message(db, conversation.id, ai_msg)
-
-            # 发送结束事件
-            end_data = {
-                'type': 'end',
-                'data': {
-                    'full_text': full_response
-                }
-            }
-            yield f"data: {json.dumps(end_data, ensure_ascii=False)}\n\n"
-
-        except Exception as e:
-            error_data = {
-                'type': 'error',
-                'data': {
-                    'message': str(e)
-                }
-            }
-            yield f"data: {json.dumps(error_data, ensure_ascii=False)}\n\n"
-
-    return StreamingResponse(
-        generate_stream(),
-        media_type="text/event-stream",
-        headers={
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
-            'X-Accel-Buffering': 'no',
-            'Content-Type': 'text/event-stream',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type',
-        }
-    ) 
+        ) 
