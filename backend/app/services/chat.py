@@ -199,3 +199,104 @@ async def get_last_user_message(
     )
     result = await db.execute(query)
     return result.scalar_one_or_none()
+
+async def init_image_stream_chat(
+    db: AsyncSession,
+    session_id: str,
+    message: str,
+    image_data: str
+) -> None:
+    """初始化流式图片聊天"""
+    conversation = await get_conversation(db, session_id)
+    if not conversation:
+        raise NotFoundError(detail=f"会话 {session_id} 不存在")
+
+    try:
+        # 保存用户消息到数据库
+        user_msg = MessageCreate(
+            role="user",
+            content=message
+        )
+        saved_user_msg = await add_message(db, conversation.id, user_msg)
+
+        # 获取上下文消息
+        context_messages = await get_context_messages(
+            db,
+            conversation.id,
+            settings.MAX_CONTEXT_TURNS
+        )
+
+        # 转换为AI客户端所需格式
+        messages = [
+            {"role": msg.role, "content": msg.content}
+            for msg in context_messages
+        ]
+        messages.append({"role": "user", "content": message})
+
+        # 初始化流式响应
+        await ai_client.initialize_image_stream(
+            session_id=session_id,
+            messages=messages,
+            image_data=image_data
+        )
+
+    except Exception as e:
+        app_logger.error(f"初始化流式图片聊天失败: {str(e)}")
+        raise APIError(detail=f"初始化流式图片聊天失败: {str(e)}")
+
+async def init_file_stream_chat(
+    db: AsyncSession,
+    session_id: str,
+    message: str,
+    file_id: str,
+    file_type: str
+) -> None:
+    """初始化流式文件聊天"""
+    conversation = await get_conversation(db, session_id)
+    if not conversation:
+        raise NotFoundError(detail=f"会话 {session_id} 不存在")
+
+    try:
+        # 保存用户消息到数据库
+        user_msg = MessageCreate(
+            role="user",
+            content=json.dumps({
+                "message": message,
+                "file_id": file_id,
+                "file_type": file_type
+            })
+        )
+        saved_user_msg = await add_message(db, conversation.id, user_msg)
+
+        # 获取上下文消息
+        context_messages = await get_context_messages(
+            db,
+            conversation.id,
+            settings.MAX_CONTEXT_TURNS
+        )
+
+        # 转换为AI客户端所需格式
+        messages = [
+            {"role": msg.role, "content": msg.content}
+            for msg in context_messages
+        ]
+        
+        # 添加当前用户消息
+        messages.append({
+            "role": "user",
+            "content": message,
+            "file_id": file_id,
+            "file_type": file_type
+        })
+
+        # 初始化流式响应
+        model = ai_client.vision_model if file_type == "image" else ai_client.model
+        await ai_client.initialize_stream(
+            session_id=session_id,
+            messages=messages,
+            model=model
+        )
+
+    except Exception as e:
+        app_logger.error(f"初始化流式文件聊天失败: {str(e)}")
+        raise APIError(detail=f"初始化流式文件聊天失败: {str(e)}")

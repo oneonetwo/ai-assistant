@@ -8,6 +8,7 @@ from app.services.exceptions import DatabaseError
 from app.core.logging import app_logger
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
+from sqlalchemy import and_
 
 async def create_conversation(
     db: AsyncSession,
@@ -162,4 +163,24 @@ async def update_conversation_name(
         return conversation
     except Exception as e:
         app_logger.error(f"更新会话名称失败: {str(e)}")
-        raise DatabaseError(detail="更新会话名称失败") 
+        raise DatabaseError(detail="更新会话名称失败")
+
+async def get_last_user_message(
+    db: AsyncSession,
+    conversation_id: int
+) -> Optional[Message]:
+    """获取会话中最后一条用户消息"""
+    query = (
+        select(Message)
+        .where(
+            and_(
+                Message.conversation_id == conversation_id,
+                Message.role == "user"
+            )
+        )
+        .order_by(desc(Message.created_at))
+        .limit(1)
+    )
+    result = await db.execute(query)
+    return result.scalar_one_or_none()
+  

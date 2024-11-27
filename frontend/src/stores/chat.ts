@@ -289,7 +289,7 @@ export const useChatStore = defineStore('chat', () => {
         message: '重命名成功'
       })
     } catch (error) {
-      // 发生错误时恢复原名称
+      // 发生错误时恢复原名��
       conversation.name = originalName
       
       showToast({
@@ -441,34 +441,77 @@ export const useChatStore = defineStore('chat', () => {
 
       // 更新文件 URL
       userMessage.file!.url = fileUrl
-
-      // 根据文件类型调用不同的 API
-      const response = isImage 
-        ? await ChatAPI.sendImageMessage(
-            currentConversationId.value,
-            content,
-            fileUrl,
-            {
-              systemPrompt: options.systemPrompt,
-              extractText: options.extractText
-            }
-          )
-        : await ChatAPI.sendFileMessage(
-            currentConversationId.value,
-            content,
-            fileUrl,
-            file.name,
-            file.type,
-            {
-              systemPrompt: options.systemPrompt
-            }
-          )
-
-      // 更新消息状态
       userMessage.status = 'success'
-      updateConversation(currentConversationId.value, {
-        messages: [...conversation.messages, response.data]
-      })
+
+      // 创建助手消息占位
+      const assistantMessage: Message = {
+        id: generateUUID(),
+        parent_message_id: userMessage.id,
+        role: 'assistant',
+        content: '',
+        timestamp: Date.now(),
+        status: 'sending'
+      }
+      
+      conversation.messages.push(assistantMessage)
+
+      // 根据文件类型调用不同的流式API
+      if (isImage) {
+        await ChatAPI.streamImageChat(
+          currentConversationId.value,
+          content,
+          fileUrl,
+          {
+            onStart: () => {
+              console.log('开始图片分析')
+            },
+            onChunk: (chunk) => {
+              updateMessageContent(currentConversationId.value!, assistantMessage.id, chunk)
+            },
+            onEnd: () => {
+              assistantMessage.status = 'success'
+              conversation.lastTime = new Date().toISOString()
+            },
+            onError: (error) => {
+              assistantMessage.status = 'error'
+              assistantMessage.error = error.message
+              throw error
+            }
+          },
+          {
+            systemPrompt: options.systemPrompt,
+            extractText: options.extractText
+          }
+        )
+      } else {
+        await ChatAPI.streamFileChat(
+          currentConversationId.value,
+          content,
+          fileUrl,
+          file.name,
+          file.type,
+          {
+            onStart: () => {
+              console.log('开始文件分析')
+            },
+            onChunk: (chunk) => {
+              updateMessageContent(currentConversationId.value!, assistantMessage.id, chunk)
+            },
+            onEnd: () => {
+              assistantMessage.status = 'success'
+              conversation.lastTime = new Date().toISOString()
+            },
+            onError: (error) => {
+              assistantMessage.status = 'error'
+              assistantMessage.error = error.message
+              throw error
+            }
+          },
+          {
+            systemPrompt: options.systemPrompt
+          }
+        )
+      }
 
     } catch (error) {
       console.error(`发送${isImage ? '图片' : '文件'}消息失败:`, error)

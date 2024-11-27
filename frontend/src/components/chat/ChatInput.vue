@@ -192,6 +192,8 @@ function getFilePreview(file: File) {
     <div class="input-area">
       <div class="toolbar">
         <van-uploader
+          accept=".txt,.pdf,.docx,.epub,.md,image/*"
+          :max-size="2000 * 1024"
           :max-count="1"
           :before-read="beforeUpload"
           :after-read="handleFileUpload"

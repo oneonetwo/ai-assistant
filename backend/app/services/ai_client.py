@@ -224,7 +224,7 @@ class AIClient:
 
         # 生成最终总结
         final_messages = [
-            {"role": "user", "content": f"基于以下分段分析结果，{query}\n\n{combined_analysis}"}
+            {"role": "user", "content": f"基于以下析结果，{query}\n\n{combined_analysis}"}
         ]
         return await self.generate_response(
             final_messages,
@@ -283,7 +283,7 @@ class AIClient:
             app_logger.error(f"图片分析失败: {str(e)}")
             raise APIError(f"图片分析失败: {str(e)}")
 
-    async def initialize_stream(self, session_id: str, messages: List[Dict[str, str]]):
+    async def initialize_stream(self, session_id: str, messages: List[Dict[str, str]], model: Optional[str] = None):
         """初始化流式响应"""
         try:
             # 清理现有的流
@@ -292,6 +292,7 @@ class AIClient:
             # 创建新的流式响应
             stream = await self._make_api_call(
                 messages=messages,
+                model=model or self.model,  # 使用传入的model或默认model
                 stream=True
             )
             
@@ -322,6 +323,118 @@ class AIClient:
         if session_id in self._active_streams:
             # 从活动流中移除
             del self._active_streams[session_id]
+
+    async def analyze_image_stream(
+        self,
+        image_url: str,
+        query: str,
+        system_prompt: Optional[str] = None,
+        extracted_text: Optional[str] = None
+    ) -> AsyncGenerator[str, None]:
+        """流式图片分析功能"""
+        try:
+            content = [
+                {"type": "text", "text": query},
+                {"type": "image_url", "image_url": {"url": image_url}}
+            ]
+
+            if extracted_text:
+                content.append({
+                    "type": "text",
+                    "text": f"\n提取的文字内容：\n{extracted_text}"
+                })
+
+            messages = [{"role": "user", "content": content}]
+            
+            if system_prompt:
+                messages.insert(0, {"role": "system", "content": system_prompt})
+
+            # 使用流式响应
+            stream = await self._make_api_call(
+                messages=messages,
+                model=self.vision_model,
+                stream=True
+            )
+
+            async for chunk in stream:
+                if chunk.choices[0].delta.content is not None:
+                    yield chunk.choices[0].delta.content
+
+        except Exception as e:
+            app_logger.error(f"流式图片分析失败: {str(e)}")
+            raise APIError(f"流式图片分析失败: {str(e)}")
+
+    async def analyze_file_stream(
+        self,
+        file_id: str,
+        query: str,
+        file_type: str,
+        system_prompt: Optional[str] = None,
+        extracted_text: Optional[str] = None
+    ) -> AsyncGenerator[str, None]:
+        """流式文件分析功能"""
+        try:
+            content = []
+            
+            if file_type == "image":
+                content = [
+                    {"type": "text", "text": query},
+                    {"type": "image_url", "image_url": {"url": file_id}}
+                ]
+            else:
+                content = [{"type": "text", "text": f"{query}\n\n文档内容：{extracted_text}"}]
+
+            messages = [{"role": "user", "content": content}]
+            
+            if system_prompt:
+                messages.insert(0, {"role": "system", "content": system_prompt})
+
+            # 使用流式响应
+            stream = await self._make_api_call(
+                messages=messages,
+                model=self.vision_model if file_type == "image" else self.model,
+                stream=True
+            )
+
+            async for chunk in stream:
+                if chunk.choices[0].delta.content is not None:
+                    yield chunk.choices[0].delta.content
+
+        except Exception as e:
+            app_logger.error(f"流式文件分析失败: {str(e)}")
+            raise APIError(f"流式文件分析失败: {str(e)}")
+
+    async def initialize_image_stream(self, session_id: str, messages: List[Dict[str, str]], image_data: str):
+        """初始化图片流式响应"""
+        try:
+            # 清理现有的流
+            await self.cleanup_stream(session_id)
+            
+            # 构造带图片的消息格式
+            content = [
+                {"type": "text", "text": messages[-1]["content"]},  # 最后一条消息的文本
+                {"type": "image_url", "image_url": {"url": image_data}}  # 图片URL
+            ]
+            
+            image_messages = messages[:-1]  # 保留之前的上下文消息
+            image_messages.append({
+                "role": "user",
+                "content": content
+            })
+            
+            # 创建新的流式响应
+            stream = await self._make_api_call(
+                messages=image_messages,
+                model=self.vision_model,  # 使用支持图片的模型
+                stream=True
+            )
+            
+            # 存储流
+            self._active_streams[session_id] = stream
+            
+        except Exception as e:
+            app_logger.error(f"初始化图片流式响应失败: {str(e)}")
+            raise APIError(f"初始化图片流式响应失败: {str(e)}")
 
 # 创建全局AI客户端实例
 ai_client = AIClient() 

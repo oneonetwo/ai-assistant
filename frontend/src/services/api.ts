@@ -45,7 +45,7 @@ export class ConversationAPI {
   }
 
   /**
-   * 清除会话上���
+   * 清除会话上
    * @param sessionId - 会话ID
    */
   static async clearContext(sessionId: string) {
@@ -152,58 +152,152 @@ export class ChatClient {
  */
 export class ChatAPI {
   /**
-   * 发送带图片的消息并获取AI分析
+   * 发送带图片的消息并获取AI分析（流式响应）
    */
-  static async sendImageMessage(
+  static async streamImageChat(
     sessionId: string,
     message: string,
     imageUrl: string,
+    callbacks: {
+      onStart?: () => void
+      onChunk?: (chunk: string, fullText: string) => void
+      onEnd?: (fullText: string) => void
+      onError?: (error: Error) => void
+      signal?: AbortSignal
+    } = {},
     options: {
       systemPrompt?: string
       extractText?: boolean
     } = {}
   ) {
     try {
-      const payload = {
+      // 首先发送 POST 请求初始化流
+      await request.post(`${API_BASE_URL}/chat/${sessionId}/image/stream`, {
         message,
         image: imageUrl,
         system_prompt: options.systemPrompt || '你是一个专业的图像分析助手',
         extract_text: options.extractText || false
+      })
+
+      // 然后建立 SSE 连接
+      const url = new URL(
+        `${window.location.origin}/api${API_BASE_URL}/chat/${sessionId}/image/stream`
+      )
+      
+      const eventSource = new EventSource(url.toString())
+      let fullText = ''
+
+      eventSource.onmessage = (event) => {
+        try {
+          const response = JSON.parse(event.data)
+          
+          switch (response.type) {
+            case 'start':
+              callbacks.onStart?.()
+              break
+              
+            case 'chunk':
+              fullText += response.data.content
+              callbacks.onChunk?.(response.data.content, fullText)
+              break
+              
+            case 'end':
+              callbacks.onEnd?.(fullText)
+              eventSource.close()
+              break
+              
+            case 'error':
+              throw new Error(response.data.message)
+          }
+        } catch (error) {
+          eventSource.close()
+          callbacks.onError?.(error as Error)
+        }
       }
 
-      return request.post(`${API_BASE_URL}/chat/${sessionId}/image`, payload)
+      eventSource.onerror = (error) => {
+        eventSource.close()
+        callbacks.onError?.(error as Error)
+      }
+
     } catch (error) {
-      console.error('发送图片消息失败:', error)
-      throw error
+      callbacks.onError?.(error as Error)
     }
   }
 
   /**
-   * 发送带文件的消息并获取AI回复
+   * 发送带文件的消息并获取AI分析（流式响应）
    */
-  static async sendFileMessage(
+  static async streamFileChat(
     sessionId: string,
     message: string,
     fileUrl: string,
     fileName: string,
     fileType: string,
+    callbacks: {
+      onStart?: () => void
+      onChunk?: (chunk: string, fullText: string) => void
+      onEnd?: (fullText: string) => void
+      onError?: (error: Error) => void
+      signal?: AbortSignal
+    } = {},
     options: {
       systemPrompt?: string
     } = {}
   ) {
     try {
-      const payload = {
+      // 首先发送 POST 请求初始化流
+      await request.post(`${API_BASE_URL}/chat/${sessionId}/file/stream`, {
         message,
         file: fileUrl,
         file_name: fileName,
         file_type: fileType,
         system_prompt: options.systemPrompt || '你是一个专业的文件分析助手'
+      })
+
+      // 然后建立 SSE 连接
+      const url = new URL(
+        `${window.location.origin}/api${API_BASE_URL}/chat/${sessionId}/file/stream`
+      )
+      
+      const eventSource = new EventSource(url.toString())
+      let fullText = ''
+
+      eventSource.onmessage = (event) => {
+        try {
+          const response = JSON.parse(event.data)
+          
+          switch (response.type) {
+            case 'start':
+              callbacks.onStart?.()
+              break
+              
+            case 'chunk':
+              fullText += response.data.content
+              callbacks.onChunk?.(response.data.content, fullText)
+              break
+              
+            case 'end':
+              callbacks.onEnd?.(fullText)
+              eventSource.close()
+              break
+              
+            case 'error':
+              throw new Error(response.data.message)
+          }
+        } catch (error) {
+          eventSource.close()
+          callbacks.onError?.(error as Error)
+        }
       }
 
-      return request.post(`${API_BASE_URL}/chat/${sessionId}/file`, payload)
+      eventSource.onerror = (error) => {
+        eventSource.close()
+        callbacks.onError?.(error as Error)
+      }
+
     } catch (error) {
-      console.error('发送文件消息失败:', error)
-      throw error
+      callbacks.onError?.(error as Error)
     }
   }
 } 
