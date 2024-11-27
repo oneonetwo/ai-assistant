@@ -1,8 +1,8 @@
-"""add_file_id_to_messages_table
+"""initial_migration
 
-Revision ID: cbfedf0230e5
-Revises: 74772de63f2f
-Create Date: 2024-11-27 17:36:48.758593
+Revision ID: fcf7d637ac1d
+Revises: 
+Create Date: 2024-11-27 18:24:48.014100
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'cbfedf0230e5'
-down_revision: Union[str, None] = '74772de63f2f'
+revision: str = 'fcf7d637ac1d'
+down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

@@ -1,14 +1,15 @@
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
-from app.db.models import Conversation, Message
-from app.models.schemas import ConversationCreate, MessageCreate
+from app.db.models import Conversation, Message, File
+from app.models.schemas import ConversationCreate, MessageCreate, MessageResponse
 from app.core.config import settings
 from app.services.exceptions import DatabaseError
 from app.core.logging import app_logger
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 from sqlalchemy import and_
+import json
 
 async def create_conversation(
     db: AsyncSession,
@@ -56,7 +57,8 @@ async def add_message(
             conversation_id=conversation_id,
             role=message.role,
             content=message.content,
-            parent_message_id=message.parent_message_id
+            parent_message_id=message.parent_message_id,
+            file_id=message.file_id
         )
         db.add(db_message)
         await db.commit()
@@ -69,32 +71,57 @@ async def add_message(
 async def get_context_messages(
     db: AsyncSession,
     conversation_id: int,
-    limit: int = settings.MAX_CONTEXT_TURNS
-) -> List[Message]:
-    """获取对话上下文消息，并按问答对组织"""
+    limit: int = None
+) -> List[MessageResponse]:
+    # 构建查询
     query = (
-        select(Message)
+        select(Message, File)
+        .outerjoin(File, File.file_id == Message.file_id)
         .where(Message.conversation_id == conversation_id)
         .order_by(desc(Message.created_at))
-        .limit(limit * 2)  # 获取足够的消息以确保完整的问答对
     )
+    
+    if limit:
+        query = query.limit(limit)
+        
     result = await db.execute(query)
-    messages = list(reversed(result.scalars().all()))
+    rows = result.all()
     
-    # 组织消息，确保问答对的完整性
-    organized_messages = []
-    current_user_message = None
+    messages = []
+    for message, file in rows:
+        file_info = None
+        if file:
+            file_info = {
+                "name": file.original_name,
+                "type": file.file_type,
+                "size": file.file_size,
+                "url": file.file_path  # 直接使用file_path作为URL
+            }
+            
+        try:
+            # 尝试解析JSON内容
+            content = message.content
+            if message.role == "user":
+                try:
+                    content_dict = json.loads(content)
+                    if isinstance(content_dict, dict):
+                        content = content_dict.get("message", content)
+                except json.JSONDecodeError:
+                    pass
+            
+            messages.append(MessageResponse(
+                id=message.id,
+                role=message.role,
+                content=content,
+                file=file_info,
+                created_at=message.created_at.isoformat() if message.created_at else None
+            ))
+            
+        except Exception as e:
+            app_logger.error(f"处理消息失败: {str(e)}")
+            continue
     
-    for message in messages:
-        if message.role == "user":
-            current_user_message = message
-        elif message.role == "assistant" and current_user_message:
-            # 确保是对应的问答对
-            if message.parent_message_id == current_user_message.id:
-                organized_messages.extend([current_user_message, message])
-                current_user_message = None
-    
-    return organized_messages
+    return messages
 
 async def clear_context(
     db: AsyncSession,

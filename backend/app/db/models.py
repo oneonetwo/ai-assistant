@@ -21,12 +21,13 @@ class Conversation(Base):
 class Message(Base):
     __tablename__ = "messages"
     
-    id = Column(Integer, primary_key=True, index=True)  # 消息ID
-    conversation_id = Column(Integer, ForeignKey("conversations.id"))  # 关联的对话ID
+    id = Column(Integer, primary_key=True, index=True)
+    role = Column(String(50), nullable=False)
+    content = Column(Text, nullable=False)
+    conversation_id = Column(Integer, ForeignKey("conversations.id"))
     parent_message_id = Column(Integer, ForeignKey("messages.id"), nullable=True)
-    role = Column(String(20))  # 消息角色（user/assistant）
-    content = Column(Text)  # 消息内容
-    created_at = Column(DateTime, default=datetime.utcnow)  # 创建时间 
+    file_id = Column(String(36), ForeignKey("files.file_id"), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     # 添加与 Conversation 的关系
     conversation = relationship("Conversation", back_populates="messages")

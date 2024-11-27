@@ -27,7 +27,8 @@ async def process_chat(
         # 保存用户消息
         user_msg = MessageCreate(
             role="user",
-            content=user_message
+            content=user_message,
+            file_id=None
         )
         saved_user_msg = await add_message(db, conversation.id, user_msg)
 
@@ -206,7 +207,8 @@ async def init_image_stream_chat(
     db: AsyncSession,
     session_id: str,
     message: str,
-    image_data: str
+    image_url: str,
+    file_id: str
 ) -> None:
     """初始化流式图片聊天"""
     conversation = await get_conversation(db, session_id)
@@ -214,10 +216,16 @@ async def init_image_stream_chat(
         raise NotFoundError(detail=f"会话 {session_id} 不存在")
 
     try:
-        # 保存用户消息到数据库
+        # 保存用户消息到数据库，参考文件聊天的格式
         user_msg = MessageCreate(
             role="user",
-            content=message
+            content=json.dumps({
+                "message": message,
+                "file_id": file_id,
+                "file_type": "image",
+                "image_url": image_url
+            }),
+            file_id=file_id
         )
         saved_user_msg = await add_message(db, conversation.id, user_msg)
 
@@ -229,17 +237,31 @@ async def init_image_stream_chat(
         )
 
         # 转换为AI客户端所需格式
-        messages = [
-            {"role": msg.role, "content": msg.content}
-            for msg in context_messages
-        ]
-        messages.append({"role": "user", "content": message})
+        messages = []
+        for msg in context_messages[:-1]:  # 排除最后一条消息
+            try:
+                content = json.loads(msg.content)
+                if isinstance(content, dict):
+                    messages.append({"role": msg.role, "content": content.get("message", msg.content)})
+                else:
+                    messages.append({"role": msg.role, "content": msg.content})
+            except json.JSONDecodeError:
+                messages.append({"role": msg.role, "content": msg.content})
+
+        # 添加当前用户消息，使用正确的Vision API格式
+        messages.append({
+            "role": "user",
+            "content": [
+                {"type": "text", "text": message},
+                {"type": "image_url", "image_url": {"url": image_url}}
+            ]
+        })
 
         # 初始化流式响应
-        await ai_client.initialize_image_stream(
+        await ai_client.initialize_stream(
             session_id=session_id,
             messages=messages,
-            image_data=image_data
+            model=ai_client.vision_model
         )
 
     except Exception as e:

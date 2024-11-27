@@ -335,6 +335,7 @@ async def init_image_stream_chat(
     request: ImageChatRequest,
     db: AsyncSession = Depends(get_db)
 ):
+    """初始化图片流式聊天"""
     try:
         # 创建文件记录
         file_id = str(uuid.uuid4())
@@ -350,50 +351,17 @@ async def init_image_stream_chat(
         db.add(file_record)
         await db.commit()
 
-        # 保存用户消息
-        user_msg = MessageCreate(
-            role="user",
-            content=json.dumps({
-                "message": request.message,
-                "image_url": request.image,
-                "file_id": file_id
-            })
-        )
-        
-        conversation = await get_conversation(db, session_id)
-        if not conversation:
-            raise NotFoundError(detail=f"会话 {session_id} 不存在")
-            
-        saved_user_msg = await add_message(db, conversation.id, user_msg)
-
-        # 获取上下文消息
-        context_messages = await get_context_messages(
-            db,
-            conversation.id,
-            settings.MAX_CONTEXT_TURNS
-        )
-
-        # 转换为AI客户端所需格式
-        messages = [
-            {"role": msg.role, "content": msg.content}
-            for msg in context_messages
-        ]
-        messages.append({
-            "role": "user", 
-            "content": request.message,
-            "image_url": request.image
-        })
-
-        # 初始化流式响应
-        await ai_client.initialize_image_stream(
+        # 初始化流式聊天
+        await chat_service.init_image_stream_chat(
+            db=db,
             session_id=session_id,
-            messages=messages,
-            image_data=request.image
+            message=request.message,
+            image_url=request.image,
+            file_id=file_id
         )
 
         return {
-            "status": "initialized", 
-            "message_id": saved_user_msg.id,
+            "status": "initialized",
             "file_id": file_id
         }
 
@@ -404,20 +372,21 @@ async def init_image_stream_chat(
             detail=str(e)
         )
 
-@router.get("/{session_id}/image/stream",
-    summary="获取图片分析流式响应",
-    description="获取图片分析的SSE流式响应")
+@router.get("/{session_id}/image/stream")
 async def stream_image_chat(
     session_id: str,
     db: AsyncSession = Depends(get_db)
 ):
-    """
-    获取图片分析的流式响应
-    
-    - **session_id**: 会话ID
-    """
+    """获取图片分析的SSE流式响应"""
     async def generate_stream():
         try:
+            # 验证会话是否已初始化
+            if not ai_client.is_session_initialized(session_id):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="会话未初始化，请先调用初始化接口"
+                )
+
             conversation = await get_conversation(db, session_id)
             if not conversation:
                 raise NotFoundError("会话不存在")
@@ -431,10 +400,7 @@ async def stream_image_chat(
             message_content = json.loads(last_message.content)
             
             full_response = ""
-            async for chunk in ai_client.analyze_image_stream(
-                image_url=message_content["image_url"],
-                query=message_content["message"]
-            ):
+            async for chunk in ai_client.get_stream(session_id):
                 full_response += chunk
                 chunk_data = {
                     'type': 'chunk',

@@ -8,6 +8,7 @@ class MessageBase(BaseModel):
     content: str = Field(..., description="消息内容")
     role: str = Field(..., description="消息角色", pattern="^(user|assistant)$")
     parent_message_id: Optional[int] = Field(None, description="父消息ID")
+    file_id: Optional[str] = Field(None, description="关联文件ID")
 
 class MessageCreate(MessageBase):
     pass

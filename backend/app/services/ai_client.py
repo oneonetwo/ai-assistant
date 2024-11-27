@@ -224,7 +224,7 @@ class AIClient:
 
         # 生成最终总结
         final_messages = [
-            {"role": "user", "content": f"基于以下析结果，{query}\n\n{combined_analysis}"}
+            {"role": "user", "content": f"基于以下结果，{query}\n\n{combined_analysis}"}
         ]
         return await self.generate_response(
             final_messages,
@@ -404,28 +404,21 @@ class AIClient:
             app_logger.error(f"流式文件分析失败: {str(e)}")
             raise APIError(f"流式文件分析失败: {str(e)}")
 
-    async def initialize_image_stream(self, session_id: str, messages: List[Dict[str, str]], image_data: str):
+    async def initialize_image_stream(
+        self, 
+        session_id: str, 
+        messages: List[Dict[str, str]], 
+        image_data: str
+    ):
         """初始化图片流式响应"""
         try:
             # 清理现有的流
             await self.cleanup_stream(session_id)
             
-            # 构造带图片的消息格式
-            content = [
-                {"type": "text", "text": messages[-1]["content"]},  # 最后一条消息的文本
-                {"type": "image_url", "image_url": {"url": image_data}}  # 图片URL
-            ]
-            
-            image_messages = messages[:-1]  # 保留之前的上下文消息
-            image_messages.append({
-                "role": "user",
-                "content": content
-            })
-            
             # 创建新的流式响应
             stream = await self._make_api_call(
-                messages=image_messages,
-                model=self.vision_model,  # 使用支持图片的模型
+                messages=messages,
+                model=self.vision_model,
                 stream=True
             )
             
@@ -435,6 +428,26 @@ class AIClient:
         except Exception as e:
             app_logger.error(f"初始化图片流式响应失败: {str(e)}")
             raise APIError(f"初始化图片流式响应失败: {str(e)}")
+
+    async def get_stream(self, session_id: str):
+        """获取流式响应"""
+        try:
+            stream = self._active_streams.get(session_id)
+            if not stream:
+                raise APIError("未找到活动的流式响应")
+
+            async for chunk in stream:
+                if hasattr(chunk.choices[0].delta, "content"):
+                    content = chunk.choices[0].delta.content
+                    if content:
+                        yield content
+
+            # 清理流
+            await self.cleanup_stream(session_id)
+
+        except Exception as e:
+            app_logger.error(f"获取流式响应失败: {str(e)}")
+            raise APIError(f"获取流式响应失败: {str(e)}")
 
 # 创建全局AI客户端实例
 ai_client = AIClient() 

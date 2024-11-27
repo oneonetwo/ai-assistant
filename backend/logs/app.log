@@ -330,3 +330,64 @@
 2024-11-27 17:57:05.340 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-11-27 17:57:15.806 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
 2024-11-27 17:57:17.651 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 17:57:19.457 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:02:19.760 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:02:21.645 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:02:44.468 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:02:46.295 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:02:48.827 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:02:50.639 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:05:30.148 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:05:56.076 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:05:58.125 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:08:10.948 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:08:12.907 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:08:15.013 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:08:43.984 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:08:45.934 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:09:09.033 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:09:11.082 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:09:13.051 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:09:15.048 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:09:17.019 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:10:08.882 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:10:29.958 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:10:31.774 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:10:39.324 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:10:41.182 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:10:51.302 | ERROR    | app.services.context:add_message:68 - 添加消息失败: 'MessageCreate' object has no attribute 'file_id'
+2024-11-27 18:10:51.303 | ERROR    | app.services.chat:initialize_stream_chat:102 - 初始化流式聊天失败: 500: Database error: 添加消息失败
+2024-11-27 18:10:51.303 | ERROR    | app.api.v1.chat:init_stream_chat:123 - 初始化流式聊天失败: 503: API error: 初始化流式聊天失败: 500: Database error: 添加消息失败
+2024-11-27 18:26:09.424 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:26:26.288 | ERROR    | app.services.context:add_message:68 - 添加消息失败: 'MessageCreate' object has no attribute 'file_id'
+2024-11-27 18:26:26.289 | ERROR    | app.services.chat:initialize_stream_chat:102 - 初始化流式聊天失败: 500: Database error: 添加消息失败
+2024-11-27 18:26:26.289 | ERROR    | app.api.v1.chat:init_stream_chat:123 - 初始化流式聊天失败: 503: API error: 初始化流式聊天失败: 500: Database error: 添加消息失败
+2024-11-27 18:27:42.789 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:27:44.724 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:27:46.646 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:27:48.479 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:32:43.475 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:32:45.376 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:32:50.518 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:32:52.479 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:32:54.343 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:36:04.835 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:36:06.806 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:36:12.150 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:36:14.011 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:36:15.852 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:36:34.069 | INFO     | app.services.chat:process_stream_chat:177 - 成功保存AI回复消息: conversation_id=4, parent_message_id=10, content_preview=这是一张抽象艺术风格的图像，主要由红色和橙色构成。
+
+在左上角到右下角有一条从深红渐变至亮黄的斜线，这条线条占据了整个画面的一半以上，并且有明显的弯曲弧度。
+背景是纯红色，与黄色曲线形成了鲜明对比，使...
+2024-11-27 18:37:05.669 | INFO     | app.services.chat:process_stream_chat:177 - 成功保存AI回复消息: conversation_id=5, parent_message_id=15, content_preview=这是一张包含两个按钮的图像，每个按钮都带有中文文字。
+
+第一个橙色渐变背景的按钮上写着“去发小红书”，而第二个紫色渐变背景的按钮则显示着“已发小红书？提交审核”。
+
+这些信息可能与某种社交媒体或应用程...
+2024-11-27 18:40:09.633 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:40:11.586 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:40:19.841 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:40:22.044 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:44:35.856 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:44:37.767 | INFO     | app.utils.cache:init:29 - Redis连接成功

@@ -14,11 +14,15 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int
 
     # 数据库配置
-    DB_HOST: str
-    DB_PORT: int
-    DB_USER: str
-    DB_PASSWORD: str
-    DB_NAME: str
+    DB_HOST: str = "localhost"
+    DB_PORT: int = 3306
+    DB_USER: str = "root"
+    DB_PASSWORD: str = "root"
+    DB_NAME: str = "ai_assistant"
+
+    @property
+    def DATABASE_URL(self) -> str:
+        return f"mysql+aiomysql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     # Redis配置
     REDIS_HOST: str = "localhost"
@@ -33,7 +37,7 @@ class Settings(BaseSettings):
     QWEN_API_TIMEOUT: int
 
     # 上下文配置
-    MAX_CONTEXT_TURNS: int
+    MAX_CONTEXT_TURNS: int = 10
     MAX_TOKEN_LENGTH: int
 
     # 文件存储配置
