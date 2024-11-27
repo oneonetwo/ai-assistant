@@ -33,6 +33,7 @@ import imghdr
 import aiohttp
 import io
 from docx import Document
+from pathlib import Path
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -218,15 +219,30 @@ async def image_chat(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="无效的会话ID格式"
             )
+            
+        # 创建文件记录
+        file_id = str(uuid.uuid4())
+        file_record = File(
+            file_id=file_id,
+            original_name=Path(request.image).name,  # 从URL提取文件名
+            file_path=request.image,  # 存储图片URL
+            file_type="image",
+            mime_type="image/*",  # 简化MIME类型
+            file_size=0,  # 远程文件不需要记录大小
+            user_session_id=session_id
+        )
+        db.add(file_record)
+        await db.commit()
         
-        # 直接使用URL分析图片
+        # 分析图片
         result = await image_service.analyze_image_from_url(
             db=db,
             image_url=request.image,
             query=request.message,
             extract_text=request.extract_text,
             system_prompt=request.system_prompt,
-            session_id=session_id
+            session_id=session_id,
+            file_id=file_id  # 添加file_id参数
         )
         
         return ImageChatResponse(**result)
@@ -319,20 +335,35 @@ async def init_image_stream_chat(
     request: ImageChatRequest,
     db: AsyncSession = Depends(get_db)
 ):
-    """初始化图片流式聊天"""
-    conversation = await get_conversation(db, session_id)
-    if not conversation:
-        raise NotFoundError(detail=f"会话 {session_id} 不存在")
-
     try:
+        # 创建文件记录
+        file_id = str(uuid.uuid4())
+        file_record = File(
+            file_id=file_id,
+            original_name=Path(request.image).name,
+            file_path=request.image,
+            file_type="image",
+            mime_type="image/*",
+            file_size=0,
+            user_session_id=session_id
+        )
+        db.add(file_record)
+        await db.commit()
+
         # 保存用户消息
         user_msg = MessageCreate(
             role="user",
             content=json.dumps({
                 "message": request.message,
-                "image_url": request.image
+                "image_url": request.image,
+                "file_id": file_id
             })
         )
+        
+        conversation = await get_conversation(db, session_id)
+        if not conversation:
+            raise NotFoundError(detail=f"会话 {session_id} 不存在")
+            
         saved_user_msg = await add_message(db, conversation.id, user_msg)
 
         # 获取上下文消息
@@ -362,7 +393,8 @@ async def init_image_stream_chat(
 
         return {
             "status": "initialized", 
-            "message_id": saved_user_msg.id
+            "message_id": saved_user_msg.id,
+            "file_id": file_id
         }
 
     except Exception as e:

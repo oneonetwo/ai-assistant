@@ -29,7 +29,7 @@ class ImageService:
     def _process_image_worker(self, file_path: Path) -> Tuple[str, Dict[str, Any]]:
         """图片处理工作函数"""
         with Image.open(file_path) as img:
-            # 获��图片元数据
+            # 获图片元数据
             metadata = {
                 "format": img.format,
                 "mode": img.mode,
@@ -155,7 +155,8 @@ class ImageService:
         query: Optional[str] = None,
         extract_text: bool = False,
         system_prompt: Optional[str] = None,
-        session_id: str = None
+        session_id: str = None,
+        file_id: Optional[str] = None
     ) -> Dict[str, Any]:
         """从URL分析图片内容"""
         try:
@@ -178,9 +179,20 @@ class ImageService:
                 query=query,
                 system_prompt=system_prompt
             )
+
+            # 如果提供了file_id，创建分析记录
+            if file_id:
+                analysis_record = AnalysisRecord(
+                    file_id=file_id,
+                    analysis_type="image",
+                    result=analysis_result
+                )
+                db.add(analysis_record)
+                await db.commit()
             
             return {
                 "url": image_url,
+                "file_id": file_id,
                 "analysis": analysis_result,
                 "extracted_text": None
             }

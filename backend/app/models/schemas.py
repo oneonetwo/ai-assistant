@@ -134,3 +134,34 @@ class DocumentAnalysisRequest(BaseModel):
     query: Optional[str] = None
     system_prompt: Optional[str] = None
     session_id: str
+class FileResponse(BaseModel):
+    name: str
+    type: str
+    size: int
+    url: str
+
+class MessageResponse(BaseModel):
+    id: int
+    role: str
+    content: str
+    file: Optional[FileResponse] = None
+    created_at: Optional[str] = None
+
+    @classmethod
+    def from_db_model(cls, message: "Message", file_info: Optional[Dict] = None):
+        content = message.content
+        try:
+            # 尝试解析JSON内容
+            content_dict = json.loads(content)
+            if isinstance(content_dict, dict):
+                content = content_dict.get("message", content)
+        except json.JSONDecodeError:
+            pass
+
+        return cls(
+            id=message.id,
+            role=message.role,
+            content=content,
+            file=FileResponse(**file_info) if file_info else None,
+            created_at=message.created_at.isoformat() if message.created_at else None
+        )
