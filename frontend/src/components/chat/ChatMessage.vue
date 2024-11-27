@@ -5,7 +5,7 @@
     </div>
     <div class="content">
       <div v-if="message.file" class="file-preview">
-        <div class="image-preview" v-if="isImage(message.file.type)">
+        <div class="image-preview" v-if="message.file &&isImage(message.file.type)">
           <img 
             :src="message.file.url" 
             :alt="message.file.name"
@@ -85,7 +85,10 @@ const renderedContent = computed(() => {
 
 
 
-const isImage = (fileType: string) => fileType.startsWith('image/')
+const isImage = (fileType: string) => {
+  console.log('fileType>>>>>>', fileType)
+  return fileType.startsWith('image/')
+}
 
 const getFileIcon = (fileType: string) => {
   if (fileType.startsWith('image/')) return 'image'
@@ -113,7 +116,7 @@ const handleImageClick = () => {
 watch(
   () => props.message,
   (newContent) => {
-    console.log('content changed', newContent)
+    console.log('content changed**************', newContent)
     // 处理 content 变化的逻辑
   }
 )

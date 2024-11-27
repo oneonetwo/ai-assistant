@@ -122,26 +122,24 @@ async def get_all_conversations(
                 # 如果消息有关联文件，获取文件信息
                 file_info = None
                 if msg.file_id:
-                    try:
-                        content_dict = json.loads(msg.content)
-                        if isinstance(content_dict, dict) and "file_id" in content_dict:
-                            file_stmt = select(File).where(File.file_id == content_dict["file_id"])
-                            file_result = await db.execute(file_stmt)
-                            file = file_result.scalar_one_or_none()
-                            if file:
-                                file_info = {
-                                    "name": file.original_name,
-                                    "type": content_dict.get("file_type", "unknown"),
-                                    "size": file.file_size,
-                                    "url": file.file_path
-                                }
-                    except json.JSONDecodeError:
-                        pass
+                    file_stmt = select(File).where(File.file_id == msg.file_id)
+                    file_result = await db.execute(file_stmt)
+                    file = file_result.scalar_one_or_none()
+                    if file:
+                        file_info = {
+                            "file_id": file.file_id,
+                            "original_name": file.original_name,
+                            "file_type": file.file_type,
+                            "file_path": file.file_path,
+                            "mime_type": file.mime_type,
+                            "file_size": file.file_size,
+                            "created_at": file.created_at.isoformat() if file.created_at else None
+                        }
 
                 # 使用 MessageResponse 的 from_db_model 方法创建消息响应
                 message = MessageResponse.from_db_model(msg, file_info)
                 messages.append(message)
-            
+
             # 构建会话响应
             conv_response = ConversationResponse(
                 session_id=conv.session_id,

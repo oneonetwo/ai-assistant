@@ -515,3 +515,93 @@
 2024-11-27 20:37:09.235 | ERROR    | app.services.chat:extract_text:384 - 文本提取失败: 'utf-8' codec can't decode byte 0x91 in position 15: invalid start byte
 2024-11-27 20:38:03.473 | ERROR    | app.services.chat:extract_text:384 - 文本提取失败: 'utf-8' codec can't decode byte 0x91 in position 15: invalid start byte
 2024-11-27 20:39:17.484 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:39:19.375 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:47:56.073 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:47:57.911 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:54:28.829 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:54:30.777 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:54:31.943 | ERROR    | app.api.v1.context:get_all_conversations:157 - 获取会话列表失败: 4 validation errors for FileResponse
+file_id
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+original_name
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_type
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_path
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-27 20:54:31.994 | ERROR    | app.api.v1.context:get_all_conversations:157 - 获取会话列表失败: 4 validation errors for FileResponse
+file_id
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+original_name
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_type
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_path
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-27 20:54:59.234 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:55:01.380 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:55:03.269 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:55:06.978 | ERROR    | app.api.v1.context:get_all_conversations:157 - 获取会话列表失败: 4 validation errors for FileResponse
+file_id
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+original_name
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_type
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_path
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-27 20:55:07.099 | ERROR    | app.api.v1.context:get_all_conversations:157 - 获取会话列表失败: 4 validation errors for FileResponse
+file_id
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+original_name
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_type
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_path
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-27 20:55:32.721 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:55:34.656 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:55:35.914 | ERROR    | app.api.v1.context:get_all_conversations:157 - 获取会话列表失败: 4 validation errors for FileResponse
+file_id
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+original_name
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_type
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_path
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-27 20:55:35.967 | ERROR    | app.api.v1.context:get_all_conversations:157 - 获取会话列表失败: 4 validation errors for FileResponse
+file_id
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+original_name
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_type
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_path
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-27 20:55:51.552 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:55:53.570 | INFO     | app.utils.cache:init:29 - Redis连接成功
