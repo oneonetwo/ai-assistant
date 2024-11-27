@@ -542,7 +542,10 @@ async def stream_file_chat(
             # 处理文件内容
             extracted_text = None
             if message_content["file_type"] == "document":
-                extracted_text = await document_service.extract_text(file_record.file_path)
+                if file_record.file_path.startswith(('http://', 'https://')):
+                    extracted_text = file_record.file_path  # 直接使用URL
+                else:
+                    extracted_text = await document_service.extract_text(file_record.file_path)
             elif message_content["file_type"] == "image" and extract_text:
                 extracted_text = await image_service.extract_text(file_record.file_path)
 

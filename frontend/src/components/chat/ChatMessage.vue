@@ -5,7 +5,7 @@
     </div>
     <div class="content">
       <div v-if="message.file" class="file-preview">
-        <div v-if="isImage(message.file.type)">
+        <div class="image-preview" v-if="isImage(message.file.type)">
           <img 
             :src="message.file.url" 
             :alt="message.file.name"
@@ -109,6 +109,14 @@ const imagePreviewRef = ref()
 const handleImageClick = () => {
   imagePreviewRef.value?.open()
 }
+
+watch(
+  () => props.message,
+  (newContent) => {
+    console.log('content changed', newContent)
+    // 处理 content 变化的逻辑
+  }
+)
 </script>
 
 <style lang="scss" scoped>
@@ -194,18 +202,21 @@ const handleImageClick = () => {
 
 .file-preview {
   margin: 8px 0;
-  max-width: 100px;
-  max-height: 100px;
+  max-width: 300px;
+  max-height: 300px;
+  .image-preview{
+    max-width: 100px;
+    height: 100px;
+    img {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s;
 
-  img {
-    max-width: 100%;
-    max-height: 100%;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: transform 0.2s;
-
-    &:hover {
-      transform: scale(1.02);
+      &:hover {
+        transform: scale(1.02);
+      }
     }
   }
 

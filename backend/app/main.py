@@ -9,6 +9,9 @@ from app.db.models import Base
 from app.api.v1 import context, chat, image_analysis, document_analysis, upload
 from app.middleware.upload import validate_upload_size
 from app.utils.cache import cache_manager
+import uvicorn
+import sys
+import signal
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -57,3 +60,26 @@ app.include_router(chat.router, prefix=settings.API_V1_PREFIX)
 app.include_router(image_analysis.router, prefix=settings.API_V1_PREFIX)
 app.include_router(document_analysis.router, prefix=settings.API_V1_PREFIX)
 app.include_router(upload.router, prefix="/api/v1")
+
+def handle_interrupt(signum, frame):
+    print("\nGracefully shutting down...")
+    sys.exit(0)
+
+if __name__ == "__main__":
+    # 注册信号处理器
+    signal.signal(signal.SIGINT, handle_interrupt)
+    
+    # 配置uvicorn
+    config = uvicorn.Config(
+        app=app,
+        host=settings.HOST,
+        port=settings.PORT,
+        reload=settings.DEBUG,
+        workers=1,  # 减少worker数量
+        loop="asyncio",
+        timeout_keep_alive=settings.TIMEOUT,
+        access_log=True
+    )
+    
+    server = uvicorn.Server(config)
+    server.run()

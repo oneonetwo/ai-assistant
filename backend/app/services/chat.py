@@ -9,6 +9,8 @@ from app.services.exceptions import NotFoundError, APIError
 from sqlalchemy import select, and_, desc
 from app.db.models import Message
 import json
+from pathlib import Path
+import aiofiles
 
 async def process_chat(
     db: AsyncSession,
@@ -300,3 +302,27 @@ async def init_file_stream_chat(
     except Exception as e:
         app_logger.error(f"初始化流式文件聊天失败: {str(e)}")
         raise APIError(detail=f"初始化流式文件聊天失败: {str(e)}")
+
+async def extract_text(self, file_path: str) -> str:
+    """从文件中提取文本"""
+    try:
+        # 如果是URL，直接返回URL
+        if file_path.startswith(('http://', 'https://')):
+            return file_path
+
+        # 获取文件后缀
+        suffix = Path(file_path).suffix.lower()
+        
+        if suffix in ['.txt']:
+            async with aiofiles.open(file_path, 'r', encoding='utf-8') as f:
+                return await f.read()
+        elif suffix in ['.pdf']:
+            return await self._extract_pdf_text(file_path)
+        elif suffix in ['.doc', '.docx']:
+            return await self._extract_doc_text(file_path)
+        else:
+            return f"不支持的文件类型: {suffix}"
+
+    except Exception as e:
+        app_logger.error(f"文本提取失败: {str(e)}")
+        return f"文本提取失败: {str(e)}"

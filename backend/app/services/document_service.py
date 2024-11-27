@@ -16,33 +16,31 @@ from sqlalchemy import select
 class DocumentService:
     """文档处理服务"""
     
-    async def extract_text(self, file_path: Path) -> str:
-        """从不同类型的文档中提取文本"""
+    async def extract_text(self, file_path: str) -> str:
+        """从文件中提取文本"""
         try:
-            suffix = file_path.suffix.lower()
+            # 如果是URL，直接返回URL内容
+            if file_path.startswith(('http://', 'https://')):
+                # 对于远程文档，我们直接返回URL，让AI服务处理
+                return f"文档URL: {file_path}\n请直接访问此URL获取文档内容进行分析。"
+
+            # 本地文件处理逻辑
+            path = Path(file_path)
+            suffix = path.suffix.lower()
             
-            if suffix == '.txt':
+            if suffix in ['.txt']:
                 async with aiofiles.open(file_path, 'r', encoding='utf-8') as f:
                     return await f.read()
-                    
-            elif suffix == '.pdf':
+            elif suffix in ['.pdf']:
                 return await self._extract_pdf_text(file_path)
-                
-            elif suffix == '.docx':
-                return await self._extract_docx_text(file_path)
-                
-            elif suffix == '.epub':
-                return await self._extract_epub_text(file_path)
-                
-            elif suffix == '.md':
-                return await self._extract_markdown_text(file_path)
-                
+            elif suffix in ['.doc', '.docx']:
+                return await self._extract_doc_text(file_path)
             else:
-                raise ValueError(f"Unsupported file format: {suffix}")
-                
+                return f"不支持的文件类型: {suffix}"
+
         except Exception as e:
             app_logger.error(f"文本提取失败: {str(e)}")
-            raise
+            return f"文本提取失败: {str(e)}"
 
     async def _extract_pdf_text(self, file_path: Path) -> str:
         """提取PDF文本"""
