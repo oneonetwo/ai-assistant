@@ -605,6 +605,162 @@ file_path
     For further information visit https://errors.pydantic.dev/2.10/v/missing
 2024-11-27 20:55:51.552 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
 2024-11-27 20:55:53.570 | INFO     | app.utils.cache:init:29 - Redis连接成功
+<<<<<<< HEAD
 2024-11-28 15:46:03.264 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-11-28 15:47:10.364 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
 2024-11-28 15:47:13.548 | INFO     | app.utils.cache:init:29 - Redis连接成功
+=======
+2024-11-27 20:55:55.435 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:57:43.911 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:57:45.881 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:57:46.557 | ERROR    | app.api.v1.context:get_all_conversations:157 - 获取会话列表失败: 4 validation errors for FileResponse
+file_id
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+original_name
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_type
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_path
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-27 20:57:46.613 | ERROR    | app.api.v1.context:get_all_conversations:157 - 获取会话列表失败: 4 validation errors for FileResponse
+file_id
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+original_name
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_type
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_path
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-27 20:58:27.223 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:58:29.069 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:58:54.616 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:58:56.435 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:59:34.009 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:59:35.909 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:59:38.008 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:59:49.258 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:59:51.185 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:59:53.082 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:59:54.988 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:59:57.008 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 21:00:42.437 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 21:00:44.291 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 21:00:45.107 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 21:00:47.043 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 14:40:34.942 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 14:41:15.961 | ERROR    | app.services.chat:init_image_stream_chat:268 - 初始化流式图片聊天失败: 4 validation errors for FileResponse
+id
+  Field required [type=missing, input_value={'file_id': '63d2aeab-b09...-a18f-15e3893bbe0c.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+name
+  Field required [type=missing, input_value={'file_id': '63d2aeab-b09...-a18f-15e3893bbe0c.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+type
+  Field required [type=missing, input_value={'file_id': '63d2aeab-b09...-a18f-15e3893bbe0c.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+url
+  Field required [type=missing, input_value={'file_id': '63d2aeab-b09...-a18f-15e3893bbe0c.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-28 14:41:15.961 | ERROR    | app.api.v1.chat:init_image_stream_chat:369 - 初始化流式图片聊天失败: 503: API error: 初始化流式图片聊天失败: 4 validation errors for FileResponse
+id
+  Field required [type=missing, input_value={'file_id': '63d2aeab-b09...-a18f-15e3893bbe0c.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+name
+  Field required [type=missing, input_value={'file_id': '63d2aeab-b09...-a18f-15e3893bbe0c.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+type
+  Field required [type=missing, input_value={'file_id': '63d2aeab-b09...-a18f-15e3893bbe0c.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+url
+  Field required [type=missing, input_value={'file_id': '63d2aeab-b09...-a18f-15e3893bbe0c.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-28 14:41:51.993 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 14:41:55.414 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 14:42:04.147 | ERROR    | app.services.chat:init_image_stream_chat:268 - 初始化流式图片聊天失败: 4 validation errors for FileResponse
+id
+  Field required [type=missing, input_value={'file_id': 'dbc1b4d5-380...-9aa3-076aed29051a.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+name
+  Field required [type=missing, input_value={'file_id': 'dbc1b4d5-380...-9aa3-076aed29051a.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+type
+  Field required [type=missing, input_value={'file_id': 'dbc1b4d5-380...-9aa3-076aed29051a.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+url
+  Field required [type=missing, input_value={'file_id': 'dbc1b4d5-380...-9aa3-076aed29051a.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-28 14:42:04.155 | ERROR    | app.api.v1.chat:init_image_stream_chat:369 - 初始化流式图片聊天失败: 503: API error: 初始化流式图片聊天失败: 4 validation errors for FileResponse
+id
+  Field required [type=missing, input_value={'file_id': 'dbc1b4d5-380...-9aa3-076aed29051a.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+name
+  Field required [type=missing, input_value={'file_id': 'dbc1b4d5-380...-9aa3-076aed29051a.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+type
+  Field required [type=missing, input_value={'file_id': 'dbc1b4d5-380...-9aa3-076aed29051a.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+url
+  Field required [type=missing, input_value={'file_id': 'dbc1b4d5-380...-9aa3-076aed29051a.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-28 14:42:16.621 | ERROR    | app.services.chat:init_image_stream_chat:268 - 初始化流式图片聊天失败: 4 validation errors for FileResponse
+id
+  Field required [type=missing, input_value={'file_id': '5fae1c98-f83...-9de0-300020a9c46d.png'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+name
+  Field required [type=missing, input_value={'file_id': '5fae1c98-f83...-9de0-300020a9c46d.png'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+type
+  Field required [type=missing, input_value={'file_id': '5fae1c98-f83...-9de0-300020a9c46d.png'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+url
+  Field required [type=missing, input_value={'file_id': '5fae1c98-f83...-9de0-300020a9c46d.png'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-28 14:42:16.621 | ERROR    | app.api.v1.chat:init_image_stream_chat:369 - 初始化流式图片聊天失败: 503: API error: 初始化流式图片聊天失败: 4 validation errors for FileResponse
+id
+  Field required [type=missing, input_value={'file_id': '5fae1c98-f83...-9de0-300020a9c46d.png'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+name
+  Field required [type=missing, input_value={'file_id': '5fae1c98-f83...-9de0-300020a9c46d.png'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+type
+  Field required [type=missing, input_value={'file_id': '5fae1c98-f83...-9de0-300020a9c46d.png'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+url
+  Field required [type=missing, input_value={'file_id': '5fae1c98-f83...-9de0-300020a9c46d.png'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-28 14:42:38.675 | ERROR    | app.services.chat:init_file_stream_chat:334 - 初始化流式文件聊天失败: 4 validation errors for FileResponse
+id
+  Field required [type=missing, input_value={'file_id': '66062ddc-d10...-b390-a93368c35082.txt'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+name
+  Field required [type=missing, input_value={'file_id': '66062ddc-d10...-b390-a93368c35082.txt'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+type
+  Field required [type=missing, input_value={'file_id': '66062ddc-d10...-b390-a93368c35082.txt'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+url
+  Field required [type=missing, input_value={'file_id': '66062ddc-d10...-b390-a93368c35082.txt'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-28 14:42:38.687 | ERROR    | app.api.v1.chat:handle_file_stream_chat:516 - 处理文件流式聊天失败: 503: API error: 初始化流式文件聊天失败: 4 validation errors for FileResponse
+id
+  Field required [type=missing, input_value={'file_id': '66062ddc-d10...-b390-a93368c35082.txt'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+name
+  Field required [type=missing, input_value={'file_id': '66062ddc-d10...-b390-a93368c35082.txt'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+type
+  Field required [type=missing, input_value={'file_id': '66062ddc-d10...-b390-a93368c35082.txt'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+url
+  Field required [type=missing, input_value={'file_id': '66062ddc-d10...-b390-a93368c35082.txt'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-28 14:46:30.738 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+>>>>>>> 93876ff... feat: 总结文档
