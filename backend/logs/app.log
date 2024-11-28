@@ -799,3 +799,4 @@ url
 2024-11-28 19:40:28.977 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-11-28 19:41:04.876 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
 2024-11-28 19:41:29.816 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 19:41:43.975 | INFO     | app.utils.cache:init:29 - Redis连接成功
