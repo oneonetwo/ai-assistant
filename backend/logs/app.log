@@ -779,3 +779,7 @@ url
 2024-11-28 18:46:00.266 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-11-28 18:46:02.126 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-11-28 18:47:13.668 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 18:47:57.163 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 18:49:59.335 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 18:50:22.392 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 18:53:07.293 | INFO     | app.utils.cache:close:37 - Redis连接已关闭

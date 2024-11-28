@@ -4,4 +4,4 @@
 # 忽略requirements.txt
 
 # 忽略日志文件
-logs/*
+./logs/*
