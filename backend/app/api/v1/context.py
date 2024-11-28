@@ -199,7 +199,28 @@ async def update_conversation(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="会话不存在"
             )
-        return conversation
+            
+        # 转换日期时间为ISO格式字符串
+        response = ConversationResponse(
+            id=conversation.id,
+            session_id=conversation.session_id,
+            name=conversation.name,
+            created_at=conversation.created_at.isoformat() if conversation.created_at else None,
+            updated_at=conversation.updated_at.isoformat() if conversation.updated_at else None,
+            messages=[
+                MessageResponse(
+                    id=msg.id,
+                    role=msg.role,
+                    content=msg.content,
+                    created_at=msg.created_at.isoformat() if msg.created_at else None,
+                    parent_message_id=msg.parent_message_id,
+                    file_id=msg.file_id
+                ) for msg in conversation.messages
+            ] if conversation.messages else []
+        )
+        
+        return response
+        
     except DatabaseError as e:
         app_logger.error(f"更新会话失败: {str(e)}")
         raise HTTPException(

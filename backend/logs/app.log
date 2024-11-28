@@ -764,3 +764,12 @@ url
     For further information visit https://errors.pydantic.dev/2.10/v/missing
 2024-11-28 14:46:30.738 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
 >>>>>>> 93876ff... feat: 总结文档
+2024-11-28 16:19:01.207 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 16:20:33.046 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 16:20:36.274 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 16:21:06.962 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 16:22:09.363 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 16:22:22.259 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 16:25:18.383 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 16:25:20.700 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 16:25:22.483 | INFO     | app.utils.cache:init:29 - Redis连接成功
