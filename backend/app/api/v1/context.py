@@ -201,6 +201,8 @@ async def update_conversation(
             )
             
         # 转换日期时间为ISO格式字符串
+            
+        # 转换日期时间为ISO格式字符串
         response = ConversationResponse(
             id=conversation.id,
             session_id=conversation.session_id,
@@ -221,6 +223,7 @@ async def update_conversation(
         
         return response
         
+
     except DatabaseError as e:
         app_logger.error(f"更新会话失败: {str(e)}")
         raise HTTPException(

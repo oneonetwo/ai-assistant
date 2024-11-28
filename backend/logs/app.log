@@ -773,3 +773,9 @@ url
 2024-11-28 16:25:18.383 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
 2024-11-28 16:25:20.700 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-11-28 16:25:22.483 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 18:43:29.615 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 18:45:56.420 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 18:45:58.341 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 18:46:00.266 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 18:46:02.126 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 18:47:13.668 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
