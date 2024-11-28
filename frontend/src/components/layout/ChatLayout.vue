@@ -9,9 +9,16 @@
       />
     </Transition>
 
-    <aside class="sidebar" :class="{ show: showSidebar }">
+    <aside 
+      class="sidebar" 
+      :class="{ 'sidebar-show': showSidebar }"
+    >
       <div class="sidebar-header">
-        <van-button class="new-chat" block @click="handleNewChat">
+        <van-button 
+          block 
+          type="primary"
+          @click="handleNewChat"
+        >
           <template #icon>
             <svg-icon name="plus" />
           </template>
@@ -20,84 +27,119 @@
       </div>
 
       <div class="conversation-list">
-        <ConversationList @select="() => { showSidebar = isMobile ? false : true }" />
-      </div>
-
-      <div class="sidebar-footer">
-        <van-button class="theme-toggle" block @click="themeStore.toggleTheme">
-          <template #icon>
-            <svg-icon :name="themeStore.isDark ? 'sun' : 'moon'" />
-          </template>
-          {{ themeStore.isDark ? '浅色模式' : '深色模式' }}
-        </van-button>
+        <ConversationList 
+          @select="() => { 
+            if (isMobile) showSidebar = false 
+          }" 
+        />
       </div>
     </aside>
 
-    <main class="main-content">
-      <router-view />
-    </main>
+    <div class="main-wrapper">
+      <AppHeader :title="route.meta.title as string">
+        <template #left>
+          <van-button
+            v-if="isMobile"
+            icon="bars"
+            @click="showSidebar = true"
+          />
+        </template>
+      </AppHeader>
+
+      <main class="main-content">
+        <router-view />
+      </main>
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .chat-layout {
-  display: flex;
   height: 100vh;
+  display: flex;
+  background: var(--van-background);
+  
+  .sidebar-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 100;
+  }
   
   .sidebar {
     width: 260px;
     display: flex;
     flex-direction: column;
-    border-right: 1px solid var(--van-border-color);
     background: var(--van-background-2);
+    border-right: 1px solid var(--van-border-color);
     
     .sidebar-header {
       padding: 12px;
       border-bottom: 1px solid var(--van-border-color);
-      
-      .new-chat {
-        --van-button-default-background: var(--van-primary-color);
-        --van-button-default-color: #fff;
-        font-weight: 500;
-      }
     }
     
     .conversation-list {
       flex: 1;
       overflow-y: auto;
     }
-    
-    .sidebar-footer {
-      padding: 12px;
-      border-top: 1px solid var(--van-border-color);
-      
-      .theme-toggle {
-        --van-button-default-background: transparent;
-        --van-button-default-border-color: transparent;
-        justify-content: flex-start;
-        font-weight: 500;
-      }
-    }
   }
-
-  .main-content {
+  
+  .main-wrapper {
     flex: 1;
     display: flex;
     flex-direction: column;
-    background: var(--van-background);
+    min-width: 0;
+  }
+  
+  .main-content {
+    flex: 1;
+    overflow-y: auto;
   }
 }
-</style> 
+
+// 移动端样式
+@media (max-width: 768px) {
+  .chat-layout {
+    .sidebar {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: -260px;
+      z-index: 101;
+      transition: transform 0.3s ease;
+      
+      &.sidebar-show {
+        transform: translateX(260px);
+      }
+    }
+  }
+}
+
+// 过渡动画
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { useChatStore } from '@/stores/chat'
-import { useThemeStore } from '@/stores/theme'
 import ConversationList from '@/components/chat/ConversationList.vue'
+import AppHeader from '@/components/common/AppHeader.vue'
 import SvgIcon from '@/components/common/SvgIcon.vue'
 
+const route = useRoute()
 const chatStore = useChatStore()
-const themeStore = useThemeStore()
 
 // 控制侧边栏显示
 const showSidebar = ref(window.innerWidth > 768)
@@ -106,18 +148,18 @@ const isMobile = computed(() => window.innerWidth <= 768)
 // 处理新建会话
 function handleNewChat() {
   chatStore.createNewConversation()
+  if (isMobile.value) {
+    showSidebar.value = false
+  }
 }
 
 // 处理窗口大小变化
 function handleResize() {
-  if (!isMobile.value) {
-    showSidebar.value = true
-  }
+  showSidebar.value = window.innerWidth > 768
 }
 
 onMounted(() => {
   window.addEventListener('resize', handleResize)
-  handleResize()
 })
 
 onUnmounted(() => {
