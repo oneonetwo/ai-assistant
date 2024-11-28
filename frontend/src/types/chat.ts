@@ -1,8 +1,8 @@
 export interface FileInfo {
-  name: string
-  type: string
-  url: string
-  size: number
+  original_name: string
+  file_type: string
+  file_path: string
+  file_size: number
   uploadProgress?: number
 }
 

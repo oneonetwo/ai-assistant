@@ -605,3 +605,6 @@ file_path
     For further information visit https://errors.pydantic.dev/2.10/v/missing
 2024-11-27 20:55:51.552 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
 2024-11-27 20:55:53.570 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 15:46:03.264 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 15:47:10.364 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 15:47:13.548 | INFO     | app.utils.cache:init:29 - Redis连接成功

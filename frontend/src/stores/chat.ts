@@ -289,7 +289,7 @@ export const useChatStore = defineStore('chat', () => {
         message: '重命名成功'
       })
     } catch (error) {
-      // 发生错误时恢复原名��
+      // 发生错误时恢复原名
       conversation.name = originalName
       
       showToast({
@@ -415,10 +415,10 @@ export const useChatStore = defineStore('chat', () => {
         timestamp: Date.now(),
         status: 'sending',
         file: {
-          name: file.name,
-          type: file.type,
-          size: file.size,
-          url: URL.createObjectURL(file)
+          original_name: file.name,
+          file_type: file.type,
+          file_size: file.size,
+          file_path: URL.createObjectURL(file)
         }
       }
       
@@ -440,7 +440,7 @@ export const useChatStore = defineStore('chat', () => {
       })
 
       // 更新文件 URL
-      userMessage.file!.url = fileUrl
+      userMessage.file!.file_path = fileUrl
       userMessage.status = 'success'
 
       // 创建助手消息占位

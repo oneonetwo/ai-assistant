@@ -5,20 +5,20 @@
     </div>
     <div class="content">
       <div v-if="message.file" class="file-preview">
-        <div class="image-preview" v-if="message.file &&isImage(message.file.type)">
+        <div class="image-preview" v-if="message.file && isImage(message.file.file_type)">
           <img 
-            :src="message.file.url" 
-            :alt="message.file.name"
+            :src="message.file.file_path" 
+            :alt="message.file.original_name"
             @click="handleImageClick"
           >
           <ImagePreview
             ref="imagePreviewRef"
-            :src="message.file.url"
+            :src="message.file.file_path"
           />
         </div>
         <div v-else class="file-info">
-          <svg-icon :name="getFileIcon(message.file.type)" />
-          <span>{{ message.file.name }}</span>
+          <svg-icon :name="getFileIcon(message.file.file_type)" />
+          <span>{{ message.file.original_name }}</span>
           <van-button size="mini" @click="downloadFile(message.file)">
             下载
           </van-button>
@@ -61,9 +61,9 @@ const props = defineProps<{
     role: 'user' | 'assistant'
     content: string
     file: {
-      url: string
-      name: string
-      type: string
+      file_path: string
+      original_name: string
+      file_type: string
     }
   }
 }>()
@@ -83,25 +83,27 @@ const renderedContent = computed(() => {
   return md.render(props.message.content)
 })
 
-
-
-const isImage = (fileType: string) => {
-  console.log('fileType>>>>>>', fileType)
-  return fileType.startsWith('image/')
+function isImage(fileType: string) {
+  return fileType.startsWith('image')
 }
 
-const getFileIcon = (fileType: string) => {
+function getFileIcon(fileType: string) {
   if (fileType.startsWith('image/')) return 'image'
-  if (fileType === 'application/pdf') return 'pdf'
-  if (fileType === 'text/plain') return 'txt'
-  if (fileType.includes('word')) return 'doc'
+  if (fileType.startsWith('video/')) return 'video'
+  if (fileType.startsWith('audio/')) return 'audio'
+  if (fileType.includes('pdf')) return 'pdf'
+  if (fileType.includes('word')) return 'word'
+  if (fileType.includes('excel')) return 'excel'
   return 'file'
 }
 
-const downloadFile = (file: { url: string, name: string }) => {
+function downloadFile(file: {
+  file_path: string
+  original_name: string
+}) {
   const link = document.createElement('a')
-  link.href = file.url
-  link.download = file.name
+  link.href = file.file_path
+  link.download = file.original_name
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
