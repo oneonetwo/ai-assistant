@@ -11,7 +11,7 @@ const router = useRouter()
 const store = useHandbookStore()
 const noteId = route.params.id as string
 const handbookId = route.query.handbook as string
-
+const isNew = route.fullPath.includes('/new')
 // 表单数据
 const title = ref('')
 const content = ref('')
@@ -27,7 +27,7 @@ const isUploading = ref(false)
 
 onMounted(async () => {
   await store.fetchTags()
-  if (noteId !== 'new') {
+  if (!isNew) {
     await loadNote()
   }
 })
@@ -50,7 +50,7 @@ async function loadNote() {
     }))
   } catch (error) {
     showToast('加载笔记失败')
-    router.back()
+    // router.back()
   }
 }
 
@@ -114,7 +114,7 @@ async function handleSave() {
       }))
     }
 
-    if (noteId === 'new') {
+    if (isNew) {
       await store.createNote(data)
     } else {
       await store.updateNote(Number(noteId), data)
@@ -132,7 +132,6 @@ async function handleSave() {
   <div class="note-editor">
     <!-- 工具栏 -->
     <van-nav-bar
-      :title="noteId === 'new' ? '新建笔记' : '编辑笔记'"
       left-arrow
       @click-left="router.back()"
     >

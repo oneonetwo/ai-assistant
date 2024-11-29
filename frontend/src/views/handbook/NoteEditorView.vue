@@ -9,15 +9,14 @@ const route = useRoute()
 const router = useRouter()
 const store = useHandbookStore()
 const noteId = route.params.id as string
-const isNew = noteId === 'new'
-
+const isNew = route.fullPath.includes('/new')
 onMounted(async () => {
   if (!isNew) {
     try {
-      await store.fetchNote(noteId)
+      await store.fetchNote(Number(noteId))
     } catch (error) {
       showToast('加载笔记失败')
-      router.back()
+      // router.back()
     }
   }
 })
@@ -26,7 +25,7 @@ onMounted(async () => {
 <template>
   <div class="note-editor-view">
     <van-nav-bar
-      :title="isNew ? '新建笔记' : '编辑笔记'"
+      v-if="!isNew"
       left-arrow
       @click-left="router.back()"
     />

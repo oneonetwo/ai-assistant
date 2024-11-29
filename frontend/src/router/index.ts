@@ -62,7 +62,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'handbook-detail',
         component: () => import('@/views/handbook/HandbookDetailView.vue'),
         meta: {
-          title: '手册详情'
+          title: '笔记列表'
         }
       },
       {
