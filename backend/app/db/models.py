@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, BigInteger
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, BigInteger, JSON, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 from sqlalchemy.orm import relationship
@@ -54,3 +54,70 @@ class AnalysisRecord(Base):
     analysis_type = Column(String(50))  # document/image/text
     result = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+class Category(Base):
+    __tablename__ = "categories"
+    
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class Handbook(Base):
+    __tablename__ = "handbooks"
+    
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False)
+    category_id = Column(Integer, ForeignKey("categories.id"))
+    user_id = Column(Integer, default=1)  # 默认用户
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # 关系
+    category = relationship("Category", backref="handbooks")
+    notes = relationship("Note", back_populates="handbook", cascade="all, delete-orphan")
+
+class Tag(Base):
+    __tablename__ = "tags"
+    
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False, unique=True)
+
+class NoteTag(Base):
+    __tablename__ = "note_tags"
+    
+    note_id = Column(Integer, ForeignKey("notes.id"), primary_key=True)
+    tag_id = Column(Integer, ForeignKey("tags.id"), primary_key=True)
+
+class Note(Base):
+    __tablename__ = "notes"
+    
+    id = Column(Integer, primary_key=True)
+    title = Column(String(200), nullable=False)
+    content = Column(Text)
+    message_ids = Column(JSON)  # 存储消息ID数组
+    priority = Column(String(10))  # 高、中、低
+    times = Column(Integer, default=0)  # 复习次数
+    status = Column(String(20))  # 状态
+    is_shared = Column(Boolean, default=False)
+    handbook_id = Column(Integer, ForeignKey("handbooks.id"))
+    user_id = Column(Integer, default=1)  # 默认用户
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # 关系
+    handbook = relationship("Handbook", back_populates="notes")
+    tags = relationship("Tag", secondary="note_tags", backref="notes")
+    attachments = relationship("NoteAttachment", back_populates="note", cascade="all, delete-orphan")
+
+class NoteAttachment(Base):
+    __tablename__ = "note_attachments"
+    
+    id = Column(Integer, primary_key=True)
+    note_id = Column(Integer, ForeignKey("notes.id"))
+    file_id = Column(String, ForeignKey("files.file_id"))
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # 关系
+    note = relationship("Note", back_populates="attachments")
+    file = relationship("File")

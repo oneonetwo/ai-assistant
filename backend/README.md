@@ -400,3 +400,282 @@ is_shared：是否共享
 
 #### 笔记搜索
 - GET /api/v1/search/notes - 搜索笔记
+
+## V1.2.0 知识手册管理功能
+
+### 新增功能
+- 知识手册管理
+  - 支持创建、编辑、删除手册
+  - 支持手册分类管理
+  - 支持在手册中添加笔记
+- 笔记管理
+  - 支持创建、编辑、删除笔记
+  - 支持添加标签
+  - 支持添加附件
+  - 支持设置优先级和状态
+  - 支持笔记复习计数
+
+### API 接口
+
+#### 手册分类管理
+
+##### 创建分类
+- 请求方法：`POST`
+- 接口路径：`/api/v1/handbooks/categories`
+- 请求体：
+```json
+{
+    "name": "分类名称"
+}
+```
+- 响应体：
+```json
+{
+    "id": 1,
+    "name": "分类名称",
+    "created_at": "2024-01-01T00:00:00",
+    "updated_at": "2024-01-01T00:00:00"
+}
+```
+
+##### 获取所有分类
+- 请求方法：`GET`
+- 接口路径：`/api/v1/handbooks/categories`
+- 响应体：
+```json
+[
+    {
+        "id": 1,
+        "name": "分类1",
+        "created_at": "2024-01-01T00:00:00",
+        "updated_at": "2024-01-01T00:00:00"
+    }
+]
+```
+
+#### 手册管理
+
+##### 创建手册
+- 请求方法：`POST`
+- 接口路径：`/api/v1/handbooks`
+- 请求体：
+```json
+{
+    "name": "手册名称",
+    "category_id": 1
+}
+```
+- 响应体：
+```json
+{
+    "id": 1,
+    "name": "手册名称",
+    "category_id": 1,
+    "created_at": "2024-01-01T00:00:00",
+    "updated_at": "2024-01-01T00:00:00"
+}
+```
+
+##### 获取手册列表
+- 请求方法：`GET`
+- 接口路径：`/api/v1/handbooks`
+- 查询参数：
+  - `category_id`：（可选）分类ID
+- 响应体：
+```json
+[
+    {
+        "id": 1,
+        "name": "手册1",
+        "category_id": 1,
+        "created_at": "2024-01-01T00:00:00",
+        "updated_at": "2024-01-01T00:00:00"
+    }
+]
+```
+
+##### 获取单个手册
+- 请求方法：`GET`
+- 接口路径：`/api/v1/handbooks/{handbook_id}`
+- 响应体：
+```json
+{
+    "id": 1,
+    "name": "手册1",
+    "category_id": 1,
+    "created_at": "2024-01-01T00:00:00",
+    "updated_at": "2024-01-01T00:00:00"
+}
+```
+
+##### 更新手册
+- 请求方法：`PATCH`
+- 接口路径：`/api/v1/handbooks/{handbook_id}`
+- 请求体：
+```json
+{
+    "name": "新手册名称",
+    "category_id": 2
+}
+```
+- 响应体：
+```json
+{
+    "id": 1,
+    "name": "新手册名称",
+    "category_id": 2,
+    "created_at": "2024-01-01T00:00:00",
+    "updated_at": "2024-01-01T00:00:00"
+}
+```
+
+##### 删除手册
+- 请求方法：`DELETE`
+- 接口路径：`/api/v1/handbooks/{handbook_id}`
+- 响应状态码：204
+
+#### 笔记管理
+
+##### 创建笔记
+- 请求方法：`POST`
+- 接口路径：`/api/v1/notes`
+- 请求体：
+```json
+{
+    "title": "笔记标题",
+    "content": "笔记内容",
+    "handbook_id": 1,
+    "tags": ["标签1", "标签2"],
+    "priority": "high",
+    "status": "待复习",
+    "is_shared": false,
+    "attachments": [
+        {
+            "url": "https://example.com/file1.pdf",
+            "file_name": "文档1.pdf"
+        }
+    ]
+}
+```
+- 响应体：
+```json
+{
+    "id": 1,
+    "title": "笔记标题",
+    "content": "笔记内容",
+    "handbook_id": 1,
+    "tags": [
+        {
+            "id": 1,
+            "name": "标签1"
+        }
+    ],
+    "priority": "high",
+    "times": 0,
+    "status": "待复习",
+    "is_shared": false,
+    "attachments": [
+        {
+            "file_id": "uuid",
+            "original_name": "文档1.pdf",
+            "file_path": "path/to/file",
+            "file_type": "attachment",
+            "mime_type": "application/pdf",
+            "file_size": 1024
+        }
+    ],
+    "created_at": "2024-01-01T00:00:00",
+    "updated_at": "2024-01-01T00:00:00"
+}
+```
+
+##### 获取笔记列表
+- 请求方法：`GET`
+- 接口路径：`/api/v1/notes`
+- 查询参数：
+  - `handbook_id`：（可选）手册ID
+  - `tag`：（可选）标签名称
+- 响应体：
+```json
+[
+    {
+        "id": 1,
+        "title": "笔记1",
+        "content": "内容1",
+        "handbook_id": 1,
+        "tags": [
+            {
+                "id": 1,
+                "name": "标签1"
+            }
+        ],
+        "priority": "high",
+        "times": 0,
+        "status": "待复习",
+        "is_shared": false,
+        "attachments": [],
+        "created_at": "2024-01-01T00:00:00",
+        "updated_at": "2024-01-01T00:00:00"
+    }
+]
+```
+
+##### 获取单个笔记
+- 请求方法：`GET`
+- 接口路径：`/api/v1/notes/{note_id}`
+- 响应体：与创建笔记的响应体格式相同
+
+##### 更新笔记
+- 请求方法：`PATCH`
+- 接口路径：`/api/v1/notes/{note_id}`
+- 请求体：
+```json
+{
+    "title": "新标题",
+    "content": "新内容",
+    "tags": ["新标签"],
+    "priority": "medium",
+    "status": "已完成"
+}
+```
+- 响应体：与创建笔记的响应体格式相同
+
+##### 删除笔记
+- 请求方法：`DELETE`
+- 接口路径：`/api/v1/notes/{note_id}`
+- 响应状态码：204
+
+##### 获取所有标签
+- 请求方法：`GET`
+- 接口路径：`/api/v1/notes/tags`
+- 响应体：
+```json
+[
+    {
+        "id": 1,
+        "name": "标签1"
+    }
+]
+```
+
+### 数据结构说明
+
+#### 优先级（priority）
+- `high`: 高优先级
+- `medium`: 中优先级
+- `low`: 低优先级
+
+#### 状态（status）
+可自定义，建议值：
+- `待复习`: 需要复习的笔记
+- `已完成`: 已完成的笔记
+- `进行中`: 正在学习的笔记
+
+### 注意事项
+1. 所有时间字段均使用 ISO 8601 格式的 UTC 时间
+2. 笔记优先级必须是预定义的三个级别之一
+3. 附件上传支持通过 URL 方式添加，系统会自动下载并保存
+4. 标签支持多个，使用数组格式
+5. 默认使用系统用户(user_id=1)
+6. 删除手册时会级联删除所有相关笔记
+7. 文件上传大小限制为 10MB
