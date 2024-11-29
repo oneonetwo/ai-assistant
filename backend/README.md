@@ -70,7 +70,8 @@ QWEN_API_URL=https://api.example.com
 QWEN_API_TIMEOUT=30
 
 # 数据库配置
-DATABASE_URL=mysql+asyncmy://user:pass@localhost/dbname
+DATABASE_URL=mysql+
+://user:pass@localhost/dbname
 
 # Redis配置
 REDIS_HOST=localhost
@@ -305,38 +306,8 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 MIT License
 
 
-v1.2.0 开发知识手册管理功能
-
-id：该笔记的唯一标识符。
-title：笔记标题，可由用户自定义。
-content：笔记的摘要或简短说明。
-message_ids：记录AI对话内容id数组。
-tags：标签数组，用户可以为笔记添加多个标签，便于搜索和分类。
-category：笔记的分类，用于大类的归类（例如，学习、工作等）。
-created_at 和 modified_at：记录笔记创建和最后修改的时间。
-author：创建笔记的用户ID，用于区分不同用户的笔记。
-priority：笔记的优先级（例如高、中、低），可以帮助用户识别重点内容。
-times: 复习次数
-status：笔记的状态，如是否已完成，或是否待复习。
-attachments：附件字段，是个数组，用于存储笔记相关的文件（如图片或文档）的引用。
-is_shared：是否共享
 
 ## v1.2.0 新功能：知识手册管理
-
-### 功能特性
-1. 知识手册管理
-   - 创建、重命名、删除手册
-   - 手册分类管理
-   - 按分类浏览手册
-
-2. 笔记管理
-   - 在手册中创建笔记
-   - 支持标签系统
-   - 笔记优先级管理
-   - 笔记状态跟踪
-   - 复习次数统计
-   - 附件管理
-   - 笔记共享功能
 ### 知识手册管理
 - **手册管理**
   - 创建、重命名、删除手册

@@ -828,3 +828,8 @@ url
 2024-11-29 10:01:39.113 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
 2024-11-29 10:03:05.466 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-11-29 10:03:42.096 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 11:16:04.989 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 12:34:56.793 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 12:35:00.731 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 12:35:02.735 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 12:46:43.926 | INFO     | app.utils.cache:init:29 - Redis连接成功

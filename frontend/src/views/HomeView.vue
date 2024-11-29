@@ -6,16 +6,22 @@ const router = useRouter()
 
 const features = [
   {
+    title: '知识手册',
+    description: '笔记管理，知识整理，标签系统',
+    icon: 'book',
+    route: '/handbooks'
+  },
+  {
     title: 'AI 助手',
     description: '智能对话，解答问题，代码生成',
     icon: 'chat',
     route: '/chat'
   },
   {
-    title: '知识手册',
-    description: '笔记管理，知识整理，标签系统',
+    title: '复习助手',
+    description: '系统复习，完全掌握',
     icon: 'book',
-    route: '/handbooks'
+    route: '/review'
   }
 ]
 </script>
@@ -24,7 +30,7 @@ const features = [
   <div class="home-view">
     <header class="header">
       <h1>AI 智囊</h1>
-      <p>你的智能助手 & 知识管理工具</p>
+      <p>你的 知识管理工具 & 智能助手 & 复习助手</p>
     </header>
 
     <main class="features">
