@@ -12,6 +12,7 @@ const newCategoryName = ref('')
 
 const props = defineProps<{
   modelValue: boolean
+  handbook?: Handbook
 }>()
 
 const emit = defineEmits<{
@@ -34,12 +35,25 @@ async function handleSubmit() {
   }
 
   try {
-    await store.createHandbook({ name: name.value, category_id: categoryId.value })
-    showToast('创建成功')
+    if (props.handbook) {
+      // 更新手册
+      await store.updateHandbook(props.handbook.id, {
+        name: name.value,
+        category_id: categoryId.value
+      })
+      showToast('更新成功')
+    } else {
+      // 创建手册
+      await store.createHandbook({
+        name: name.value,
+        category_id: categoryId.value
+      })
+      showToast('创建成功')
+    }
     emit('success')
     handleClose()
   } catch {
-    showToast('创建失败')
+    showToast(props.handbook ? '更新失败' : '创建失败')
   }
 }
 
@@ -68,6 +82,17 @@ watch(() => store.categories, (newCategories) => {
         categoryId.value = store.categories[0].id   
     }
 })
+
+// 监听 handbook 变化，设置初始值
+watch(() => props.handbook, (newHandbook) => {
+  if (newHandbook) {
+    name.value = newHandbook.name
+    categoryId.value = newHandbook.category_id
+  } else {
+    name.value = ''
+    categoryId.value = undefined
+  }
+}, { immediate: true })
 </script>
 
 <template>
@@ -80,7 +105,7 @@ watch(() => store.categories, (newCategories) => {
   >
     <div class="handbook-form">
       <div class="header">
-        <h3>创建手册</h3>
+        <h3>{{ props.handbook ? '编辑手册' : '创建手册' }}</h3>
         <van-icon name="cross" @click="handleClose" />
       </div>
 
@@ -126,7 +151,7 @@ watch(() => store.categories, (newCategories) => {
               native-type="submit"
               :loading="store.isLoading"
             >
-              创建
+              {{ props.handbook ? '更新' : '创建' }}
             </van-button>
           </div>
         </van-form>

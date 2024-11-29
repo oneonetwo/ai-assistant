@@ -13,6 +13,10 @@ const selectedCategoryId = ref<number>()
 // 创建手册弹窗
 const showCreateForm = ref(false)
 
+// 编辑手册弹窗
+const showEditForm = ref(false)
+const editingHandbook = ref<Handbook>()
+
 onMounted(async () => {
   await Promise.all([
     loadHandbooks(),
@@ -47,6 +51,38 @@ async function handleCategoryChange(categoryId: number) {
 // 创建手册成功回调
 async function handleCreateSuccess() {
   await loadHandbooks()
+}
+
+// 编辑手册
+function handleEdit(handbook: Handbook) {
+  editingHandbook.value = handbook
+  showEditForm.value = true
+}
+
+// 删除手册
+async function handleDelete(handbook: Handbook) {
+  try {
+    await showDialog({
+      title: '确认删除',
+      message: `是否确认删除手册"${handbook.name}"？`,
+      showCancelButton: true
+    })
+    
+    await store.deleteHandbook(handbook.id)
+    showToast('删除成功')
+    await loadHandbooks()
+  } catch (error) {
+    if (error) {
+      showToast('删除失败')
+    }
+  }
+}
+
+// 编辑手册成功回调
+async function handleEditSuccess() {
+  await loadHandbooks()
+  showEditForm.value = false
+  editingHandbook.value = undefined
 }
 </script>
 
@@ -94,7 +130,7 @@ async function handleCreateSuccess() {
               <van-button 
                 size="small"
                 icon="edit"
-                @click.stop="handleRename(handbook)"
+                @click.stop="handleEdit(handbook)"
               />
             </template>
           </van-cell>
@@ -121,6 +157,14 @@ async function handleCreateSuccess() {
       :modelValue="showCreateForm"
       @success="handleCreateSuccess"
       @update:model-value="showCreateForm = $event"
+    />
+
+    <!-- 编辑手册表单 -->
+    <HandbookForm
+      :modelValue="showEditForm"
+      @success="handleEditSuccess"
+      @update:model-value="showEditForm = $event"
+      :handbook="editingHandbook"
     />
   </div>
 </template>

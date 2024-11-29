@@ -11,6 +11,38 @@ from app.core.logging import app_logger
 
 router = APIRouter(prefix="/notes", tags=["notes"])
 
+@router.get("/tags", response_model=List[TagResponse])
+async def get_tags(db: AsyncSession = Depends(get_db)):
+    """获取所有标签列表"""
+    try:
+        tags = await note_service.get_tags(db)
+        if not tags:
+            return []
+        return tags
+    except Exception as e:
+        app_logger.error(f"获取标签列表失败: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
+@router.get("", response_model=List[NoteResponse])
+async def get_notes(
+    handbook_id: Optional[int] = None,
+    skip: int = 0,
+    limit: int = 10,
+    db: AsyncSession = Depends(get_db)
+):
+    """获取笔记列表"""
+    try:
+        return await note_service.get_notes(db, handbook_id, skip, limit)
+    except Exception as e:
+        app_logger.error(f"获取笔记列表失败: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
 @router.post("", response_model=NoteResponse,
     summary="创建笔记",
     description="在指定手册中创建新笔记",
@@ -34,30 +66,6 @@ async def create_note(
         return await note_service.create_note(db, note)
     except Exception as e:
         app_logger.error(f"创建笔记失败: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
-        )
-
-@router.get("", response_model=List[NoteResponse],
-    summary="获取笔记列表",
-    description="获取笔记列表，可按手册和标签筛选",
-    response_description="返回笔记列表")
-async def get_notes(
-    handbook_id: Optional[int] = None,
-    tag: Optional[str] = None,
-    db: AsyncSession = Depends(get_db)
-):
-    """
-    获取笔记列表
-    
-    - **handbook_id**: 可选的手册ID过滤器
-    - **tag**: 可选的标签过滤器
-    """
-    try:
-        return await note_service.get_notes(db, handbook_id, tag)
-    except Exception as e:
-        app_logger.error(f"获取笔记列表失败: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
@@ -142,23 +150,6 @@ async def delete_note(
             )
     except Exception as e:
         app_logger.error(f"删除笔记失败: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
-        )
-
-@router.get("/tags", response_model=List[TagResponse],
-    summary="获取标签列表",
-    description="获取所有可用的标签",
-    response_description="返回标签列表")
-async def get_tags(db: AsyncSession = Depends(get_db)):
-    """
-    获取所有标签列表
-    """
-    try:
-        return await note_service.get_tags(db)
-    except Exception as e:
-        app_logger.error(f"获取标签列表失败: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)

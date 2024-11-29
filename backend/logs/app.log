@@ -891,3 +891,95 @@ FROM categories]
 2024-11-29 15:57:08.037 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
 2024-11-29 15:58:34.969 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-11-29 17:27:17.709 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 17:28:11.467 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 17:36:10.128 | ERROR    | app.api.v1.handbooks:update_handbook:144 - 更新手册失败: The unique() method must be invoked on this Result, as it contains results that include joined eager loads against collections
+2024-11-29 17:37:34.720 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 17:37:36.757 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 17:37:38.784 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 17:37:57.902 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 17:37:59.941 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 17:38:01.170 | ERROR    | app.api.v1.handbooks:update_handbook:152 - 更新手册失败: name 'Handbook' is not defined
+2024-11-29 17:38:09.298 | ERROR    | app.api.v1.handbooks:update_handbook:152 - 更新手册失败: name 'Handbook' is not defined
+2024-11-29 17:38:53.914 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 17:38:55.857 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 17:39:03.195 | ERROR    | app.api.v1.handbooks:update_handbook:152 - 更新手册失败: name 'Handbook' is not defined
+2024-11-29 17:40:30.348 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 17:40:32.276 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 17:51:55.575 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 17:51:58.731 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 17:52:15.634 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 17:53:42.709 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 17:53:44.601 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 17:53:46.429 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:01:22.736 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:01:27.761 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:01:29.693 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:01:31.663 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:01:33.675 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:01:40.530 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:01:42.430 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:01:44.351 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:02:58.136 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:04:36.656 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:04:52.001 | ERROR    | app.api.v1.notes:get_notes:60 - 获取笔记列表失败: 'NoteService' object has no attribute 'get_notes'
+2024-11-29 18:06:18.697 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:06:20.609 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:06:26.059 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:06:27.944 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:06:31.683 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:06:33.650 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:08:24.130 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:08:26.076 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:08:31.433 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:08:33.356 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:08:37.802 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:08:39.755 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:08:41.775 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:08:44.009 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:08:45.937 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:08:50.830 | ERROR    | app.services.note_service:get_notes:164 - 获取笔记列表失败: Error creating backref 'notes' on relationship 'Note.tags': property of that name exists on mapper 'Mapper[Tag(tags)]'
+2024-11-29 18:08:50.831 | ERROR    | app.api.v1.notes:get_notes:65 - 获取笔记列表失败: 500: 获取笔记列表失败: Error creating backref 'notes' on relationship 'Note.tags': property of that name exists on mapper 'Mapper[Tag(tags)]'
+2024-11-29 18:08:50.833 | ERROR    | app.services.handbook_service:get_handbook:88 - 获取手册详情失败: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Note(notes)]'. Original exception was: Error creating backref 'notes' on relationship 'Note.tags': property of that name exists on mapper 'Mapper[Tag(tags)]'
+2024-11-29 18:10:06.504 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:10:08.428 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:10:32.441 | ERROR    | app.services.note_service:get_notes:164 - 获取笔记列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'tags_1.updated_at' in 'field list'")
+[SQL: SELECT anon_1.id, anon_1.title, anon_1.content, anon_1.message_ids, anon_1.priority, anon_1.status, anon_1.is_shared, anon_1.handbook_id, anon_1.created_at, anon_1.updated_at, tags_1.id AS id_1, tags_1.name, tags_1.created_at AS created_at_1, tags_1.updated_at AS updated_at_1, note_attachments_1.id AS id_2, note_attachments_1.note_id, note_attachments_1.file_id, note_attachments_1.created_at AS created_at_2 
+FROM (SELECT notes.id AS id, notes.title AS title, notes.content AS content, notes.message_ids AS message_ids, notes.priority AS priority, notes.status AS status, notes.is_shared AS is_shared, notes.handbook_id AS handbook_id, notes.created_at AS created_at, notes.updated_at AS updated_at 
+FROM notes 
+WHERE notes.handbook_id = %s ORDER BY notes.created_at DESC 
+ LIMIT %s, %s) AS anon_1 LEFT OUTER JOIN (note_tags AS note_tags_1 INNER JOIN tags AS tags_1 ON tags_1.id = note_tags_1.tag_id) ON anon_1.id = note_tags_1.note_id LEFT OUTER JOIN note_attachments AS note_attachments_1 ON anon_1.id = note_attachments_1.note_id ORDER BY anon_1.created_at DESC]
+[parameters: (1, 0, 10)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 18:10:32.444 | ERROR    | app.api.v1.notes:get_notes:65 - 获取笔记列表失败: 500: 获取笔记列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'tags_1.updated_at' in 'field list'")
+[SQL: SELECT anon_1.id, anon_1.title, anon_1.content, anon_1.message_ids, anon_1.priority, anon_1.status, anon_1.is_shared, anon_1.handbook_id, anon_1.created_at, anon_1.updated_at, tags_1.id AS id_1, tags_1.name, tags_1.created_at AS created_at_1, tags_1.updated_at AS updated_at_1, note_attachments_1.id AS id_2, note_attachments_1.note_id, note_attachments_1.file_id, note_attachments_1.created_at AS created_at_2 
+FROM (SELECT notes.id AS id, notes.title AS title, notes.content AS content, notes.message_ids AS message_ids, notes.priority AS priority, notes.status AS status, notes.is_shared AS is_shared, notes.handbook_id AS handbook_id, notes.created_at AS created_at, notes.updated_at AS updated_at 
+FROM notes 
+WHERE notes.handbook_id = %s ORDER BY notes.created_at DESC 
+ LIMIT %s, %s) AS anon_1 LEFT OUTER JOIN (note_tags AS note_tags_1 INNER JOIN tags AS tags_1 ON tags_1.id = note_tags_1.tag_id) ON anon_1.id = note_tags_1.note_id LEFT OUTER JOIN note_attachments AS note_attachments_1 ON anon_1.id = note_attachments_1.note_id ORDER BY anon_1.created_at DESC]
+[parameters: (1, 0, 10)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 18:10:53.520 | ERROR    | app.services.note_service:get_notes:164 - 获取笔记列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'tags_1.updated_at' in 'field list'")
+[SQL: SELECT anon_1.id, anon_1.title, anon_1.content, anon_1.message_ids, anon_1.priority, anon_1.status, anon_1.is_shared, anon_1.handbook_id, anon_1.created_at, anon_1.updated_at, tags_1.id AS id_1, tags_1.name, tags_1.created_at AS created_at_1, tags_1.updated_at AS updated_at_1, note_attachments_1.id AS id_2, note_attachments_1.note_id, note_attachments_1.file_id, note_attachments_1.created_at AS created_at_2 
+FROM (SELECT notes.id AS id, notes.title AS title, notes.content AS content, notes.message_ids AS message_ids, notes.priority AS priority, notes.status AS status, notes.is_shared AS is_shared, notes.handbook_id AS handbook_id, notes.created_at AS created_at, notes.updated_at AS updated_at 
+FROM notes 
+WHERE notes.handbook_id = %s ORDER BY notes.created_at DESC 
+ LIMIT %s, %s) AS anon_1 LEFT OUTER JOIN (note_tags AS note_tags_1 INNER JOIN tags AS tags_1 ON tags_1.id = note_tags_1.tag_id) ON anon_1.id = note_tags_1.note_id LEFT OUTER JOIN note_attachments AS note_attachments_1 ON anon_1.id = note_attachments_1.note_id ORDER BY anon_1.created_at DESC]
+[parameters: (1, 0, 10)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 18:10:53.524 | ERROR    | app.api.v1.notes:get_notes:65 - 获取笔记列表失败: 500: 获取笔记列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'tags_1.updated_at' in 'field list'")
+[SQL: SELECT anon_1.id, anon_1.title, anon_1.content, anon_1.message_ids, anon_1.priority, anon_1.status, anon_1.is_shared, anon_1.handbook_id, anon_1.created_at, anon_1.updated_at, tags_1.id AS id_1, tags_1.name, tags_1.created_at AS created_at_1, tags_1.updated_at AS updated_at_1, note_attachments_1.id AS id_2, note_attachments_1.note_id, note_attachments_1.file_id, note_attachments_1.created_at AS created_at_2 
+FROM (SELECT notes.id AS id, notes.title AS title, notes.content AS content, notes.message_ids AS message_ids, notes.priority AS priority, notes.status AS status, notes.is_shared AS is_shared, notes.handbook_id AS handbook_id, notes.created_at AS created_at, notes.updated_at AS updated_at 
+FROM notes 
+WHERE notes.handbook_id = %s ORDER BY notes.created_at DESC 
+ LIMIT %s, %s) AS anon_1 LEFT OUTER JOIN (note_tags AS note_tags_1 INNER JOIN tags AS tags_1 ON tags_1.id = note_tags_1.tag_id) ON anon_1.id = note_tags_1.note_id LEFT OUTER JOIN note_attachments AS note_attachments_1 ON anon_1.id = note_attachments_1.note_id ORDER BY anon_1.created_at DESC]
+[parameters: (1, 0, 10)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 18:12:25.478 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:12:27.439 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:12:39.022 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:12:40.924 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:12:44.976 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:12:46.896 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:14:34.764 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:14:36.739 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:15:05.220 | INFO     | app.utils.cache:close:37 - Redis连接已关闭

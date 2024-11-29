@@ -41,11 +41,17 @@ class TagBase(BaseModel):
 class TagCreate(TagBase):
     pass
 
-class TagResponse(TagBase):
+class TagResponse(BaseModel):
     id: int
+    name: str
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
+        json_encoders = {
+            datetime: lambda v: v.isoformat() if v else None
+        }
 
 class AttachmentCreate(BaseModel):
     url: str

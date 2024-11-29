@@ -82,12 +82,27 @@ class Tag(Base):
     
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False, unique=True)
+    created_at = Column(
+        DateTime,
+        server_default=func.current_timestamp(),
+        nullable=False
+    )
+    updated_at = Column(
+        DateTime,
+        server_default=func.current_timestamp(),
+        server_onupdate=func.current_timestamp(),
+        nullable=False
+    )
+
+    # 关系定义
+    notes_relation = relationship("Note", secondary="note_tags", back_populates="tags")
 
 class NoteTag(Base):
     __tablename__ = "note_tags"
     
     note_id = Column(Integer, ForeignKey("notes.id"), primary_key=True)
     tag_id = Column(Integer, ForeignKey("tags.id"), primary_key=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 class Note(Base):
     __tablename__ = "notes"
@@ -95,20 +110,18 @@ class Note(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String(200), nullable=False)
     content = Column(Text)
-    message_ids = Column(JSON)  # 存储消息ID数组
-    priority = Column(String(10))  # 高、中、低
-    times = Column(Integer, default=0)  # 复习次数
-    status = Column(String(20))  # 状态
+    message_ids = Column(JSON)  # 存储相关消息ID
+    priority = Column(Integer, default=0)
+    status = Column(String(50), default="draft")
     is_shared = Column(Boolean, default=False)
     handbook_id = Column(Integer, ForeignKey("handbooks.id"))
-    user_id = Column(Integer, default=1)  # 默认用户
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    # 关系
+
+    # 关系定义
     handbook = relationship("Handbook", back_populates="notes")
-    tags = relationship("Tag", secondary="note_tags", backref="notes")
-    attachments = relationship("NoteAttachment", back_populates="note", cascade="all, delete-orphan")
+    tags = relationship("Tag", secondary="note_tags", back_populates="notes_relation")
+    attachments = relationship("NoteAttachment", back_populates="note")
 
 class NoteAttachment(Base):
     __tablename__ = "note_attachments"

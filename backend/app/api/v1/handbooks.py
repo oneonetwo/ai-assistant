@@ -8,6 +8,9 @@ from app.models.handbook_schemas import (
 )
 from app.services.handbook_service import handbook_service
 from app.core.logging import app_logger
+from sqlalchemy import select
+from sqlalchemy.orm import joinedload
+from app.db.models import Handbook
 
 router = APIRouter(prefix="/handbooks", tags=["handbooks"])
 
@@ -116,35 +119,42 @@ async def get_handbook(
         )
     return handbook
 
-@router.patch("/{handbook_id}", response_model=HandbookResponse,
-    summary="更新手册",
-    description="更新指定手册的信息",
-    response_description="返回更新后的手册信息")
+@router.patch("/{handbook_id}", response_model=HandbookResponse)
 async def update_handbook(
     handbook_id: int,
-    handbook_update: HandbookUpdate,
+    handbook_update: HandbookCreate,
     db: AsyncSession = Depends(get_db)
 ):
-    """
-    更新手册信息
-    
-    - **handbook_id**: 手册ID
-    - **name**: 可选的新手册名称
-    - **category_id**: 可选的新分类ID
-    """
     try:
-        handbook = await handbook_service.update_handbook(db, handbook_id, handbook_update)
+        # 首先检查手册是否存在
+        stmt = select(Handbook).options(
+            joinedload(Handbook.category)
+        ).filter(Handbook.id == handbook_id)
+        
+        result = await db.execute(stmt)
+        handbook = result.unique().scalar_one_or_none()
+        
         if not handbook:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
+                status_code=404,
                 detail="手册不存在"
             )
+
+        # 更新手册信息
+        for key, value in handbook_update.model_dump().items():
+            setattr(handbook, key, value)
+        
+        await db.commit()
+        await db.refresh(handbook)
+        
         return handbook
+        
     except Exception as e:
-        app_logger.error(f"更新手册失败: {str(e)}")
+        app_logger.error(f"更新手册失败: {e}")
+        await db.rollback()
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
+            status_code=500,
+            detail="更新手册失败"
         )
 
 @router.delete("/{handbook_id}",

@@ -6,6 +6,7 @@ from app.models.handbook_schemas import HandbookCreate, HandbookUpdate, Category
 from app.core.logging import app_logger
 from sqlalchemy.orm import joinedload
 from datetime import datetime
+from fastapi import HTTPException, status
 
 class HandbookService:
     async def create_category(self, db: AsyncSession, category: CategoryCreate) -> Category:
@@ -67,12 +68,27 @@ class HandbookService:
         return True
 
     async def get_handbook(self, db: AsyncSession, handbook_id: int) -> Optional[Handbook]:
-        """获取单个手册"""
-        result = await db.execute(
-            select(Handbook)
-            .where(Handbook.id == handbook_id)
-            .options(joinedload(Handbook.notes))
-        )
-        return result.scalar_one_or_none()
+        """获取指定手册详情"""
+        try:
+            # 使用 joinedload 加载关联的 category 和 notes
+            stmt = (
+                select(Handbook)
+                .options(
+                    joinedload(Handbook.category),
+                    joinedload(Handbook.notes)
+                )
+                .where(Handbook.id == handbook_id)
+            )
+            
+            result = await db.execute(stmt)
+            # 添加 .unique() 来处理一对多关系
+            return result.unique().scalar_one_or_none()
+            
+        except Exception as e:
+            app_logger.error(f"获取手册详情失败: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"获取手册详情失败: {str(e)}"
+            )
 
 handbook_service = HandbookService() 

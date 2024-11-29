@@ -12,11 +12,11 @@ const handbookId = route.params.id as string
 
 onMounted(async () => {
   try {
-    await store.fetchHandbook(handbookId)
-    await store.fetchNotes(handbookId)
+    await store.getHandbook(Number(handbookId))
+    // await store.fetchNotes(Number(handbookId))
   } catch (error) {
     showToast('加载失败')
-    router.push('/handbooks')
+    // router.push('/handbooks')
   }
 })
 </script>
