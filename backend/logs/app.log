@@ -983,3 +983,8 @@ WHERE notes.handbook_id = %s ORDER BY notes.created_at DESC
 2024-11-29 18:14:34.764 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
 2024-11-29 18:14:36.739 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-11-29 18:15:05.220 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 19:13:43.504 | ERROR    | app.utils.cache:init:31 - Redis连接失败: Error Multiple exceptions: [Errno 10061] Connect call failed ('::1', 6379, 0, 0), [Errno 10061] Connect call failed ('127.0.0.1', 6379) connecting to localhost:6379.
+2024-11-29 19:14:29.375 | ERROR    | app.utils.cache:init:31 - Redis连接失败: Error Multiple exceptions: [Errno 10061] Connect call failed ('::1', 6379, 0, 0), [Errno 10061] Connect call failed ('127.0.0.1', 6379) connecting to localhost:6379.
+2024-11-29 19:17:13.776 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 19:36:58.779 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 19:54:39.892 | INFO     | app.utils.cache:close:37 - Redis连接已关闭

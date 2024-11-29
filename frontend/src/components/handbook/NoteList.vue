@@ -32,6 +32,7 @@ async function loadNotes() {
 
 // 过滤笔记
 const filteredNotes = computed(() => {
+  if (!store.notes) return []
   return store.notes.filter(note => {
     const matchKeyword = !searchKeyword.value || 
       note.title.toLowerCase().includes(searchKeyword.value.toLowerCase()) ||

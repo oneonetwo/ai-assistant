@@ -33,7 +33,7 @@ onMounted(async () => {
           type="primary" 
           size="small"
           icon="plus"
-          @click="router.push(`/notes/new?handbook=${handbookId}`)"
+          @click="router.push(`/handbooks/notes/new?handbook=${handbookId}`)"
         >
           新建笔记
         </van-button>
