@@ -160,3 +160,32 @@ class DocumentAnalysisRequest(BaseModel):
     query: Optional[str] = None
     system_prompt: Optional[str] = None
     session_id: str
+
+class CategoryBase(BaseModel):
+    name: str = Field(..., description="分类名称")
+
+class CategoryCreate(CategoryBase):
+    pass
+
+class CategoryResponse(CategoryBase):
+    id: int
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+class HandbookBase(BaseModel):
+    title: str = Field(..., description="手册标题")
+    content: str = Field(..., description="手册内容")
+    category_id: int = Field(..., description="分类ID")
+
+class HandbookCreate(HandbookBase):
+    pass
+
+class HandbookResponse(HandbookBase):
+    id: int
+    created_at: datetime
+    category: Optional[CategoryResponse] = None
+    
+    class Config:
+        from_attributes = True

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useHandbookStore } from '@/stores/handbook'
 import { showDialog, showToast } from 'vant'
@@ -38,7 +38,7 @@ const filteredNotes = computed(() => {
       note.content.toLowerCase().includes(searchKeyword.value.toLowerCase())
     
     const matchTags = selectedTags.value.length === 0 ||
-      selectedTags.value.some(tag => note.tags.includes(tag))
+      selectedTags.value.some(tag => note.tags.some(t => t.name === tag))
     
     const matchPriority = !selectedPriority.value || 
       note.priority === selectedPriority.value
@@ -50,34 +50,11 @@ const filteredNotes = computed(() => {
   })
 })
 
-async function handleCreate() {
-  try {
-    const title = await showDialog({
-      title: '创建笔记',
-      message: '请输入笔记标题',
-      showCancelButton: true,
-      confirmButtonText: '创建'
-    })
-    
-    if (title) {
-      await store.createNote(handbookId, { 
-        title,
-        content: '',
-        tags: [],
-        priority: 'medium',
-        status: 'draft'
-      })
-      showToast('创建成功')
-    }
-  } catch {
-    // 用户取消
-  }
-}
-
+// 删除笔记
 async function handleDelete(note: Note) {
   try {
     await showDialog({
-      title: '删除笔记',
+      title: '确认删除',
       message: '确定要删除这个笔记吗？',
       showCancelButton: true
     })
@@ -92,18 +69,7 @@ async function handleDelete(note: Note) {
 
 <template>
   <div class="note-list">
-    <div class="header">
-      <h2>笔记列表</h2>
-      <van-button 
-        type="primary" 
-        size="small"
-        icon="plus"
-        @click="handleCreate"
-      >
-        新建笔记
-      </van-button>
-    </div>
-
+    <!-- 搜索和筛选 -->
     <div class="filters">
       <van-search
         v-model="searchKeyword"
@@ -111,64 +77,70 @@ async function handleDelete(note: Note) {
         shape="round"
       />
       
-      <div class="filter-tags">
-        <van-dropdown-menu>
-          <van-dropdown-item v-model="selectedPriority" :options="[
-            { text: '全部优先级', value: '' },
-            { text: '低优先级', value: 'low' },
-            { text: '中优先级', value: 'medium' },
-            { text: '高优先级', value: 'high' }
-          ]" />
-          
-          <van-dropdown-item v-model="selectedStatus" :options="[
-            { text: '全部状态', value: '' },
-            { text: '草稿', value: 'draft' },
-            { text: '已发布', value: 'published' },
-            { text: '已归档', value: 'archived' }
-          ]" />
-        </van-dropdown-menu>
-        
+      <!-- 标签筛选 -->
+      <div class="filter-section">
         <van-tag
           v-for="tag in store.tags"
           :key="tag.id"
           :type="selectedTags.includes(tag.name) ? 'primary' : 'default'"
           class="filter-tag"
-          @click="
-            selectedTags.includes(tag.name)
-              ? selectedTags = selectedTags.filter(t => t !== tag.name)
-              : selectedTags.push(tag.name)
-          "
+          @click="selectedTags.includes(tag.name) 
+            ? selectedTags = selectedTags.filter(t => t !== tag.name)
+            : selectedTags.push(tag.name)"
         >
           {{ tag.name }}
         </van-tag>
       </div>
+      
+      <!-- 优先级和状态筛选 -->
+      <van-row gutter="16">
+        <van-col span="12">
+          <van-dropdown-menu>
+            <van-dropdown-item v-model="selectedPriority" :options="[
+              { text: '全部优先级', value: '' },
+              { text: '高', value: 'high' },
+              { text: '中', value: 'medium' },
+              { text: '低', value: 'low' }
+            ]" />
+          </van-dropdown-menu>
+        </van-col>
+        <van-col span="12">
+          <van-dropdown-menu>
+            <van-dropdown-item v-model="selectedStatus" :options="[
+              { text: '全部状态', value: '' },
+              { text: '待复习', value: '待复习' },
+              { text: '复习中', value: '复习中' },
+              { text: '已完成', value: '已完成' }
+            ]" />
+          </van-dropdown-menu>
+        </van-col>
+      </van-row>
     </div>
 
+    <!-- 笔记列表 -->
     <div class="list">
-      <van-cell-group>
+      <van-empty v-if="!filteredNotes.length" description="暂无笔记" />
+      <van-cell-group v-else>
         <van-swipe-cell
           v-for="note in filteredNotes"
           :key="note.id"
         >
           <van-cell
             :title="note.title"
-            :label="note.content.slice(0, 50) + (note.content.length > 50 ? '...' : '')"
+            :label="note.content"
             is-link
-            :to="`/notes/${note.id}`"
+            @click="$router.push(`/notes/${note.id}`)"
           >
-            <template #right-icon>
+            <template #value>
               <div class="note-meta">
-                <van-tag 
-                  :type="note.priority === 'high' ? 'danger' : note.priority === 'medium' ? 'warning' : 'success'"
-                  size="small"
-                >
+                <van-tag :type="note.priority === 'high' ? 'danger' : note.priority === 'medium' ? 'warning' : 'success'">
                   {{ note.priority }}
                 </van-tag>
-                <van-tag 
-                  :type="note.status === 'published' ? 'primary' : 'default'"
-                  size="small"
-                >
+                <van-tag :type="note.status === '已完成' ? 'success' : 'primary'">
                   {{ note.status }}
+                </van-tag>
+                <van-tag v-for="tag in note.tags" :key="tag.id" plain>
+                  {{ tag.name }}
                 </van-tag>
               </div>
             </template>
@@ -187,6 +159,9 @@ async function handleDelete(note: Note) {
         </van-swipe-cell>
       </van-cell-group>
     </div>
+
+    <!-- 加载状态 -->
+    <van-loading v-if="store.isLoading" vertical>加载中...</van-loading>
   </div>
 </template>
 
@@ -194,27 +169,14 @@ async function handleDelete(note: Note) {
 .note-list {
   padding: var(--van-padding-md);
 
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--van-padding-md);
-    
-    h2 {
-      margin: 0;
-      font-size: 20px;
-      font-weight: 600;
-    }
-  }
-
   .filters {
     margin-bottom: var(--van-padding-md);
     
-    .filter-tags {
+    .filter-section {
+      margin: var(--van-padding-xs) 0;
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-top: var(--van-padding-xs);
       
       .filter-tag {
         cursor: pointer;
@@ -225,6 +187,7 @@ async function handleDelete(note: Note) {
   .note-meta {
     display: flex;
     gap: 4px;
+    flex-wrap: wrap;
   }
 
   .delete-button {

@@ -833,3 +833,59 @@ url
 2024-11-29 12:35:00.731 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-11-29 12:35:02.735 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-11-29 12:46:43.926 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 12:47:57.301 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 13:01:41.327 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 13:08:40.481 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 13:11:33.241 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 13:56:43.879 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 13:56:54.776 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 14:08:50.945 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 14:15:30.519 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 14:15:31.473 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 14:15:36.957 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 14:16:04.882 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 14:16:33.720 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 14:16:43.878 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 14:24:56.524 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 14:26:22.803 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 14:29:28.170 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 15:57:08.037 | INFO     | app.utils.cache:close:37 - Redis连接已关闭

@@ -1,100 +1,94 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useHandbookStore } from '@/stores/handbook'
 import { showDialog, showToast } from 'vant'
+import { useRouter } from 'vue-router'
 import type { Handbook } from '@/types/handbook'
+import HandbookForm from './HandbookForm.vue'
 
+const router = useRouter()
 const store = useHandbookStore()
+const selectedCategoryId = ref<number>()
 
-onMounted(() => {
-  loadHandbooks()
+// 创建手册弹窗
+const showCreateForm = ref(false)
+
+onMounted(async () => {
+  await Promise.all([
+    loadHandbooks(),
+    loadCategories()
+  ])
 })
 
+// 加载数据
 async function loadHandbooks() {
   try {
-    await store.fetchHandbooks()
+    await store.fetchHandbooks(selectedCategoryId.value)
   } catch (error) {
     showToast('加载手册失败')
   }
 }
 
-async function handleCreate() {
+async function loadCategories() {
   try {
-    const title = await showDialog({
-      title: '创建手册',
-      message: '请输入手册标题',
-      showCancelButton: true,
-      confirmButtonText: '创建'
-    })
-    
-    if (title) {
-      await store.createHandbook({ title })
-      showToast('创建成功')
-    }
-  } catch {
-    // 用户取消
+    await store.fetchCategories()
+    console.log('store.categories>>>>', store.categories)
+  } catch (error) {
+    showToast('加载分类失败')
   }
 }
 
-async function handleDelete(handbook: Handbook) {
-  try {
-    await showDialog({
-      title: '删除手册',
-      message: '确定要删除这个手册吗？',
-      showCancelButton: true
-    })
-    
-    await store.deleteHandbook(handbook.id)
-    showToast('删除成功')
-  } catch {
-    // 用户取消或删除失败
-  }
+// 分类切换
+async function handleCategoryChange(categoryId: number) {
+  selectedCategoryId.value = categoryId
+  await loadHandbooks()
 }
 
-async function handleRename(handbook: Handbook) {
-  try {
-    const title = await showDialog({
-      title: '重命名手册',
-      message: '请输入新的标题',
-      showCancelButton: true,
-      confirmButtonText: '确定'
-    })
-    
-    if (title) {
-      await store.updateHandbook(handbook.id, { title })
-      showToast('重命名成功')
-    }
-  } catch {
-    // 用户取消
-  }
+// 创建手册成功回调
+async function handleCreateSuccess() {
+  await loadHandbooks()
 }
 </script>
 
 <template>
   <div class="handbook-list">
+    <!-- 顶部操作栏 -->
     <div class="header">
       <h2>知识手册</h2>
       <van-button 
         type="primary" 
         size="small"
         icon="plus"
-        @click="handleCreate"
+        @click="showCreateForm = true"
       >
         新建手册
       </van-button>
     </div>
 
+    <!-- 分类选择 -->
+    <div class="categories" v-if="store.categories.length">
+      <van-tabs v-model:active="selectedCategoryId" @change="handleCategoryChange">
+        <van-tab 
+          v-for="category in store.categories" 
+          :key="category.id"
+          :title="category.name"
+          :name="category.id"
+        />
+      </van-tabs>
+    </div>
+
+    <!-- 手册列表 -->
     <div class="list">
-      <van-cell-group>
+      <van-empty v-if="!store.handbooks.length" description="暂无手册" />
+      <van-cell-group v-else>
         <van-swipe-cell
           v-for="handbook in store.handbooks"
           :key="handbook.id"
         >
           <van-cell
-            :title="handbook.title"
-            :label="handbook.description || '暂无描述'"
+            :title="handbook.name"
             is-link
-            :to="`/handbooks/${handbook.id}`"
+            @click="router.push(`/handbooks/${handbook.id}`)"
           >
             <template #right-icon>
               <van-button 
@@ -118,6 +112,15 @@ async function handleRename(handbook: Handbook) {
         </van-swipe-cell>
       </van-cell-group>
     </div>
+
+    <!-- 加载状态 -->
+    <van-loading v-if="store.isLoading" vertical>加载中...</van-loading>
+
+    <!-- 创建手册表单 -->
+    <HandbookForm
+      :modelValue="showCreateForm"
+      @success="handleCreateSuccess"
+    />
   </div>
 </template>
 
@@ -135,6 +138,16 @@ async function handleRename(handbook: Handbook) {
       margin: 0;
       font-size: 20px;
       font-weight: 600;
+    }
+  }
+
+  .categories {
+    margin-bottom: var(--van-padding-md);
+  }
+
+  .list {
+    .van-cell {
+      align-items: center;
     }
   }
 

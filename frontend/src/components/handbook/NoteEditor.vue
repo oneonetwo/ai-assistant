@@ -3,89 +3,134 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useHandbookStore } from '@/stores/handbook'
 import { showToast } from 'vant'
-import type { Note } from '@/types/handbook'
+import type { Note, NotePriority, NoteStatus } from '@/types/handbook'
+import TagSelector from './TagSelector.vue'
 
 const route = useRoute()
 const router = useRouter()
 const store = useHandbookStore()
 const noteId = route.params.id as string
+const handbookId = route.query.handbook as string
 
-const note = ref<Note | null>(null)
+// 表单数据
 const title = ref('')
 const content = ref('')
 const selectedTags = ref<string[]>([])
-const priority = ref<Note['priority']>('medium')
-const status = ref<Note['status']>('draft')
+const priority = ref<NotePriority>('medium')
+const status = ref<NoteStatus>('待复习')
+const isShared = ref(false)
+const newTagName = ref('')
+
+// 文件上传
+const fileList = ref<any[]>([])
+const isUploading = ref(false)
 
 onMounted(async () => {
+  await store.fetchTags()
   if (noteId !== 'new') {
     await loadNote()
   }
-  await store.fetchTags()
 })
 
+// 加载笔记数据
 async function loadNote() {
   try {
-    const response = await store.fetchNote(noteId)
-    note.value = response
-    title.value = response.title
-    content.value = response.content
-    selectedTags.value = response.tags
-    priority.value = response.priority
-    status.value = response.status
+    const note = await store.fetchNote(Number(noteId))
+    title.value = note.title
+    content.value = note.content
+    selectedTags.value = note.tags.map(tag => tag.name)
+    priority.value = note.priority
+    status.value = note.status
+    isShared.value = note.is_shared
+    // 加载附件列表
+    fileList.value = note.attachments.map(attachment => ({
+      url: attachment.file_path,
+      name: attachment.original_name,
+      isImage: attachment.mime_type.startsWith('image/')
+    }))
   } catch (error) {
     showToast('加载笔记失败')
     router.back()
   }
 }
 
+// 添加新标签
+async function handleAddTag() {
+  if (!newTagName.value) return
+  
+  if (!selectedTags.value.includes(newTagName.value)) {
+    selectedTags.value.push(newTagName.value)
+  }
+  newTagName.value = ''
+}
+
+// 文件上传
+async function handleUpload(file: File) {
+  try {
+    isUploading.value = true
+    // TODO: 实现文件上传逻辑
+    fileList.value.push({
+      url: URL.createObjectURL(file),
+      name: file.name,
+      isImage: file.type.startsWith('image/')
+    })
+    return true
+  } catch (error) {
+    showToast('文件上传失败')
+    return false
+  } finally {
+    isUploading.value = false
+  }
+}
+
+// 删除文件
+async function handleDeleteFile(file: any) {
+  // TODO: 实现文件删除逻辑
+  const index = fileList.value.indexOf(file)
+  if (index !== -1) {
+    fileList.value.splice(index, 1)
+  }
+}
+
+// 保存笔记
 async function handleSave() {
   try {
+    if (!title.value || !content.value) {
+      showToast('请填写标题和内容')
+      return
+    }
+
     const data = {
       title: title.value,
       content: content.value,
+      handbook_id: Number(handbookId),
       tags: selectedTags.value,
       priority: priority.value,
-      status: status.value
+      status: status.value,
+      is_shared: isShared.value,
+      attachments: fileList.value.map(file => ({
+        url: file.url,
+        file_name: file.name
+      }))
     }
-    
+
     if (noteId === 'new') {
-      await store.createNote(route.params.handbookId as string, data)
+      await store.createNote(data)
     } else {
-      await store.updateNote(noteId, data)
+      await store.updateNote(Number(noteId), data)
     }
-    
+
     showToast('保存成功')
     router.back()
   } catch (error) {
     showToast('保存失败')
   }
 }
-
-async function handleUpload(file: File) {
-  try {
-    if (!note.value) return
-    await store.uploadAttachment(note.value.id, file)
-    showToast('上传成功')
-    await loadNote() // 重新加载笔记以获取最新附件
-  } catch (error) {
-    showToast('上传失败')
-  }
-}
-
-async function handleDeleteAttachment(attachmentId: string) {
-  try {
-    await store.deleteAttachment(attachmentId)
-    showToast('删除成功')
-    await loadNote() // 重新加载笔记以更新附件列表
-  } catch (error) {
-    showToast('删除失败')
-  }
-}
 </script>
 
 <template>
   <div class="note-editor">
+    <!-- 工具栏 -->
     <van-nav-bar
       :title="noteId === 'new' ? '新建笔记' : '编辑笔记'"
       left-arrow
@@ -95,109 +140,106 @@ async function handleDeleteAttachment(attachmentId: string) {
         <van-button 
           type="primary" 
           size="small"
+          :loading="store.isLoading"
           @click="handleSave"
         >
-          ��存
+          保存
         </van-button>
       </template>
     </van-nav-bar>
 
+    <!-- 编辑区域 -->
     <div class="editor-content">
+      <!-- 标题 -->
       <van-field
         v-model="title"
         label="标题"
         placeholder="请输入笔记标题"
+        required
       />
-      
+
+      <!-- 内容 -->
       <van-field
         v-model="content"
         type="textarea"
         label="内容"
         placeholder="请输入笔记内容"
-        rows="10"
-        autosize
+        rows="6"
+        required
       />
-      
-      <van-field label="标签">
-        <template #input>
-          <div class="tag-selector">
-            <van-tag
-              v-for="tag in store.tags"
-              :key="tag.id"
-              :type="selectedTags.includes(tag.name) ? 'primary' : 'default'"
-              class="tag-item"
-              @click="
-                selectedTags.includes(tag.name)
-                  ? selectedTags = selectedTags.filter(t => t !== tag.name)
-                  : selectedTags.push(tag.name)
-              "
-            >
-              {{ tag.name }}
-            </van-tag>
-          </div>
-        </template>
-      </van-field>
-      
-      <van-field label="优先级">
-        <template #input>
-          <van-radio-group v-model="priority" direction="horizontal">
-            <van-radio name="low">低</van-radio>
-            <van-radio name="medium">中</van-radio>
-            <van-radio name="high">高</van-radio>
-          </van-radio-group>
-        </template>
-      </van-field>
-      
-      <van-field label="状态">
-        <template #input>
-          <van-radio-group v-model="status" direction="horizontal">
-            <van-radio name="draft">草稿</van-radio>
-            <van-radio name="published">已发布</van-radio>
-            <van-radio name="archived">已归档</van-radio>
-          </van-radio-group>
-        </template>
-      </van-field>
-      
+
+      <!-- 标签 -->
+      <div class="tag-section">
+        <div class="section-title">标签</div>
+        <TagSelector
+          v-model="selectedTags"
+          :max-tags="5"
+        />
+      </div>
+
+      <!-- 优先级和状态 -->
+      <van-cell-group>
+        <van-field
+          label="优先级"
+          readonly
+        >
+          <template #input>
+            <van-radio-group v-model="priority" direction="horizontal">
+              <van-radio name="low">低</van-radio>
+              <van-radio name="medium">中</van-radio>
+              <van-radio name="high">高</van-radio>
+            </van-radio-group>
+          </template>
+        </van-field>
+
+        <van-field
+          label="状态"
+          readonly
+        >
+          <template #input>
+            <van-radio-group v-model="status" direction="horizontal">
+              <van-radio name="待复习">待复习</van-radio>
+              <van-radio name="复习中">复习中</van-radio>
+              <van-radio name="已完成">已完成</van-radio>
+            </van-radio-group>
+          </template>
+        </van-field>
+      </van-cell-group>
+
+      <!-- 附件 -->
       <div class="attachments">
         <div class="section-title">附件</div>
         <van-uploader
-          :after-read="handleUpload"
-          multiple
+          v-model="fileList"
+          :max-count="5"
+          :before-read="handleUpload"
+          :loading="isUploading"
         />
-        
-        <div v-if="note?.attachments.length" class="attachment-list">
-          <van-cell-group>
-            <van-swipe-cell
-              v-for="attachment in note.attachments"
-              :key="attachment.id"
-            >
-              <van-cell
-                :title="attachment.name"
-                :label="`${(attachment.size / 1024).toFixed(2)}KB`"
-              >
-                <template #right-icon>
-                  <van-button 
-                    size="small"
-                    icon="down"
-                    @click="window.open(attachment.url)"
-                  />
-                </template>
-              </van-cell>
-              
-              <template #right>
-                <van-button
-                  square
-                  type="danger"
-                  class="delete-button"
-                  @click="handleDeleteAttachment(attachment.id)"
-                >
-                  删除
-                </van-button>
-              </template>
-            </van-swipe-cell>
-          </van-cell-group>
+        <div class="attachment-list">
+          <van-cell
+            v-for="file in fileList"
+            :key="file.url"
+            :title="file.name"
+          >
+            <template #right-icon>
+              <van-button 
+                size="small"
+                icon="delete"
+                @click="handleDeleteFile(file)"
+              />
+            </template>
+          </van-cell>
         </div>
       </div>
+
+      <!-- 分享设置 -->
+      <van-cell-group>
+        <van-cell title="公开分享">
+          <template #right-icon>
+            <van-switch v-model="isShared" />
+          </template>
+        </van-cell>
+      </van-cell-group>
     </div>
   </div>
 </template>
@@ -214,18 +256,17 @@ async function handleDeleteAttachment(attachmentId: string) {
     padding: var(--van-padding-md);
   }
 
-  .tag-selector {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+  .tag-section {
+    margin: var(--van-padding-md) 0;
     
-    .tag-item {
-      cursor: pointer;
+    .section-title {
+      margin-bottom: var(--van-padding-xs);
+      font-weight: 500;
     }
   }
 
   .attachments {
-    margin-top: var(--van-padding-md);
+    margin: var(--van-padding-md) 0;
     
     .section-title {
       margin-bottom: var(--van-padding-xs);
@@ -233,12 +274,8 @@ async function handleDeleteAttachment(attachmentId: string) {
     }
     
     .attachment-list {
-      margin-top: var(--van-padding-xs);
+      margin-top: var(--van-padding-md);
     }
-  }
-
-  .delete-button {
-    height: 100%;
   }
 }
 </style> 
