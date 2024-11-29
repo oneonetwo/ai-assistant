@@ -28,7 +28,6 @@ export const useHandbookStore = defineStore('handbook', () => {
     try {
       isLoading.value = true
       const response = await HandbookAPI.getCategories()
-      console.log('response>>>>', response)
       categories.value = response
     } catch (err) {
       error.value = '获取分类失败'

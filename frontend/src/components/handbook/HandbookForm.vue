@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useHandbookStore } from '@/stores/handbook'
 import { showToast } from 'vant'
+import Selector from '@/components/common/Selector.vue'
 
-// 添加 showCategoryPicker ref
-const showCategoryPicker = ref(false)
-const categoryPicker = ref()
+const store = useHandbookStore()
+const name = ref('')
+const categoryId = ref<number | undefined>()
+const showAddCategoryPopup = ref(false)
+const newCategoryName = ref('')
 
 const props = defineProps<{
   modelValue: boolean
@@ -16,14 +19,9 @@ const emit = defineEmits<{
   (e: 'success'): void
 }>()
 
-const store = useHandbookStore()
-const name = ref('')
-const categoryId = ref<number>()
-
 // 关闭弹窗
 function handleClose() {
   emit('update:modelValue', false)
-  // 重置表单
   name.value = ''
   categoryId.value = undefined
 }
@@ -36,7 +34,7 @@ async function handleSubmit() {
   }
 
   try {
-    await store.createHandbook(name.value, categoryId.value)
+    await store.createHandbook({ name: name.value, category_id: categoryId.value })
     showToast('创建成功')
     emit('success')
     handleClose()
@@ -44,6 +42,32 @@ async function handleSubmit() {
     showToast('创建失败')
   }
 }
+
+// 添加新分类
+async function handleAddCategory() {
+  if (!newCategoryName.value) {
+    showToast('请输入分类名称')
+    return
+  }
+
+  try {
+    await store.createCategory(newCategoryName.value)
+    showToast('创建成功')
+    newCategoryName.value = ''
+    showAddCategoryPopup.value = false
+  } catch {
+    showToast('创建失败')
+  }
+}
+
+// 组件初始化时设置默认分类
+onMounted(() => {
+})
+watch(() => store.categories, (newCategories) => {
+    if (newCategories.length > 0 && !categoryId.value) {
+        categoryId.value = store.categories[0].id   
+    }
+})
 </script>
 
 <template>
@@ -72,21 +96,25 @@ async function handleSubmit() {
             />
 
             <!-- 分类选择 -->
-            <van-field
-              v-model="categoryId"
-              label="所属分类"
-              placeholder="请选择分类"
-              readonly
-              is-link
-              :rules="[{ required: true, message: '请选择分类' }]"
-              @click="showCategoryPicker = true"
-            >
-              <template #input>
-                <span v-if="categoryId">
-                  {{ store.categories.find(c => c.id === categoryId)?.name }}
-                </span>
-              </template>
-            </van-field>
+
+            <div class="category-field">
+              <span class="category-label">所属分类</span>
+              <Selector
+                v-model="categoryId"
+                :options="store.categories.map(c => ({
+                  text: c.name,
+                  value: c.id
+                }))"
+                placeholder="请选择分类"
+              />
+              <van-button 
+                size="small" 
+                type="primary" 
+                @click="showAddCategoryPopup = true"
+              >
+                添加分类
+              </van-button>
+            </div>
           </van-cell-group>
 
           <!-- 提交按钮 -->
@@ -103,26 +131,36 @@ async function handleSubmit() {
           </div>
         </van-form>
 
-        <!-- 分类选择器 -->
+        <!-- 添加分类弹窗 -->
         <van-popup
-          v-model:show="showCategoryPicker"
+          v-model:show="showAddCategoryPopup"
           round
-          position="bottom"
+          position="center"
+          :style="{ width: '80%', maxWidth: '300px' }"
         >
-          <van-picker
-            ref="categoryPicker"
-            :columns="store.categories.map(c => ({
-              text: c.name,
-              value: c.id
-            }))"
-            :default-index="0"
-            title="选择分类"
-            @confirm="(value) => {
-              categoryId = value.value
-              showCategoryPicker = false
-            }"
-            @cancel="showCategoryPicker = false"
-          />
+          <div class="add-category-popup">
+            <div class="popup-header">
+              <h4>新建分类</h4>
+              <van-icon name="cross" @click="showAddCategoryPopup = false" />
+            </div>
+            <div class="popup-content">
+              <van-field
+                v-model="newCategoryName"
+                placeholder="请输入分类名称"
+                :rules="[{ required: true, message: '请输入分类名称' }]"
+              />
+              <div class="popup-buttons">
+                <van-button 
+                  round 
+                  block 
+                  type="primary" 
+                  @click="handleAddCategory"
+                >
+                  确认
+                </van-button>
+              </div>
+            </div>
+          </div>
         </van-popup>
       </div>
     </div>
@@ -163,6 +201,23 @@ async function handleSubmit() {
 
     .van-cell-group {
       margin-bottom: var(--van-padding-md);
+      overflow: visible;
+    }
+  }
+
+  .category-field {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: var(--van-padding-xs) var(--van-padding-md);
+    background: #444654;
+    
+    .custom-selector {
+      flex: 1;
+    }
+    
+    .van-button {
+      flex-shrink: 0;
     }
   }
 
@@ -175,5 +230,42 @@ async function handleSubmit() {
       font-size: 16px;
     }
   }
+}
+
+.add-category-popup {
+  .popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--van-padding-md);
+    border-bottom: 1px solid var(--van-border-color);
+
+    h4 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .van-icon {
+      cursor: pointer;
+      color: var(--van-gray-6);
+      
+      &:hover {
+        color: var(--van-gray-8);
+      }
+    }
+  }
+
+  .popup-content {
+    padding: var(--van-padding-md);
+
+    .popup-buttons {
+      margin-top: var(--van-padding-lg);
+    }
+  }
+}
+.category-label {
+  margin-right: 20px;
+  font-size: 14px;
 }
 </style> 

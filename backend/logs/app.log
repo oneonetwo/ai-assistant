@@ -889,3 +889,5 @@ FROM categories]
 2024-11-29 14:26:22.803 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
 2024-11-29 14:29:28.170 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-11-29 15:57:08.037 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 15:58:34.969 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 17:27:17.709 | INFO     | app.utils.cache:close:37 - Redis连接已关闭

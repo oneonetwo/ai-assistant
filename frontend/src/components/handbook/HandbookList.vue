@@ -120,6 +120,7 @@ async function handleCreateSuccess() {
     <HandbookForm
       :modelValue="showCreateForm"
       @success="handleCreateSuccess"
+      @update:model-value="showCreateForm = $event"
     />
   </div>
 </template>
