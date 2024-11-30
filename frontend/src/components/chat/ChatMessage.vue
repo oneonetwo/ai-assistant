@@ -1,5 +1,19 @@
 <template>
-  <div class="message" :class="message.role">
+  <div 
+    class="message" 
+    :class="[
+      message.role,
+      { 'selectable': isSelectable },
+      { 'selected': isSelected }
+    ]"
+    @click="handleMessageClick"
+  >
+    <div v-if="isSelectable" class="select-box">
+      <van-checkbox 
+        :model-value="isSelected"
+        @change="$emit('select', message.id)"
+      />
+    </div>
     <div class="avatar">
       {{ message.role === 'assistant' ? 'AI' : '你' }}
     </div>
@@ -29,7 +43,7 @@
         <div class="markdown-body" v-html="renderedContent" />
       </div>
       <Transition name="fade">
-        <div v-if="showActions" class="actions">
+        <div v-if="showActions && !isSelectable" class="actions">
           <van-button size="mini" @click="$emit('quote', message)">
             <template #icon><svg-icon name="quote" /></template>
             引用
@@ -60,12 +74,22 @@ const props = defineProps<{
     id: string
     role: 'user' | 'assistant'
     content: string
-    file: {
+    file?: {
       file_path: string
       original_name: string
       file_type: string
     }
   }
+  showActions?: boolean
+  isSelectable?: boolean
+  isSelected?: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'quote', message: Message): void
+  (e: 'edit', message: Message): void
+  (e: 'copy', message: Message): void
+  (e: 'select', messageId: string): void
 }>()
 
 const md = new MarkdownIt({
@@ -122,6 +146,12 @@ watch(
     // 处理 content 变化的逻辑
   }
 )
+
+function handleMessageClick() {
+  if (props.isSelectable) {
+    emit('select', props.message.id)
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -246,6 +276,30 @@ watch(
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+  }
+}
+
+.message {
+  &.selectable {
+    cursor: pointer;
+    padding-left: 40px;
+    position: relative;
+    
+    &:hover {
+      background: var(--van-background-2);
+    }
+    
+    &.selected {
+      background: var(--van-primary-light);
+    }
+  }
+  
+  .select-box {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
   }
 }
 </style>

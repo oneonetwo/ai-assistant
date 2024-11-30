@@ -314,7 +314,22 @@ UI 框架：Vant
    - [ ] UI/UX优化
    
 ###  1. 现在进行v1.2.1 功能的开发  2024-12-01
-1. AI聊天助手新建‘收录’按钮，’收录完成创建笔记‘的按钮，点击收录之后，可能对自己或者ai回答的message进行选择，选择完成之后，’收录完成创建笔记‘就可以进行操作，点击‘收录完成创建笔记‘，前端会有一个弹窗，下拉选择手册，然后点击确定之后，发送message_ids给后端
-2. 假设后端的接口是post方式，url是 /chat/v1/collect，那么请求参数是messageIds，然后进行sse的流式返回， 希望前端调转到创建笔记的页面，表示人工智能正在进行分析整理。等拿到接口数据之后，关闭loading页面，跳转到创建笔记页面
-3. 后端处理完成之后，返回一个title， content， messageList，messageList就是刚才选择的消息的所有数据，
-4. 前端拿到返回的结果， 然后调用笔记的创建接口，创建笔记，
+1. AI聊天助手页面点击‘收录到笔记’按钮，可以对自己或者ai回答的message进行多条选择，有选择的条目之后，‘收录完成进行分析整理’按钮可以进行操作，点击‘收录完成进行分析整理’按钮，进入到一个新的分析整理的页面
+2. 到达分析整理的页面，发送请求到后端，是个流式响应的接口， /api/v1/chat/analyze/stream/init  post,  参数是 {
+  "messages": [
+    {message对象}
+  ],
+  "system_prompt": "string"
+} 
+sse接口/api/v1/chat/analyze/stream
+3. 后端处理完成之后，返回格式如下               onChunk(
+                response.data.content, 
+                response.data.section,
+                fullText
+              )， 
+4. 等后端处理完成之后，出现下拉选择框，取消按钮，创建笔记按钮，取消按钮则返回ai聊天页面，创建笔记按钮则进入到创建笔记页面。把生成的title，content，messageIds，handbookId带到创建笔记页面。
+system_protmpt:
+You are an AI assistant skilled in summarizing conversations. You will be provided with several dialogues between a user (who is a lifelong learner, student) and GPT. Your task is to extract the key insights and main ideas from each dialogue and provide a cohesive summary of all the conversations. Focus on identifying important concepts, any overarching themes, and key takeaways from the dialogues, while disregarding irrelevant or minor details. The summary should provide clarity and focus on the essence of the discussions, even if the viewpoints are diverse.
+Please ensure that the summary reflects the intellectual depth and learning journey of the user, capturing how their thoughts have evolved over the course of the conversations. 
+你是人工智能助手，擅长概括对话内容。你将获得几段用户（终身学习者）与 GPT 之间的对话。你的任务是从每个对话中提取关键见解和主要思想，并提供所有对话的连贯总结。重点在于识别重要概念、任何贯穿始终的主题以及对话的关键要点，同时忽略无关或次要的细节。总结应提供清晰度，并专注于讨论的本质，即使观点多样。
+请确保摘要能够反映用户的思维深度和学习历程，捕捉他们在对话过程中思想的演变过程。

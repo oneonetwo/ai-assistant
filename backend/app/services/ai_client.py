@@ -27,7 +27,7 @@ class AIClient:
             base_url=settings.QWEN_API_URL,
             timeout=settings.QWEN_API_TIMEOUT
         )
-        self.model = "qwen-plus"
+        self.model = "qwen-max"
         self.vision_model = "qwen-vl-plus"
         self._active_streams = {}
         self._initialized_sessions = set()

@@ -8,11 +8,11 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Analytics: typeof import('./src/components/chat/Analytics.vue')['default']
+    AnalyzeView: typeof import('./src/components/AnalyzeView.vue')['default']
     AppHeader: typeof import('./src/components/common/AppHeader.vue')['default']
     ChatInput: typeof import('./src/components/chat/ChatInput.vue')['default']
     ChatLayout: typeof import('./src/components/layout/ChatLayout.vue')['default']
     ChatMessage: typeof import('./src/components/chat/ChatMessage.vue')['default']
-    ChatWindow: typeof import('./src/components/chat/ChatWindow.vue')['default']
     CodeSnippets: typeof import('./src/components/chat/CodeSnippets.vue')['default']
     ConversationList: typeof import('./src/components/chat/ConversationList.vue')['default']
     EmptyState: typeof import('./src/components/chat/EmptyState.vue')['default']
@@ -49,6 +49,7 @@ declare module 'vue' {
     VanButton: typeof import('vant/es')['Button']
     VanCell: typeof import('vant/es')['Cell']
     VanCellGroup: typeof import('vant/es')['CellGroup']
+    VanCheckbox: typeof import('vant/es')['Checkbox']
     VanCol: typeof import('vant/es')['Col']
     VanDropdownItem: typeof import('vant/es')['DropdownItem']
     VanDropdownMenu: typeof import('vant/es')['DropdownMenu']

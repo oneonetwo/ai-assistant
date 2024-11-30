@@ -145,6 +145,69 @@ export class ChatClient {
       onError(error as Error)
     }
   }
+
+  async streamAnalyze(
+    messages: Message[],
+    callbacks: {
+      onStart?: () => void
+      onChunk?: (content: string, section: string, fullText: string) => void
+      onEnd?: () => void
+      onError?: (error: Error) => void
+    } = {}
+  ) {
+    try {
+      // 初始化分析
+      await request.post('/api/v1/chat/analyze/stream/init', {
+        messages,
+        system_prompt: '请分析整理以下对话内容'
+      })
+
+      // 建立 SSE 连接
+      const url = new URL(`${window.location.origin}/api/v1/chat/analyze/stream`)
+      const eventSource = new EventSource(url.toString())
+      let fullText = ''
+
+      eventSource.onmessage = (event) => {
+        try {
+          const response = JSON.parse(event.data)
+          
+          switch (response.type) {
+            case 'start':
+              callbacks.onStart?.()
+              break
+              
+            case 'chunk':
+              fullText += response.data.content
+              callbacks.onChunk?.(
+                response.data.content, 
+                response.data.section,
+                fullText
+              )
+              break
+              
+            case 'end':
+              callbacks.onEnd?.()
+              eventSource.close()
+              break
+              
+            case 'error':
+              throw new Error(response.data.message)
+          }
+        } catch (error) {
+          eventSource.close()
+          callbacks.onError?.(error as Error)
+        }
+      }
+
+      eventSource.onerror = (error) => {
+        eventSource.close()
+        callbacks.onError?.(error as Error)
+      }
+
+    } catch (error) {
+      callbacks.onError?.(error as Error)
+    }
+  }
 }
 
 /**

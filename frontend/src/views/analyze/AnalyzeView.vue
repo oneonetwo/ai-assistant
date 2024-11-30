@@ -1,0 +1,84 @@
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { showToast } from 'vant'
+
+const route = useRoute()
+const router = useRouter()
+const analyzing = ref(true)
+const analysisResult = ref('')
+const currentSection = ref('')
+
+onMounted(async () => {
+  const messages = JSON.parse(route.params.messages as string)
+  await startAnalysis(messages)
+})
+
+async function startAnalysis(messages: Message[]) {
+  try {
+    const chatClient = new ChatClient()
+    await chatClient.streamAnalyze(messages, {
+      onStart: () => {
+        analyzing.value = true
+      },
+      onChunk: (content: string, section: string, fullText: string) => {
+        analysisResult.value = fullText
+        currentSection.value = section
+      },
+      onEnd: () => {
+        analyzing.value = false
+      },
+      onError: (error: Error) => {
+        showToast(error.message)
+        analyzing.value = false
+      }
+    })
+  } catch (error) {
+    showToast('分析失败')
+    analyzing.value = false
+  }
+}
+
+function handleCreateNote() {
+  router.push({
+    name: 'note-create',
+    query: {
+      title: '分析整理',
+      content: analysisResult.value,
+      messageIds: route.params.messages
+    }
+  })
+}
+</script>
+
+<template>
+  <div class="analyze-view">
+    <div v-if="analyzing" class="analyzing">
+      <van-loading type="spinner" />
+      <p>正在分析整理中...</p>
+      <p class="section">{{ currentSection }}</p>
+    </div>
+    
+    <div v-else class="result">
+      <div class="content" v-html="analysisResult"></div>
+      
+      <div class="actions">
+        <van-button 
+          block 
+          type="primary"
+          @click="handleCreateNote"
+        >
+          创建笔记
+        </van-button>
+        
+        <van-button 
+          block 
+          plain
+          @click="router.back()"
+        >
+          取消
+        </van-button>
+      </div>
+    </div>
+  </div>
+</template>

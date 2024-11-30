@@ -100,6 +100,14 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
   {
+    path: '/analyze',
+    name: 'analyze',
+    component: () => import('@/views/analyze/AnalyzeView.vue'),
+    meta: {
+      title: '分析整理'
+    }
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: () => import('@/views/NotFoundView.vue'),

@@ -483,7 +483,7 @@ async def initialize_message_analysis_stream(
 
 请提供:
 1. 一个不超过30个字的精简标题
-2. 详细的分析内容
+2. 请分析内容，结构清晰，内容完整
 
 输出格式:
 title: <标题>
