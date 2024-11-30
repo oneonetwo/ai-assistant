@@ -26,7 +26,7 @@ from app.core.config import settings
 import json
 import asyncio
 import uuid
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import base64
 from io import BytesIO
 import imghdr
@@ -34,6 +34,7 @@ import aiohttp
 import io
 from docx import Document
 from pathlib import Path
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -614,4 +615,60 @@ async def handle_file_stream_chat(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
+        ) 
+
+class MessageAnalysisRequest(BaseModel):
+    messages: List[str]
+    system_prompt: Optional[str] = None
+
+@router.post("/analyze/stream/init",
+    summary="初始化消息分析流",
+    description="初始化一个或多个消息的分析流")
+async def init_message_analysis_stream(
+    request: MessageAnalysisRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    初始化消息分析流
+    
+    - **messages**: 消息内容列表
+    - **system_prompt**: 可选的系统提示
+    """
+    try:
+        await chat_service.initialize_message_analysis_stream(
+            request.messages,
+            request.system_prompt
+        )
+        return {"status": "initialized"}
+    except Exception as e:
+        app_logger.error(f"初始化消息分析流失败: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="初始化消息分析流失败"
+        )
+
+@router.get("/analyze/stream",
+    summary="获取消息分析流式响应",
+    description="获取消息分析的SSE流式响应")
+async def get_message_analysis_stream():
+    """获取消息分析的流式响应"""
+    try:
+        return StreamingResponse(
+            chat_service.get_message_analysis_stream(),
+            media_type="text/event-stream",
+            headers={
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+                'X-Accel-Buffering': 'no',
+                'Content-Type': 'text/event-stream',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type',
+            }
+        )
+    except Exception as e:
+        app_logger.error(f"获取消息分析流失败: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="获取消息分析流失败"
         ) 

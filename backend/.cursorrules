@@ -61,9 +61,10 @@ You are an expert in Python, FastAPI, and scalable API development.
   Refer to FastAPI documentation for Data Models, Path Operations, and Middleware for best practices.
 
 
-  1. V1.1.0 当前版本，完成基本功能。
-  2. V1.2.0 现在进行开发，完成知识手册管理的开发。不改变V1.1.0的功能，服务，逻辑，接口。
-
+1. V1.1.0 当前版本，完成基本功能。
+2. V1.2.0 完成，完成知识手册管理的开发。不改变V1.1.0的功能，服务，逻辑，接口。
+3. 现在进行v1.2.1 功能的开发  2024-12-01
+  需求是：提供支持对多个或者一个message分析整理，返回给客户端
 
 
 

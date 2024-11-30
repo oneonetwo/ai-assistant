@@ -397,3 +397,157 @@ async def extract_text(file_path: str) -> str:
     except Exception as e:
         app_logger.error(f"文本提取失败: {str(e)}")
         return f"文本提取失败: {str(e)}"
+
+async def process_message_analysis_stream(
+    messages: List[str],
+    system_prompt: Optional[str] = None
+) -> AsyncGenerator[str, None]:
+    """处理消息分析的流式响应"""
+    try:
+        # 构建分析提示
+        combined_message = "\n".join(messages)
+        analysis_prompt = f"""请分析以下消息内容:
+{combined_message}
+
+请提供:
+1. 一个不超过30个字的精简标题
+2. 详细的分析内容
+
+输出格式:
+title: <标题>
+content: <分析内容>"""
+
+        # 构建消息列表
+        prompt_messages = []
+        if system_prompt:
+            prompt_messages.append({"role": "system", "content": system_prompt})
+        prompt_messages.append({"role": "user", "content": analysis_prompt})
+
+        # 发送开始事件
+        yield f"data: {json.dumps({'type': 'start', 'data': {}}, ensure_ascii=False)}\n\n"
+
+        # 初始化结果变量
+        full_response = ""
+        current_section = None
+        
+        # 调用AI模型进行流式分析
+        async for response_chunk in ai_client.get_analysis_stream(prompt_messages):
+            full_response += response_chunk
+            
+            # 处理分段
+            if response_chunk.strip().startswith("title:"):
+                current_section = "title"
+            elif response_chunk.strip().startswith("content:"):
+                current_section = "content"
+                
+            # 发送数据块事件
+            chunk_data = {
+                'type': 'chunk',
+                'data': {
+                    'section': current_section,
+                    'content': response_chunk,
+                    'full_text': full_response
+                }
+            }
+            yield f"data: {json.dumps(chunk_data, ensure_ascii=False)}\n\n"
+
+        # 发送结束事件
+        end_data = {
+            'type': 'end',
+            'data': {
+                'full_text': full_response
+            }
+        }
+        yield f"data: {json.dumps(end_data, ensure_ascii=False)}\n\n"
+
+    except Exception as e:
+        app_logger.error(f"消息分析失败: {str(e)}")
+        error_data = {
+            'type': 'error',
+            'data': {
+                'message': str(e)
+            }
+        }
+        yield f"data: {json.dumps(error_data, ensure_ascii=False)}\n\n"
+
+async def initialize_message_analysis_stream(
+    messages: List[str],
+    system_prompt: Optional[str] = None
+) -> None:
+    """初始化消息分析流"""
+    try:
+        # 构建分析提示
+        combined_message = "\n".join(messages)
+        analysis_prompt = f"""请分析以下消息内容:
+{combined_message}
+
+请提供:
+1. 一个不超过30个字的精简标题
+2. 详细的分析内容
+
+输出格式:
+title: <标题>
+content: <分析内容>"""
+
+        # 构建消息列表
+        prompt_messages = []
+        if system_prompt:
+            prompt_messages.append({"role": "system", "content": system_prompt})
+        prompt_messages.append({"role": "user", "content": analysis_prompt})
+
+        # 初始化流式响应
+        await ai_client.initialize_analysis_stream(prompt_messages)
+
+    except Exception as e:
+        app_logger.error(f"初始化消息分析流失败: {str(e)}")
+        raise APIError(f"初始化消息分析流失败: {str(e)}")
+
+async def get_message_analysis_stream() -> AsyncGenerator[str, None]:
+    """获取消息分析流式响应"""
+    try:
+        # 发送开始事件
+        yield f"data: {json.dumps({'type': 'start', 'data': {}}, ensure_ascii=False)}\n\n"
+
+        # 初始化结果变量
+        full_response = ""
+        current_section = None
+        
+        # 获取流式响应
+        async for response_chunk in ai_client.get_analysis_stream():
+            full_response += response_chunk
+            
+            # 处理分段
+            if response_chunk.strip().startswith("title:"):
+                current_section = "title"
+            elif response_chunk.strip().startswith("content:"):
+                current_section = "content"
+                
+            # 发送数据块事件
+            chunk_data = {
+                'type': 'chunk',
+                'data': {
+                    'section': current_section,
+                    'content': response_chunk,
+                    'full_text': full_response
+                }
+            }
+            yield f"data: {json.dumps(chunk_data, ensure_ascii=False)}\n\n"
+
+        # 发送结束事件
+        end_data = {
+            'type': 'end',
+            'data': {
+                'full_text': full_response
+            }
+        }
+        yield f"data: {json.dumps(end_data, ensure_ascii=False)}\n\n"
+
+    except Exception as e:
+        app_logger.error(f"获取消息分析流失败: {str(e)}")
+        error_data = {
+            'type': 'error',
+            'data': {
+                'message': str(e)
+            }
+        }
+        yield f"data: {json.dumps(error_data, ensure_ascii=False)}\n\n"

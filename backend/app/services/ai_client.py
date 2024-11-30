@@ -224,7 +224,7 @@ class AIClient:
 
         # 生成最终总结
         final_messages = [
-            {"role": "user", "content": f"基于以下结果，{query}\n\n{combined_analysis}"}
+            {"role": "user", "content": f"基于以下���果，{query}\n\n{combined_analysis}"}
         ]
         return await self.generate_response(
             final_messages,
@@ -446,8 +446,29 @@ class AIClient:
             await self.cleanup_stream(session_id)
 
         except Exception as e:
-            app_logger.error(f"获取流式响应失败: {str(e)}")
+            app_logger.error(f"获��流式响应失��: {str(e)}")
             raise APIError(f"获取流式响应失败: {str(e)}")
+
+    async def get_analysis_stream(
+        self,
+        messages: List[Dict[str, str]]
+    ) -> AsyncGenerator[str, None]:
+        """获取分析流式响应"""
+        try:
+            # 创建流式响应
+            stream = await self._make_api_call(
+                messages=messages,
+                model=self.model,
+                stream=True
+            )
+            
+            async for chunk in stream:
+                if chunk.choices[0].delta.content is not None:
+                    yield chunk.choices[0].delta.content
+                
+        except Exception as e:
+            app_logger.error(f"获取分析流式响应失败: {str(e)}")
+            raise APIError(f"获取分析流式响应失败: {str(e)}")
 
 # 创建全局AI客户端实例
 ai_client = AIClient() 
