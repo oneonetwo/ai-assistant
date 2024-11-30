@@ -13,10 +13,10 @@ const handbookId = route.params.id as string
 onMounted(async () => {
   try {
     await store.getHandbook(Number(handbookId))
-    // await store.fetchNotes(Number(handbookId))
+    await store.fetchNotes(Number(handbookId))
   } catch (error) {
     showToast('加载失败')
-    // router.push('/handbooks')
+    router.push('/handbooks')
   }
 })
 </script>
@@ -24,7 +24,7 @@ onMounted(async () => {
 <template>
   <div class="handbook-detail-view">
     <van-nav-bar
-      :title="store.currentHandbook?.title || '加载中...'"
+      :title="store.currentHandbook?.name || '加载中...'"
       left-arrow
       @click-left="router.back()"
     >

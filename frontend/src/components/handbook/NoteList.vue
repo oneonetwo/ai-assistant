@@ -14,6 +14,19 @@ const searchKeyword = ref('')
 const selectedTags = ref<string[]>([])
 const selectedPriority = ref<Note['priority'] | ''>('')
 const selectedStatus = ref<Note['status'] | ''>('')
+const priorityOptions = ref<{ text: string; value: Note['priority'] }[]>([
+  { text: '全部优先级', value: '' },
+  { text: '高', value: 'high' },
+  { text: '中', value: 'medium' },
+  { text: '低', value: 'low' }
+])
+
+const statusOptions = ref<{ text: string; value: Note['status'] }[]>([
+  { text: '全部状态', value: '' },
+  { text: '待复习', value: '待复习' },
+  { text: '复习中', value: '复习中' },
+  { text: '已完成', value: '已完成' }
+])
 
 onMounted(async () => {
   await Promise.all([
@@ -76,8 +89,7 @@ async function handleDelete(note: Note) {
         v-model="searchKeyword"
         placeholder="搜索笔记"
         shape="round"
-      />
-      
+      />  
       <!-- 标签筛选 -->
       <div class="filter-section">
         <van-tag
@@ -97,22 +109,12 @@ async function handleDelete(note: Note) {
       <van-row gutter="16">
         <van-col span="12">
           <van-dropdown-menu>
-            <van-dropdown-item v-model="selectedPriority" :options="[
-              { text: '全部优先级', value: '' },
-              { text: '高', value: 'high' },
-              { text: '中', value: 'medium' },
-              { text: '低', value: 'low' }
-            ]" />
+            <van-dropdown-item v-model="selectedPriority" :options="priorityOptions" />
           </van-dropdown-menu>
         </van-col>
         <van-col span="12">
           <van-dropdown-menu>
-            <van-dropdown-item v-model="selectedStatus" :options="[
-              { text: '全部状态', value: '' },
-              { text: '待复习', value: '待复习' },
-              { text: '复习中', value: '复习中' },
-              { text: '已完成', value: '已完成' }
-            ]" />
+            <van-dropdown-item v-model="selectedStatus" :options="statusOptions" />
           </van-dropdown-menu>
         </van-col>
       </van-row>
@@ -130,7 +132,7 @@ async function handleDelete(note: Note) {
             :title="note.title"
             :label="note.content"
             is-link
-            @click="$router.push(`/notes/${note.id}`)"
+            @click="$router.push(`/handbooks/notes/${note.id}`)"
           >
             <template #value>
               <div class="note-meta">

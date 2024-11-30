@@ -12,7 +12,7 @@ export class NoteAPI {
    */
   static async createNote(data: CreateNoteData): Promise<Note> {
     const response = await request.post(`${API_BASE_URL}/notes`, data)
-    return response.data
+    return response
   }
 
   /**
@@ -20,7 +20,7 @@ export class NoteAPI {
    */
   static async getNotes(params?: { handbook_id?: number; tag?: string }): Promise<Note[]> {
     const response = await request.get(`${API_BASE_URL}/notes`, { params })
-    return response.data
+    return response
   }
 
   /**
@@ -28,7 +28,7 @@ export class NoteAPI {
    */
   static async getNote(noteId: number): Promise<Note> {
     const response = await request.get(`${API_BASE_URL}/notes/${noteId}`)
-    return response.data
+    return response
   }
 
   /**
