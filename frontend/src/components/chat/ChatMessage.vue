@@ -8,9 +8,9 @@
     ]"
     @click="handleMessageClick"
   >
-    <div v-if="isSelectable" class="select-box">
+    <div class="select-box" v-if="isSelectable" @click.stop="$emit('select', message.id)">
       <van-checkbox 
-        :model-value="isSelected"
+        :model-value="isChecked"
         @change="$emit('select', message.id)"
       />
     </div>
@@ -85,6 +85,11 @@ const props = defineProps<{
   isSelected?: boolean
 }>()
 
+const isChecked = computed(() => props.isSelected)
+watch(props.isSelected , (newVal) => {
+  console.log('newVal>>>>>>', newVal)
+  isChecked.value = newVal
+})
 const emit = defineEmits<{
   (e: 'quote', message: Message): void
   (e: 'edit', message: Message): void
@@ -280,10 +285,10 @@ function handleMessageClick() {
 }
 
 .message {
+  position: relative;
+  
   &.selectable {
-    cursor: pointer;
-    padding-left: 40px;
-    position: relative;
+    padding-right: 40px;
     
     &:hover {
       background: var(--van-background-2);
@@ -296,10 +301,47 @@ function handleMessageClick() {
   
   .select-box {
     position: absolute;
-    left: 8px;
-    top: 50%;
-    transform: translateY(-50%);
+    right: 12px;
+    top: 12px;
     z-index: 1;
+    opacity: 0;
+    transition: opacity 0.2s;
+    
+    .van-checkbox {
+      padding: 4px;
+      border-radius: 4px;
+      background: var(--van-background);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+  
+  .select-box {
+    opacity: 1;
+  }
+  
+  &.selected .select-box {
+    opacity: 1;
+  }
+}
+
+.select-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 8px 0;
+  
+  .van-button {
+    border-radius: 16px;
+    padding: 0 16px;
+    
+    &--primary {
+      background: var(--van-primary-color);
+      border: none;
+      
+      &:disabled {
+        opacity: 0.6;
+      }
+    }
   }
 }
 </style>

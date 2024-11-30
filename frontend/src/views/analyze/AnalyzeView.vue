@@ -43,9 +43,10 @@ function handleCreateNote() {
   router.push({
     name: 'note-create',
     query: {
-      title: '分析整理',
+      title: '对话分析整理',
       content: analysisResult.value,
-      messageIds: route.params.messages
+      messageIds: JSON.stringify(Array.from(selectedMessages.value)),
+      handbookId: route.query.handbookId as string
     }
   })
 }
@@ -82,3 +83,35 @@ function handleCreateNote() {
     </div>
   </div>
 </template>
+
+<style scoped>
+.analyzing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  
+  .section {
+    margin-top: 12px;
+    color: var(--van-gray-6);
+  }
+}
+
+.result {
+  padding: 20px;
+  
+  .content {
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: sticky;
+    bottom: 20px;
+  }
+}
+</style>

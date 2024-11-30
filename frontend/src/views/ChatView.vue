@@ -141,12 +141,21 @@ watch(() => chatStore.isLoading, (newVal, oldVal) => {
   }
 })
 
+// 计算属性: 消息选中状态
+const messageSelectedState = computed(() => {
+  return (messageId: string) => selectedMessages.value.has(messageId)
+})
+
+// 修改选择切换函数
 function toggleMessageSelection(messageId: string) {
-  if (selectedMessages.value.has(messageId)) {
-    selectedMessages.value.delete(messageId)
+  console.log('toggleMessageSelection.......', messageId)
+  const newSelectedMessages = new Set(selectedMessages.value)
+  if (newSelectedMessages.has(messageId)) {
+    newSelectedMessages.delete(messageId)
   } else {
-    selectedMessages.value.add(messageId)
+    newSelectedMessages.add(messageId)
   }
+  selectedMessages.value = newSelectedMessages
 }
 
 function handleAnalyze() {
@@ -159,9 +168,18 @@ function handleAnalyze() {
   router.push({
     name: 'analyze',
     params: {
-      messages: JSON.stringify(messages)
+      messages: JSON.stringify(messages),
+      systemPrompt: '请对这些对话内容进行分析整理,生成一篇结构化的笔记'
     }
   })
+}
+
+// 切换选择模式
+function toggleSelecting() {
+  isSelecting.value = !isSelecting.value
+  if (!isSelecting.value) {
+    selectedMessages.value.clear()
+  }
 }
 </script>
 
@@ -183,7 +201,7 @@ function handleAnalyze() {
             :message="message"
             :show-actions="true"
             :is-selectable="isSelecting"
-            :is-selected="selectedMessages.has(message.id)"
+            :is-selected="messageSelectedState(message.id)"
             @quote="handleQuote"
             @select="toggleMessageSelection"
           />
@@ -206,26 +224,7 @@ function handleAnalyze() {
             />
           </template>
         </MessageQuote>
-        
-        <div v-if="isSelecting" class="select-toolbar">
-          <van-button 
-            type="primary"
-            size="small"
-            @click="toggleSelecting"
-          >
-            取消选择
-          </van-button>
-          
-          <van-button
-            type="primary"
-            size="small"
-            :disabled="selectedMessages.size === 0"
-            @click="handleAnalyze"
-          >
-            分析整理 ({{ selectedMessages.size }})
-          </van-button>
-        </div>
-        
+      
         <ChatInput
           ref="inputRef"
           v-model="inputText"
