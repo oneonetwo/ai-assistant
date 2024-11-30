@@ -120,8 +120,8 @@ class Note(Base):
 
     # 关系定义
     handbook = relationship("Handbook", back_populates="notes")
-    tags = relationship("Tag", secondary="note_tags", back_populates="notes_relation")
-    attachments = relationship("NoteAttachment", back_populates="note")
+    tags = relationship("Tag", secondary="note_tags", back_populates="notes_relation", lazy="selectin")
+    attachments = relationship("NoteAttachment", back_populates="note", lazy="selectin")
 
 class NoteAttachment(Base):
     __tablename__ = "note_attachments"

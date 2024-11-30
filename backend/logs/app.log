@@ -994,3 +994,6 @@ WHERE notes.handbook_id = %s ORDER BY notes.created_at DESC
 2024-11-30 15:35:07.784 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
 2024-11-30 15:35:10.218 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-11-30 15:36:26.013 | ERROR    | app.services.note_service:create_tag:194 - 创建标签失败: 409: 标签 '红色' 已存在
+2024-11-30 16:01:31.445 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-30 16:20:24.308 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-30 16:25:05.450 | INFO     | app.utils.cache:init:29 - Redis连接成功

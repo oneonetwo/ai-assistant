@@ -54,7 +54,14 @@ class NoteService:
             await db.commit()
             await db.refresh(db_note)
             
-            return db_note
+            # 显式加载关联数据
+            stmt = select(Note).options(
+                joinedload(Note.tags),
+                joinedload(Note.attachments)
+            ).where(Note.id == db_note.id)
+            
+            result = await db.execute(stmt)
+            return result.unique().scalar_one()
             
         except Exception as e:
             await db.rollback()

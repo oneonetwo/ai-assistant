@@ -66,6 +66,16 @@ class FileResponse(BaseModel):
     mime_type: Optional[str] = None
     file_size: Optional[int] = None
 
+class NoteAttachmentResponse(BaseModel):
+    id: int
+    note_id: int
+    file_id: str
+    created_at: datetime
+    file: Optional[FileResponse] = None
+
+    class Config:
+        from_attributes = True
+
 class NoteBase(BaseModel):
     title: str = Field(..., max_length=200)
     content: Optional[str] = None
@@ -88,13 +98,19 @@ class NoteUpdate(BaseModel):
     is_shared: Optional[bool] = None
     tags: Optional[List[str]] = None
 
-class NoteResponse(NoteBase):
+class NoteResponse(BaseModel):
     id: int
-    times: int
-    tags: List[TagResponse]
-    attachments: List[FileResponse] = []
+    title: str
+    content: Optional[str]
+    message_ids: Optional[List[int]] = []
+    priority: Optional[str] = "medium"
+    status: Optional[str] = "draft"
+    is_shared: Optional[bool] = False
+    handbook_id: int
     created_at: datetime
     updated_at: datetime
+    tags: List[TagResponse] = []
+    attachments: List[NoteAttachmentResponse] = []
 
     class Config:
         from_attributes = True
