@@ -167,5 +167,35 @@ class NoteService:
                 detail=f"获取笔记列表失败: {str(e)}"
             )
 
+    async def create_tag(self, db: AsyncSession, tag_name: str) -> Tag:
+        """创建新标签"""
+        try:
+            # 检查标签是否已存在
+            stmt = select(Tag).where(Tag.name == tag_name)
+            result = await db.execute(stmt)
+            existing_tag = result.scalar_one_or_none()
+            
+            if existing_tag:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail=f"标签 '{tag_name}' 已存在"
+                )
+                
+            # 创建新标签
+            new_tag = Tag(name=tag_name)
+            db.add(new_tag)
+            await db.commit()
+            await db.refresh(new_tag)
+            
+            return new_tag
+            
+        except Exception as e:
+            await db.rollback()
+            app_logger.error(f"创建标签失败: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"创建标签失败: {str(e)}"
+            )
+
 # 创建服务实例
 note_service = NoteService()

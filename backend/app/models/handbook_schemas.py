@@ -38,8 +38,9 @@ class HandbookResponse(HandbookBase):
 class TagBase(BaseModel):
     name: str = Field(..., max_length=50)
 
-class TagCreate(TagBase):
-    pass
+class TagCreate(BaseModel):
+    """创建标签请求模型"""
+    name: str = Field(..., min_length=1, max_length=50, description="标签名称")
 
 class TagResponse(BaseModel):
     id: int

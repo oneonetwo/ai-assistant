@@ -4,7 +4,7 @@ from typing import List, Optional
 from app.db.database import get_db
 from app.models.handbook_schemas import (
     NoteCreate, NoteUpdate, NoteResponse,
-    TagResponse
+    TagResponse, TagCreate
 )
 from app.services.note_service import note_service
 from app.core.logging import app_logger
@@ -150,6 +150,30 @@ async def delete_note(
             )
     except Exception as e:
         app_logger.error(f"删除笔记失败: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
+@router.post("/tags", response_model=TagResponse,
+    summary="创建标签",
+    description="创建一个新的标签",
+    response_description="返回创建的标签信息")
+async def create_tag(
+    tag: TagCreate,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    创建新标签
+    
+    - **name**: 标签名称
+    """
+    try:
+        return await note_service.create_tag(db, tag.name)
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        app_logger.error(f"创建标签失败: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useHandbookStore } from '@/stores/handbook'
 import { showToast } from 'vant'
 import type { Tag } from '@/types/handbook'
@@ -15,18 +15,17 @@ const emit = defineEmits<{
 
 const store = useHandbookStore()
 const searchKeyword = ref('')
-const newTagName = ref('')
 
 // 过滤标签建议
 const tagSuggestions = computed(() => {
   if (!searchKeyword.value) return store.tags
-  
   const keyword = searchKeyword.value.toLowerCase()
   return store.tags.filter(tag => 
     tag.name.toLowerCase().includes(keyword) &&
     !props.modelValue.includes(tag.name)
   )
 })
+
 
 // 添加标签
 async function handleAddTag(tagName: string) {
@@ -44,12 +43,12 @@ async function handleAddTag(tagName: string) {
 
 // 创建新标签
 async function handleCreateTag() {
-  if (!newTagName.value) return
+  if (!searchKeyword.value) return
   
   try {
-    await store.createTag(newTagName.value)
-    handleAddTag(newTagName.value)
-    newTagName.value = ''
+    await store.createTag(searchKeyword.value)
+    handleAddTag(searchKeyword.value)
+    searchKeyword.value = ''
   } catch {
     showToast('创建标签失败')
   }
@@ -86,7 +85,7 @@ function handleRemoveTag(tagName: string) {
       >
         <template #right-icon>
           <van-button
-            v-if="searchKeyword"
+            v-if="searchKeyword && tagSuggestions.length === 0"
             size="small"
             type="primary"
             @click="handleCreateTag"

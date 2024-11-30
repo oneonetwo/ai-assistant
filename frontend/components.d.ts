@@ -44,6 +44,8 @@ declare module 'vue' {
     TagSelector: typeof import('./src/components/handbook/TagSelector.vue')['default']
     ThemeSwitch: typeof import('./src/components/common/ThemeSwitch.vue')['default']
     UploadProgress: typeof import('./src/components/chat/UploadProgress.vue')['default']
+    VanActionBar: typeof import('vant/es')['ActionBar']
+    VanActionBarButton: typeof import('vant/es')['ActionBarButton']
     VanButton: typeof import('vant/es')['Button']
     VanCell: typeof import('vant/es')['Cell']
     VanCellGroup: typeof import('vant/es')['CellGroup']
