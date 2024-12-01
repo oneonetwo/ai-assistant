@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional, Dict, Any
 from datetime import datetime
+from app.models.schemas import MessageResponse  # 导入消息响应模型
 
 class CategoryBase(BaseModel):
     name: str = Field(..., max_length=50)
@@ -102,7 +103,7 @@ class NoteResponse(BaseModel):
     id: int
     title: str
     content: Optional[str]
-    message_ids: Optional[List[int]] = []
+    messages: List[MessageResponse] = []  # 修改为messages字段,使用MessageResponse模型
     priority: Optional[str] = "medium"
     status: Optional[str] = "draft"
     is_shared: Optional[bool] = False

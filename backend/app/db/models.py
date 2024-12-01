@@ -32,6 +32,8 @@ class Message(Base):
     # 添加与 Conversation 的关系
     conversation = relationship("Conversation", back_populates="messages")
     parent_message = relationship("Message", remote_side=[id], backref="child_messages")
+    # 添加与 File 的关系
+    file = relationship("File", lazy="joined")
 
 class File(Base):
     __tablename__ = "files"

@@ -1489,3 +1489,22 @@ WHERE notes.handbook_id = %s ORDER BY notes.created_at DESC
 2024-12-01 20:47:41.795 | INFO     | app.services.chat:initialize_message_analysis_stream:449 - 成功初始化消息分析流，会话ID: 307e5689-4828-4109-ba4f-2272831636ea
 2024-12-01 20:52:37.365 | INFO     | app.services.ai_client:initialize_analysis_stream:520 - 成功初始化分析流，会话ID: bc5be299-502f-47e4-bed6-45c5f286ffef
 2024-12-01 20:52:37.367 | INFO     | app.services.chat:initialize_message_analysis_stream:449 - 成功初始化消息分析流，会话ID: bc5be299-502f-47e4-bed6-45c5f286ffef
+2024-12-01 21:16:30.113 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 21:16:39.097 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 21:16:44.878 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 21:16:47.299 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 21:16:50.163 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 21:16:52.815 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 21:16:55.123 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 21:21:58.668 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 21:22:01.427 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 21:22:30.493 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 21:22:33.104 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 21:25:40.581 | INFO     | app.services.ai_client:initialize_analysis_stream:520 - 成功初始化分析流，会话ID: a46f4d68-7918-4378-8e9d-ccbc56a0cec0
+2024-12-01 21:25:40.581 | INFO     | app.services.chat:initialize_message_analysis_stream:450 - 成功初始化消息分析流，会话ID: a46f4d68-7918-4378-8e9d-ccbc56a0cec0
+2024-12-01 21:28:04.721 | ERROR    | app.services.note_service:get_note:252 - 获取笔记详情失败: type object 'Message' has no attribute 'file'
+2024-12-01 21:28:04.806 | ERROR    | app.services.note_service:get_note:252 - 获取笔记详情失败: type object 'Message' has no attribute 'file'
+2024-12-01 21:29:58.312 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 21:30:07.446 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 21:30:12.932 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 21:30:15.738 | INFO     | app.utils.cache:init:29 - Redis连接成功

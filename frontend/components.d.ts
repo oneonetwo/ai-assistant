@@ -32,6 +32,7 @@ declare module 'vue' {
     MessageQuote: typeof import('./src/components/chat/MessageQuote.vue')['default']
     MessageSearch: typeof import('./src/components/chat/MessageSearch.vue')['default']
     MessageSkeleton: typeof import('./src/components/chat/MessageSkeleton.vue')['default']
+    NoteDetail: typeof import('./src/components/handbook/NoteDetail.vue')['default']
     NoteEditor: typeof import('./src/components/handbook/NoteEditor.vue')['default']
     NoteList: typeof import('./src/components/handbook/NoteList.vue')['default']
     NoteSearch: typeof import('./src/components/handbook/NoteSearch.vue')['default']

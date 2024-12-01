@@ -132,8 +132,11 @@ async function handleDelete(note: Note) {
             :title="note.title"
             :label="note.content"
             is-link
-            @click="$router.push(`/handbooks/notes/${note.id}`)"
+            @click="$router.push(`/handbooks/notes/${note.id}/detail`)"
           >
+            <template #label>
+              <div class="note-content">{{ note.content }}</div>
+            </template>
             <template #value>
               <div class="note-meta">
                 <van-tag :type="note.priority === 'high' ? 'danger' : note.priority === 'medium' ? 'warning' : 'success'">
@@ -152,9 +155,17 @@ async function handleDelete(note: Note) {
           <template #right>
             <van-button
               square
+              type="primary"
+              class="edit-button"
+              @click.stop="$router.push(`/handbooks/notes/${note.id}`)"
+            >
+              编辑
+            </van-button>
+            <van-button
+              square
               type="danger"
               class="delete-button"
-              @click="handleDelete(note)"
+              @click.stop="handleDelete(note)"
             >
               删除
             </van-button>
@@ -195,6 +206,28 @@ async function handleDelete(note: Note) {
 
   .delete-button {
     height: 100%;
+  }
+
+  .note-content {
+    display: -webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.5;
+    max-height: 3em; // line-height * 3 lines
+    color: var(--van-text-color-2);
+    font-size: var(--van-font-size-sm);
+  }
+
+  .list {
+    .note-item {
+      margin-bottom: 8px;
+      
+      &:not(:last-child) {
+        border-bottom: 8px solid var(--van-gray-3);
+      }
+    }
   }
 }
 </style>

@@ -1,11 +1,12 @@
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.db.models import Tag, Note, NoteTag
+from app.db.models import Tag, Note, NoteTag, Message
 from app.models.handbook_schemas import TagResponse, NoteCreate, NoteUpdate
 from app.core.logging import app_logger
 from fastapi import HTTPException, status
 from sqlalchemy.orm import joinedload
+from app.models.schemas import MessageResponse
 
 class NoteService:
     async def get_tags(self, db: AsyncSession) -> List[TagResponse]:
@@ -202,6 +203,66 @@ class NoteService:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"创建标签失败: {str(e)}"
+            )
+
+    async def get_note(self, db: AsyncSession, note_id: int) -> Optional[Note]:
+        """获取笔记详情"""
+        try:
+            # 查询笔记
+            query = (
+                select(Note)
+                .options(
+                    joinedload(Note.tags),
+                    joinedload(Note.attachments)
+                )
+                .where(Note.id == note_id)
+            )
+            result = await db.execute(query)
+            note = result.unique().scalar_one_or_none()
+            
+            if not note:
+                return None
+                
+            # 如果有message_ids,查询对应的消息
+            if note.message_ids:
+                messages_query = (
+                    select(Message)
+                    .where(Message.id.in_(note.message_ids))
+                )
+                messages_result = await db.execute(messages_query)
+                messages = messages_result.scalars().all()
+                
+                # 转换为MessageResponse对象
+                note.messages = []
+                for message in messages:
+                    # 获取文件信息（如果存在）
+                    file_info = None
+                    if message.file:
+                        file_info = {
+                            'file_id': message.file.file_id,
+                            'original_name': message.file.original_name,
+                            'file_type': message.file.file_type,
+                            'file_path': message.file.file_path,
+                            'mime_type': message.file.mime_type,
+                            'file_size': message.file.file_size
+                        }
+                    
+                    # 创建消息响应对象
+                    message_response = MessageResponse.from_db_model(
+                        message,
+                        file_info=file_info
+                    )
+                    note.messages.append(message_response)
+            else:
+                note.messages = []
+                
+            return note
+            
+        except Exception as e:
+            app_logger.error(f"获取笔记详情失败: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"获取笔记详情失败: {str(e)}"
             )
 
 # 创建服务实例

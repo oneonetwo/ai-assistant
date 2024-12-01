@@ -82,6 +82,14 @@ const routes: Array<RouteRecordRaw> = [
         }
       },
       {
+        path: 'notes/:id/detail',
+        name: 'note-detail',
+        component: () => import('@/views/handbook/NoteDetailView.vue'),
+        meta: {
+          title: '笔记详情'
+        }
+      },
+      {
         path: 'tags',
         name: 'tags',
         component: () => import('@/views/handbook/TagManagerView.vue'),

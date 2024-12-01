@@ -434,7 +434,8 @@ async def initialize_message_analysis_stream(
 标题: <标题>
 
 关键字: <关键字>
-内容: <分析内容>"""
+
+ <分析内容>"""
 
         # 构建消息列表
         prompt_messages = []

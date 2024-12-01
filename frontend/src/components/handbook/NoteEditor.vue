@@ -125,6 +125,7 @@ async function handleSave() {
       priority: priority.value,
       status: status.value,
       is_shared: canShare.value,
+      message_ids: messageIds.value,
       attachments: fileList.value.map(file => ({
         url: file.url,
         file_name: file.name
