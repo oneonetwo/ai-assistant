@@ -207,7 +207,12 @@ function getFilePreview(file: File) {
         placeholder="输入消息，Shift + Enter 换行"
         rows="3"
         autosize
-        @keydown.enter.prevent="handleSend"
+        @keydown.enter="(e: KeyboardEvent) => {
+          if (!e.shiftKey) {
+            e.preventDefault()
+            handleSend()
+          }
+        }"
         ref="inputRef"
       >
         <template #button>

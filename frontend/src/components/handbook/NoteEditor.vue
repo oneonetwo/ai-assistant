@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useHandbookStore } from '@/stores/handbook'
+import { useNoteEditorStore } from '@/stores/noteEditor'
 import { showToast } from 'vant'
 import type { Note, NotePriority, NoteStatus } from '@/types/handbook'
 import TagSelector from './TagSelector.vue'
@@ -9,12 +10,24 @@ import TagSelector from './TagSelector.vue'
 const route = useRoute()
 const router = useRouter()
 const store = useHandbookStore()
+const noteEditorStore = useNoteEditorStore()
+
 const noteId = route.params.id as string
 const handbookId = route.query.handbook as string
 const isNew = route.fullPath.includes('/new')
+
+// 从 store 中获取数据
+const title = ref(noteEditorStore.draftTitle || '')
+const content = ref(noteEditorStore.draftContent || '')
+const messageIds = ref(noteEditorStore.draftMessageIds || [])
+
+// 在组件卸载时清除草稿数据
+onUnmounted(() => {
+  noteEditorStore.clearDraft()
+})
+
 // 表单数据
-const title = ref('')
-const content = ref('')
+
 const selectedTags = ref<string[]>([])
 const priority = ref<NotePriority>('medium')
 const status = ref<NoteStatus>('待复习')

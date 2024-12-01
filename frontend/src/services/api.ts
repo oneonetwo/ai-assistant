@@ -168,7 +168,6 @@ export class ChatClient {
       const url = new URL(`${window.location.origin}/api${this.baseUrl}/analyze/stream/${response.session_id}`)
       const eventSource = new EventSource(url.toString())
       let fullText = ''
-
       eventSource.onmessage = (event) => {
         try {
           const response = JSON.parse(event.data)
@@ -179,11 +178,10 @@ export class ChatClient {
               break
               
             case 'chunk':
-              fullText += response.data.content
               callbacks.onChunk?.(
                 response.data.content, 
                 response.data.section,
-                fullText
+                response.data.full_text
               )
               break
               

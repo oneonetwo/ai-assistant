@@ -432,6 +432,7 @@ async def initialize_message_analysis_stream(
 
 输出格式:
 标题: <标题>
+
 关键字: <关键字>
 内容: <分析内容>"""
 
@@ -452,11 +453,7 @@ async def initialize_message_analysis_stream(
         raise APIError(f"初始化消息分析流失败: {str(e)}")
 
 async def get_message_analysis_stream(session_id: str) -> AsyncGenerator[str, None]:
-    """获取消息分析的流式响应
-    
-    Args:
-        session_id: 分析会话ID
-    """
+    """获取消息分析的流式响应"""
     try:
         # 发送开始事件
         yield f"data: {json.dumps({'type': 'start', 'data': {}}, ensure_ascii=False)}\n\n"
@@ -475,8 +472,12 @@ async def get_message_analysis_stream(session_id: str) -> AsyncGenerator[str, No
 
         full_response = ""
         async for chunk in ai_client.get_analysis_stream(session_id):
+            # 确保chunk是UTF-8编码
+            if isinstance(chunk, bytes):
+                chunk = chunk.decode('utf-8')
+            
             full_response += chunk
-            # 构建数据块事件
+            # 构建数据块事件并确保使用UTF-8编码
             chunk_data = {
                 'type': 'chunk',
                 'data': {
@@ -485,7 +486,7 @@ async def get_message_analysis_stream(session_id: str) -> AsyncGenerator[str, No
                     'full_text': full_response
                 }
             }
-            yield f"data: {json.dumps(chunk_data, ensure_ascii=False)}\n\n"
+            yield f"data: {json.dumps(chunk_data, ensure_ascii=False)}\n\n".encode('utf-8').decode('utf-8')
 
         # 发送结束事件
         end_data = {
@@ -494,7 +495,7 @@ async def get_message_analysis_stream(session_id: str) -> AsyncGenerator[str, No
                 'full_text': full_response
             }
         }
-        yield f"data: {json.dumps(end_data, ensure_ascii=False)}\n\n"
+        yield f"data: {json.dumps(end_data, ensure_ascii=False)}\n\n".encode('utf-8').decode('utf-8')
 
     except Exception as e:
         app_logger.error(f"获取消息分析流失败: {str(e)}")
