@@ -1008,3 +1008,369 @@ WHERE notes.handbook_id = %s ORDER BY notes.created_at DESC
 2024-12-01 00:35:45.856 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
 2024-12-01 00:35:54.636 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-12-01 08:00:12.201 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 09:59:12.124 | ERROR    | app.services.chat:initialize_message_analysis_stream:502 - 初始化消息分析流失败: 'AIClient' object has no attribute 'initialize_analysis_stream'
+2024-12-01 09:59:12.125 | ERROR    | app.api.v1.chat:init_message_analysis_stream:644 - 初始化消息分析流失败: 503: API error: 初始化消息分析流失败: 'AIClient' object has no attribute 'initialize_analysis_stream'
+2024-12-01 10:30:40.705 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 10:30:49.379 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 10:31:00.462 | ERROR    | app.services.chat:initialize_message_analysis_stream:502 - 初始化消息分析流失败: sequence item 0: expected str instance, Message found
+2024-12-01 10:31:00.462 | ERROR    | app.api.v1.chat:init_message_analysis_stream:649 - 初始化消息分析流失败: 503: API error: 初始化消息分析流失败: sequence item 0: expected str instance, Message found
+2024-12-01 10:36:26.001 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 10:36:34.516 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 10:36:35.960 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 10:36:38.409 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 10:36:40.849 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 10:36:52.303 | ERROR    | app.services.chat:initialize_message_analysis_stream:508 - 初始化消息分析流失败: 'AIClient' object has no attribute 'initialize_analysis_stream'
+2024-12-01 10:36:52.304 | ERROR    | app.api.v1.chat:init_message_analysis_stream:649 - 初始化消息分析流失败: 503: API error: 初始化消息分析流失败: 'AIClient' object has no attribute 'initialize_analysis_stream'
+2024-12-01 10:39:18.242 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 10:39:21.507 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 10:39:28.819 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 10:39:31.734 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 10:39:34.177 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 10:43:05.378 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 10:43:09.034 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 10:46:29.942 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 10:46:33.250 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 10:47:24.507 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 10:47:27.258 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 10:47:34.258 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 10:47:37.086 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 10:47:39.825 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 10:48:07.376 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 10:48:14.879 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 10:48:26.152 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 10:48:29.369 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 10:48:31.857 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 10:48:34.375 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 10:48:46.863 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 10:48:50.309 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 10:54:36.831 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 10:54:40.328 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 10:59:10.438 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 10:59:13.692 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 10:59:16.161 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 10:59:18.543 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:00:39.163 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 11:02:43.607 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:02:50.800 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:02:58.821 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:03:03.220 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:03:10.472 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:03:13.047 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:03:19.150 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:03:21.750 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:03:25.005 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:03:30.149 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 11:04:44.975 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:04:47.629 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:04:58.009 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 11:07:20.123 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:07:22.658 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:08:41.950 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:08:54.775 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 11:09:36.147 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:09:39.261 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:09:42.357 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:09:44.999 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:09:47.349 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:10:55.331 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 11:13:08.365 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:13:12.249 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:13:23.346 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:13:26.016 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:13:28.550 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:13:35.642 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:13:38.139 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:13:57.827 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:14:00.733 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:14:07.914 | ERROR    | app.services.ai_client:_make_api_call:84 - API调用失败: AsyncCompletions.create() got an unexpected keyword argument 'session_id'
+2024-12-01 11:14:11.916 | ERROR    | app.services.ai_client:_make_api_call:84 - API调用失败: AsyncCompletions.create() got an unexpected keyword argument 'session_id'
+2024-12-01 11:14:15.919 | ERROR    | app.services.ai_client:_make_api_call:84 - API调用失败: AsyncCompletions.create() got an unexpected keyword argument 'session_id'
+2024-12-01 11:14:15.920 | ERROR    | app.services.ai_client:initialize_analysis_stream:496 - 初始化分析流失败: RetryError[<Future at 0x10fdd8b80 state=finished raised APIError>]
+2024-12-01 11:14:15.921 | ERROR    | app.services.chat:initialize_message_analysis_stream:515 - 初始化消息分析流失败: 503: API error: 初始化分析流失败: RetryError[<Future at 0x10fdd8b80 state=finished raised APIError>]
+2024-12-01 11:14:15.922 | ERROR    | app.api.v1.chat:init_message_analysis_stream:649 - 初始化消息分析流失败: 503: API error: 初始化消息分析流失败: 503: API error: 初始化分析流失败: RetryError[<Future at 0x10fdd8b80 state=finished raised APIError>]
+2024-12-01 11:16:57.391 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:16:59.983 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:17:17.651 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:19:07.946 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:19:18.565 | ERROR    | app.services.ai_client:_make_api_call:99 - API调用失败: 'AIClient' object has no attribute 'max_retries'
+2024-12-01 11:19:22.568 | ERROR    | app.services.ai_client:_make_api_call:99 - API调用失败: 'AIClient' object has no attribute 'max_retries'
+2024-12-01 11:19:26.571 | ERROR    | app.services.ai_client:_make_api_call:99 - API调用失败: 'AIClient' object has no attribute 'max_retries'
+2024-12-01 11:19:26.571 | ERROR    | app.services.ai_client:initialize_analysis_stream:511 - 初始化分析流失败: RetryError[<Future at 0x118855f30 state=finished raised APIError>]
+2024-12-01 11:19:26.572 | ERROR    | app.services.chat:initialize_message_analysis_stream:486 - 初始化消息分析流失败: 503: API error: 初始化分析流失败: RetryError[<Future at 0x118855f30 state=finished raised APIError>]
+2024-12-01 11:19:26.572 | ERROR    | app.api.v1.chat:init_message_analysis_stream:649 - 初始化消息分析流失败: 503: API error: 初始化消息分析流失败: 503: API error: 初始化分析流失败: RetryError[<Future at 0x118855f30 state=finished raised APIError>]
+2024-12-01 11:20:10.718 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:20:13.395 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:20:22.404 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 11:21:30.288 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:21:33.186 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:21:39.366 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:21:42.173 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:21:49.146 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 11:23:21.015 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:23:23.572 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:23:31.457 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:23:33.963 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:23:43.773 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 11:25:55.063 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:25:58.602 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:26:04.696 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:26:07.652 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:26:09.015 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:26:12.135 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:26:15.083 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:26:16.624 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:26:19.286 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:26:19.719 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:26:22.991 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:26:32.578 | ERROR    | app.api.v1.chat:init_stream_chat:124 - 初始化流式聊失败: 'AIClient' object has no attribute 'initialized_sessions'
+2024-12-01 11:26:44.507 | INFO     | app.services.ai_client:initialize_analysis_stream:504 - 成功初始化分析流，会话ID: 94b8cdb7-c04e-4f5c-b876-c68971f0a847
+2024-12-01 11:26:44.521 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 'AIClient' object has no attribute 'initialized_sessions'
+2024-12-01 11:27:41.195 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:27:45.201 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:28:02.434 | INFO     | app.services.ai_client:initialize_analysis_stream:519 - 成功初始化分析流，会话ID: 5199f6c4-32bd-4c4d-bd47-8dd0a39b30ff
+2024-12-01 11:28:02.449 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 11:41:21.884 | INFO     | app.services.ai_client:initialize_analysis_stream:519 - 成功初始化分析流，会话ID: 7b915097-08af-4de4-8526-3588ae7107af
+2024-12-01 11:41:21.900 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 11:45:19.900 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:45:29.616 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:45:35.136 | INFO     | app.services.ai_client:initialize_analysis_stream:519 - 成功初始化分析流，会话ID: f09d0f05-6f9c-416b-adbb-e69f62c53b16
+2024-12-01 11:45:35.138 | INFO     | app.services.chat:initialize_message_analysis_stream:473 - 成功初始化消息分析流，会话ID: f09d0f05-6f9c-416b-adbb-e69f62c53b16
+2024-12-01 11:45:35.152 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 11:50:05.908 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:50:13.546 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:50:15.980 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:50:18.487 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:51:08.207 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:51:10.650 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:52:08.840 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:52:11.339 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:52:16.636 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:52:18.983 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:52:56.124 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 11:53:08.994 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:53:11.560 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 11:54:58.836 | INFO     | app.services.ai_client:initialize_analysis_stream:519 - 成功初始化分析流，会话ID: b69b2cbd-f645-465a-881a-0a218292879b
+2024-12-01 11:54:58.837 | INFO     | app.services.chat:initialize_message_analysis_stream:481 - 成功初始化消息分析流，会话ID: b69b2cbd-f645-465a-881a-0a218292879b
+2024-12-01 11:54:58.852 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 12:00:01.272 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:00:03.853 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:00:45.222 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:00:47.753 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:00:52.727 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:00:55.864 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:00:59.439 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:01:04.162 | INFO     | app.services.ai_client:initialize_analysis_stream:529 - 成功初始化分析流，会话ID: 1a9a92ad-bef1-4a1f-a478-f38cf6be1b8b
+2024-12-01 12:01:04.163 | INFO     | app.services.chat:initialize_message_analysis_stream:481 - 成功初始化消息分析流，会话ID: 1a9a92ad-bef1-4a1f-a478-f38cf6be1b8b
+2024-12-01 12:01:04.181 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 12:04:09.936 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:04:17.366 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:05:25.710 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:05:28.676 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:05:31.728 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:05:34.328 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:05:40.145 | INFO     | app.services.ai_client:initialize_analysis_stream:529 - 成功初始化分析流，会话ID: 419557d5-450f-4f5c-a7ec-2d451df7f24c
+2024-12-01 12:05:40.146 | INFO     | app.services.chat:initialize_message_analysis_stream:481 - 成功初始化消息分析流，会话ID: 419557d5-450f-4f5c-a7ec-2d451df7f24c
+2024-12-01 12:05:40.158 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 12:05:46.678 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:05:49.537 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:06:37.716 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:06:40.330 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:06:44.448 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:06:47.791 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:06:53.855 | INFO     | app.services.ai_client:initialize_analysis_stream:529 - 成功初始化分析流，会话ID: fc69e729-96b8-4202-a898-2d87a03084a5
+2024-12-01 12:06:53.856 | INFO     | app.services.chat:initialize_message_analysis_stream:481 - 成功初始化消息分析流，会话ID: fc69e729-96b8-4202-a898-2d87a03084a5
+2024-12-01 12:06:53.871 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 12:07:26.654 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:07:29.453 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:07:32.718 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:07:35.548 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:07:49.097 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:07:54.092 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:07:56.606 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:07:59.582 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:08:04.067 | INFO     | app.services.ai_client:initialize_analysis_stream:529 - 成功初始化分析流，会话ID: 2a4bc5cc-04a3-4e2b-af85-b79287d9f347
+2024-12-01 12:08:04.069 | INFO     | app.services.chat:initialize_message_analysis_stream:481 - 成功初始化消息分析流，会话ID: 2a4bc5cc-04a3-4e2b-af85-b79287d9f347
+2024-12-01 12:08:04.080 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 12:08:21.065 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:08:23.494 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:09:00.108 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:09:02.547 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:09:04.970 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:09:08.092 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:09:12.776 | INFO     | app.services.ai_client:initialize_analysis_stream:529 - 成功初始化分析流，会话ID: 5a6d9778-c5c0-4c63-a5ed-1bfb9f87773a
+2024-12-01 12:09:12.777 | INFO     | app.services.chat:initialize_message_analysis_stream:481 - 成功初始化消息分析流，会话ID: 5a6d9778-c5c0-4c63-a5ed-1bfb9f87773a
+2024-12-01 12:09:12.789 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 12:09:34.799 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:09:37.440 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:10:59.903 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:11:03.181 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:11:06.407 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:11:10.804 | INFO     | app.services.ai_client:initialize_analysis_stream:529 - 成功初始化分析流，会话ID: a9662ecc-1148-4c2c-828e-e0f265ebe097
+2024-12-01 12:11:10.805 | INFO     | app.services.chat:initialize_message_analysis_stream:481 - 成功初始化消息分析流，会话ID: a9662ecc-1148-4c2c-828e-e0f265ebe097
+2024-12-01 12:11:10.817 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 12:15:36.187 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:15:39.524 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:15:42.513 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:15:46.614 | INFO     | app.services.ai_client:initialize_analysis_stream:529 - 成功初始化分析流，会话ID: 1205cf18-a4ca-4a72-bf76-004d944c5bf1
+2024-12-01 12:15:46.615 | INFO     | app.services.chat:initialize_message_analysis_stream:481 - 成功初始化消息分析流，会话ID: 1205cf18-a4ca-4a72-bf76-004d944c5bf1
+2024-12-01 12:15:46.628 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 12:16:16.520 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:16:19.719 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:16:22.591 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:16:28.396 | INFO     | app.services.ai_client:initialize_analysis_stream:529 - 成功初始化分析流，会话ID: 08c34959-03d0-41b1-a5a8-ec2bbb5369f3
+2024-12-01 12:16:28.397 | INFO     | app.services.chat:initialize_message_analysis_stream:481 - 成功初始化消息分析流，会话ID: 08c34959-03d0-41b1-a5a8-ec2bbb5369f3
+2024-12-01 12:16:28.409 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 12:16:32.111 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:16:34.562 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:16:37.066 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:16:40.208 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:16:49.108 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:16:52.270 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:16:55.429 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:16:59.152 | INFO     | app.services.ai_client:initialize_analysis_stream:529 - 成功初始化分析流，会话ID: 7b6b697b-bc84-423a-ab6c-569a0d2df26a
+2024-12-01 12:16:59.153 | INFO     | app.services.chat:initialize_message_analysis_stream:481 - 成功初始化消息分析流，会话ID: 7b6b697b-bc84-423a-ab6c-569a0d2df26a
+2024-12-01 12:16:59.174 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 12:18:04.220 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:18:36.764 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:18:46.872 | INFO     | app.services.ai_client:initialize_analysis_stream:529 - 成功初始化分析流，会话ID: 8dbbcba2-5277-4c92-b1d7-ad0c566df367
+2024-12-01 12:18:46.873 | INFO     | app.services.chat:initialize_message_analysis_stream:481 - 成功初始化消息分析流，会话ID: 8dbbcba2-5277-4c92-b1d7-ad0c566df367
+2024-12-01 12:18:46.885 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 12:21:36.744 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:21:39.205 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:21:51.270 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:21:53.772 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:23:00.908 | ERROR    | app.api.v1.chat:init_message_analysis_stream:653 - 初始化消息分析流失败: initialize_message_analysis_stream() takes from 1 to 2 positional arguments but 3 were given
+2024-12-01 12:24:53.684 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:24:56.964 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:25:21.096 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:25:23.558 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:25:26.108 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:25:28.983 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:25:37.233 | INFO     | app.services.ai_client:initialize_analysis_stream:529 - 成功初始化分析流，会话ID: dff17f63-05a8-426e-b7a3-e6148f8c27a9
+2024-12-01 12:25:37.234 | INFO     | app.services.chat:initialize_message_analysis_stream:498 - 成功初始化消息分析流，会话ID: dff17f63-05a8-426e-b7a3-e6148f8c27a9
+2024-12-01 12:25:37.246 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 12:27:35.405 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:27:38.028 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:27:45.764 | INFO     | app.services.ai_client:initialize_analysis_stream:529 - 成功初始化分析流，会话ID: 0d20214d-821f-4fb4-b45a-13e44b387eaf
+2024-12-01 12:27:45.765 | INFO     | app.services.chat:initialize_message_analysis_stream:498 - 成功初始化消息分析流，会话ID: 0d20214d-821f-4fb4-b45a-13e44b387eaf
+2024-12-01 12:27:45.785 | ERROR    | app.api.v1.chat:stream_chat:165 - 处理流式响应失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 12:28:25.204 | INFO     | app.services.ai_client:initialize_analysis_stream:529 - 成功初始化分析流，会话ID: e50a4c1c-c567-42f5-97f5-09994f83d65e
+2024-12-01 12:28:25.205 | INFO     | app.services.chat:initialize_message_analysis_stream:498 - 成功初始化消息分析流，会话ID: e50a4c1c-c567-42f5-97f5-09994f83d65e
+2024-12-01 12:28:25.221 | ERROR    | app.api.v1.chat:get_message_analysis_stream:704 - 获取消息分析流失败: 400: 会话未初始化，请先调用初始化接口
+2024-12-01 12:30:15.413 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:30:18.817 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:30:21.365 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:30:59.118 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:31:01.506 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:31:03.828 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:31:06.321 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:31:25.064 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:31:27.614 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:31:35.599 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:31:38.175 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:31:40.604 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:31:50.079 | INFO     | app.services.ai_client:initialize_analysis_stream:529 - 成功初始化分析流，会话ID: c5fb0f88-40f9-4f37-bf0f-2f8f91595bbd
+2024-12-01 12:31:50.080 | INFO     | app.services.chat:initialize_message_analysis_stream:498 - 成功初始化消息分析流，会话ID: c5fb0f88-40f9-4f37-bf0f-2f8f91595bbd
+2024-12-01 12:34:44.842 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:34:48.216 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:34:53.310 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:34:55.759 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:42:39.947 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:42:42.720 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:42:53.178 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:42:55.707 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:44:09.931 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:44:12.899 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:44:15.398 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:45:04.888 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:45:07.401 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:49:40.919 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:49:48.450 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:49:48.778 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:49:52.024 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:49:54.839 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:50:21.474 | INFO     | app.services.ai_client:initialize_analysis_stream:529 - 成功初始化分析流，会话ID: e0a7fd77-b4c7-48d5-9575-d1e4b3693750
+2024-12-01 12:50:21.475 | INFO     | app.services.chat:initialize_message_analysis_stream:505 - 成功初始化消息分析流，会话ID: e0a7fd77-b4c7-48d5-9575-d1e4b3693750
+2024-12-01 12:51:32.712 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:51:35.913 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:51:37.371 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:51:39.878 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:51:42.389 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:51:44.791 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:51:48.036 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:52:09.616 | INFO     | app.services.ai_client:initialize_analysis_stream:529 - 成功初始化分析流，会话ID: 9c559a3e-3e72-4f45-bb7f-ed785bde0c8a
+2024-12-01 12:52:09.617 | INFO     | app.services.chat:initialize_message_analysis_stream:505 - 成功初始化消息分析流，会话ID: 9c559a3e-3e72-4f45-bb7f-ed785bde0c8a
+2024-12-01 12:52:57.534 | INFO     | app.services.ai_client:initialize_analysis_stream:529 - 成功初始化分析流，会话ID: 18f0e251-96c1-4a55-83ba-2c77f1dd1b7f
+2024-12-01 12:52:57.535 | INFO     | app.services.chat:initialize_message_analysis_stream:505 - 成功初始化消息分析流，会话ID: 18f0e251-96c1-4a55-83ba-2c77f1dd1b7f
+2024-12-01 12:53:12.661 | INFO     | app.services.ai_client:initialize_analysis_stream:529 - 成功初始化分析流，会话ID: 0d0b4be6-af9f-4f98-823d-0aee939c073b
+2024-12-01 12:53:12.661 | INFO     | app.services.chat:initialize_message_analysis_stream:505 - 成功初始化消息分析流，会话ID: 0d0b4be6-af9f-4f98-823d-0aee939c073b
+2024-12-01 12:54:08.713 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:54:12.042 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:58:48.489 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 12:58:51.101 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:59:19.070 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 12:59:25.731 | INFO     | app.services.ai_client:initialize_analysis_stream:529 - 成功初始化分析流，会话ID: 6eaf61ee-43df-4003-a4aa-689134a700f7
+2024-12-01 12:59:25.732 | INFO     | app.services.chat:initialize_message_analysis_stream:506 - 成功初始化消息分析流，会话ID: 6eaf61ee-43df-4003-a4aa-689134a700f7
+2024-12-01 13:01:33.622 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 13:01:36.210 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:01:56.084 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 13:01:58.577 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:02:11.713 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 13:02:14.693 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:02:19.228 | ERROR    | app.services.chat:initialize_message_analysis_stream:450 - 初始化消息分析流失败: 'dict' object has no attribute 'role'
+2024-12-01 13:02:19.228 | ERROR    | app.api.v1.chat:init_message_analysis_stream:672 - 初始化消息分析流失败: 503: API error: 初始化消息分析流失败: 'dict' object has no attribute 'role'
+2024-12-01 13:04:42.470 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 13:04:51.441 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:04:57.630 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 13:05:00.654 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:05:05.155 | INFO     | app.services.ai_client:initialize_analysis_stream:529 - 成功初始化分析流，会话ID: 62ed1045-61a6-4b0b-8ae4-d499460fd828
+2024-12-01 13:05:05.156 | INFO     | app.services.chat:initialize_message_analysis_stream:506 - 成功初始化消息分析流，会话ID: 62ed1045-61a6-4b0b-8ae4-d499460fd828
+2024-12-01 13:08:29.521 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 13:08:32.177 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:09:02.614 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 13:09:05.266 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:09:13.438 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 13:09:16.037 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:09:18.584 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:09:46.308 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 13:09:48.714 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:10:10.635 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 13:10:13.504 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:13:36.862 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 13:13:39.554 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:13:41.944 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:14:35.842 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 13:14:38.418 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:14:47.360 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 13:14:49.901 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:15:01.078 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 13:15:03.631 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:15:08.303 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 13:15:10.835 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:15:14.900 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 13:15:17.356 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:15:17.599 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 13:15:20.694 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:15:23.585 | ERROR    | app.services.chat:initialize_message_analysis_stream:524 - 初始化消息分析流失败: 'dict' object has no attribute 'role'
+2024-12-01 13:15:23.586 | ERROR    | app.api.v1.chat:init_message_analysis_stream:672 - 初始化消息分析流失败: 503: API error: 初始化消息分析流失败: 'dict' object has no attribute 'role'
+2024-12-01 13:16:57.470 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 13:17:00.111 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:17:03.279 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 13:17:07.925 | INFO     | app.services.ai_client:initialize_analysis_stream:520 - 成功初始化分析流，会话ID: 3dcfda54-2a12-4090-956a-b45ae8767e53
+2024-12-01 13:17:07.926 | INFO     | app.services.chat:initialize_message_analysis_stream:521 - 成功初始化消息分析流，会话ID: 3dcfda54-2a12-4090-956a-b45ae8767e53
+2024-12-01 15:39:23.926 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 15:39:33.701 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 15:39:47.871 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 15:39:50.599 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 15:39:52.341 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 15:39:54.958 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 15:39:57.471 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 15:40:00.148 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 15:40:02.498 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 15:40:05.166 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 15:41:25.247 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 15:41:28.495 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 15:41:32.968 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 15:41:35.260 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 15:41:55.951 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-12-01 15:41:58.284 | INFO     | app.utils.cache:init:29 - Redis连接成功

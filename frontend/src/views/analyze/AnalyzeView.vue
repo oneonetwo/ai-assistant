@@ -10,14 +10,19 @@ const analysisResult = ref('')
 const currentSection = ref('')
 
 onMounted(async () => {
+  console.log('systemPrompt.......', route.params)
   const messages = JSON.parse(route.params.messages as string)
-  await startAnalysis(messages)
+  const systemPrompt = route.params.systemPrompt as string
+  await startAnalysis(messages, systemPrompt)
 })
 
-async function startAnalysis(messages: Message[]) {
+async function startAnalysis(messages: Message[], systemPrompt: string) {
   try {
+
+    return
     const chatClient = new ChatClient()
     await chatClient.streamAnalyze(messages, {
+      systemPrompt,
       onStart: () => {
         analyzing.value = true
       },

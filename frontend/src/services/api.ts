@@ -1,3 +1,4 @@
+import type { Message } from '@/types/chat'
 import { request } from '@/utils/request'
 
 const API_BASE_URL = '/api/v1'
@@ -73,8 +74,8 @@ export class ChatClient {
   private sessionId: string
   private baseUrl: string
 
-  constructor(sessionId: string) {
-    this.sessionId = sessionId
+  constructor(sessionId?: string) {
+    this.sessionId = sessionId || ''
     this.baseUrl = `${API_BASE_URL}/chat`
   }
 
@@ -147,7 +148,8 @@ export class ChatClient {
   }
 
   async streamAnalyze(
-    messages: Message[],
+    messages: Pick<Message, 'role' | 'content' | 'id'>[],
+    systemPrompt: string,
     callbacks: {
       onStart?: () => void
       onChunk?: (content: string, section: string, fullText: string) => void
@@ -157,13 +159,13 @@ export class ChatClient {
   ) {
     try {
       // 初始化分析
-      await request.post('/api/v1/chat/analyze/stream/init', {
+      const response = await request.post(`${this.baseUrl}/analyze/stream/init`, {
         messages,
-        system_prompt: '请分析整理以下对话内容'
+        system_prompt: systemPrompt
       })
 
       // 建立 SSE 连接
-      const url = new URL(`${window.location.origin}/api/v1/chat/analyze/stream`)
+      const url = new URL(`${window.location.origin}/api${this.baseUrl}/analyze/stream/${response.session_id}`)
       const eventSource = new EventSource(url.toString())
       let fullText = ''
 

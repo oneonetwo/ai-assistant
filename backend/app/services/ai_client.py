@@ -10,6 +10,7 @@ import asyncio
 from contextlib import asynccontextmanager
 from tenacity import retry, stop_after_attempt, wait_exponential
 import redis.asyncio as redis
+import uuid
 
 # 初始化 Redis 客户端
 redis_client = redis.Redis(
@@ -22,6 +23,7 @@ redis_client = redis.Redis(
 class AIClient:
     """通义千问API客户端增强版"""
     def __init__(self):
+        # API客户端配置
         self.client = AsyncOpenAI(
             api_key=settings.QWEN_API_KEY,
             base_url=settings.QWEN_API_URL,
@@ -29,14 +31,31 @@ class AIClient:
         )
         self.model = "qwen-max"
         self.vision_model = "qwen-vl-plus"
+        
+        # 重试配置
+        self.max_retries = 3
+        self.retry_delay = 1  # 基础重试延迟（秒）
+        
+        # 会话和缓存管理
         self._active_streams = {}
-        self._initialized_sessions = set()
+        self._analysis_sessions = {}  # 添加分析会话字典
+        self._current_analysis_session_id = None  # 添加当前分析会话ID
         self._response_cache = cache_manager.get_cache('ai_responses')
         self.initialized_sessions = set()
+        
+        # API配置
         self.api_key = settings.QWEN_API_KEY
         self.api_url = settings.QWEN_API_URL
         self.api_timeout = settings.QWEN_API_TIMEOUT
+        
+        # Redis客户端
         self.redis_client = redis_client
+        
+        # 会话存储
+        self.sessions = {}
+        self.analysis_sessions = {}  # 分析会话存储
+        self._analysis_sessions = {}
+        self._current_analysis_session_id = None
 
     def is_session_initialized(self, session_id: str) -> bool:
         """检查会话是否已初始化"""
@@ -55,29 +74,41 @@ class AIClient:
     async def _make_api_call(
         self,
         messages: List[Dict[str, Any]],
+        model: str,
         stream: bool = False,
         temperature: float = 0.7,
-        max_tokens: int = 2000,
-        model: Optional[str] = None,
+        max_tokens: Optional[int] = None,
         **kwargs
     ) -> Any:
-        """统一的API调用方法，支持重试"""
+        """进行API调用"""
         try:
-            # 如果没有指定model，使用默认的self.model
-            model = model or self.model
+            # 移除不支持的参数
+            api_params = {
+                "model": model,
+                "messages": messages,
+                "stream": stream,
+                "temperature": temperature,
+            }
             
-            response = await self.client.chat.completions.create(
-                model=model,
-                messages=messages,
-                stream=stream,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                **kwargs
-            )
-            return response
+            # 只在有值时添加max_tokens参数
+            if max_tokens is not None:
+                api_params["max_tokens"] = max_tokens
+                
+            # 添加其他支持的参数
+            for key, value in kwargs.items():
+                if key not in ['session_id']:  # 排除不支持的参数
+                    api_params[key] = value
+
+            try:
+                response = await self.client.chat.completions.create(**api_params)
+                return response
+            except Exception as e:
+                app_logger.error(f"API调用出错: {str(e)}")
+                raise APIError(f"API调用出错: {str(e)}")
+                
         except Exception as e:
             app_logger.error(f"API调用失败: {str(e)}")
-            raise APIError(f"AI服务调用失败: {str(e)}")
+            raise APIError(f"API调用失败: {str(e)}")
 
     async def _get_cached_response(self, cache_key: str) -> Optional[str]:
         """获取缓存的响应"""
@@ -224,7 +255,7 @@ class AIClient:
 
         # 生成最终总结
         final_messages = [
-            {"role": "user", "content": f"基于以下���果，{query}\n\n{combined_analysis}"}
+            {"role": "user", "content": f"基于以下果，{query}\n\n{combined_analysis}"}
         ]
         return await self.generate_response(
             final_messages,
@@ -446,29 +477,105 @@ class AIClient:
             await self.cleanup_stream(session_id)
 
         except Exception as e:
-            app_logger.error(f"获��流式响应失��: {str(e)}")
+            app_logger.error(f"获流式响应失败: {str(e)}")
             raise APIError(f"获取流式响应失败: {str(e)}")
 
-    async def get_analysis_stream(
+    async def initialize_analysis_stream(
         self,
-        messages: List[Dict[str, str]]
-    ) -> AsyncGenerator[str, None]:
-        """获取分析流式响应"""
+        messages: List[Dict[str, Any]],
+        temperature: float = 0.7,
+        max_tokens: Optional[int] = None,
+        **kwargs
+    ) -> str:
+        """初始化消息分析流"""
         try:
+            # 生成新的会话ID
+            analysis_session_id = str(uuid.uuid4())
+            
+            
             # 创建流式响应
             stream = await self._make_api_call(
                 messages=messages,
                 model=self.model,
-                stream=True
+                stream=True,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                **{k: v for k, v in kwargs.items() if k != 'session_id'}
             )
             
-            async for chunk in stream:
-                if chunk.choices[0].delta.content is not None:
-                    yield chunk.choices[0].delta.content
-                
+            # 存储会话信息
+            self._analysis_sessions[analysis_session_id] = {
+                'stream': stream,
+                'messages': messages
+            }
+            self._current_analysis_session_id = analysis_session_id
+            
+            # 将会话ID存储到Redis中，设置过期时间为5分钟
+            await self.redis_client.set(
+                f"analysis_session:{analysis_session_id}",
+                "active",
+                ex=300
+            )
+            
+            app_logger.info(f"成功初始化分析流，会话ID: {analysis_session_id}")
+            return analysis_session_id
+            
         except Exception as e:
-            app_logger.error(f"获取分析流式响应失败: {str(e)}")
-            raise APIError(f"获取分析流式响应失败: {str(e)}")
+            app_logger.error(f"初始化分析流失败: {str(e)}")
+            raise APIError(f"初始化分析流失败: {str(e)}")
+
+    async def get_analysis_stream(self, analysis_session_id: str) -> AsyncGenerator[str, None]:
+        """获取分析流式响应"""
+        try:
+            # 检查会话是否存在于Redis中
+            is_active = await self.redis_client.get(f"analysis_session:{analysis_session_id}")
+            if not is_active:
+                raise APIError("分析会话不存在或已过期")
+
+            session_data = self._analysis_sessions.get(analysis_session_id)
+            if not session_data:
+                raise APIError("分析会话不存在")
+
+            stream = session_data['stream']
+            async for chunk in stream:
+                if chunk.choices and chunk.choices[0].delta.content:
+                    yield chunk.choices[0].delta.content
+
+        except Exception as e:
+            app_logger.error(f"获取分析流失败: {str(e)}")
+            raise APIError(f"获取分析流失败: {str(e)}")
+        finally:
+            # 清理会话
+            if analysis_session_id in self._analysis_sessions:
+                del self._analysis_sessions[analysis_session_id]
+                await self.redis_client.delete(f"analysis_session:{analysis_session_id}")
+
+    async def get_current_analysis_session_id(self) -> Optional[str]:
+        """获取当前分析会话ID"""
+        app_logger.debug(f"当前分析会话ID: {self._current_analysis_session_id}")
+        return self._current_analysis_session_id
+
+    async def cleanup_analysis_session(self, analysis_session_id: str):
+        """清理分析会话"""
+        if analysis_session_id in self.analysis_sessions:
+            del self.analysis_sessions[analysis_session_id]
+
+    async def is_session_active(self, session_id: str) -> bool:
+        """检查会话是否活跃
+        
+        Args:
+            session_id: 会话ID
+        
+        Returns:
+            bool: 会话是否活跃
+        """
+        try:
+            # 从Redis中检查会话状态
+            is_active = await self.redis_client.get(f"analysis_session:{session_id}")
+            return bool(is_active)
+        except Exception as e:
+            app_logger.error(f"检查会话状态失败: {str(e)}")
+            return False
 
 # 创建全局AI客户端实例
 ai_client = AIClient() 

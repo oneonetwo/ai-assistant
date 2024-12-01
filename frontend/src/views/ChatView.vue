@@ -10,6 +10,8 @@ import ConversationList from '@/components/chat/ConversationList.vue'
 import WelcomeScreen from '@/components/chat/WelcomeScreen.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { analyzeSystemPrompt } from '@/utils/prompt'
+import type { Message } from '@/types/chat'
+import AnalyzeOverlay from '@/components/analyze/AnalyzeOverlay.vue'
 
 const chatStore = useChatStore()
 const containerRef = ref<HTMLElement | null>(null)
@@ -21,6 +23,7 @@ const selectedMessages = ref<Set<string>>(new Set())
 const isSelecting = ref(false)
 const route = useRoute()
 const router = useRouter()
+const showAnalyze = ref(false)
 
 onMounted(async () => {
   try {
@@ -164,16 +167,11 @@ function handleAnalyze() {
   const messages = chatStore.currentMessages.filter(
     msg => selectedMessages.value.has(msg.id)
   )
-  
-  router.push({
-    name: 'analyze',
-    params: {
-      messages: JSON.stringify(messages),
-      systemPrompt: analyzeSystemPrompt
-    }
-  })
+  showAnalyze.value = true
 }
-
+function handleCloseAnalyze() {
+  showAnalyze.value = false
+}
 // 切换选择模式
 function toggleSelecting() {
   isSelecting.value = !isSelecting.value
@@ -270,6 +268,20 @@ function toggleSelecting() {
     </div>
 
     <!-- 添加选择模式切换按钮 -->
+    <teleport to="body">
+      <AnalyzeOverlay
+        v-if="showAnalyze"
+          :messages="chatStore.currentMessages.filter(
+          msg => selectedMessages.has(msg.id)
+        ).map(msg=>({
+          role: msg.role,
+          content: msg.content,
+          id: msg.id,
+        }))"
+        :system-prompt="analyzeSystemPrompt"
+        @close="handleCloseAnalyze"
+      />
+    </teleport>
   </div>
 </template>
 

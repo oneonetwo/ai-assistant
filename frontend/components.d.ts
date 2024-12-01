@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Analytics: typeof import('./src/components/chat/Analytics.vue')['default']
+    AnalyzeOverlay: typeof import('./src/components/analyze/AnalyzeOverlay.vue')['default']
     AnalyzeView: typeof import('./src/components/AnalyzeView.vue')['default']
     AppHeader: typeof import('./src/components/common/AppHeader.vue')['default']
     ChatInput: typeof import('./src/components/chat/ChatInput.vue')['default']
