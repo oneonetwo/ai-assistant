@@ -1007,3 +1007,4 @@ WHERE notes.handbook_id = %s ORDER BY notes.created_at DESC
 2024-12-01 00:05:55.408 | INFO     | app.utils.cache:init:29 - Redis连接成功
 2024-12-01 00:35:45.856 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
 2024-12-01 00:35:54.636 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-12-01 08:00:12.201 | INFO     | app.utils.cache:init:29 - Redis连接成功

@@ -8,10 +8,9 @@
     ]"
     @click="handleMessageClick"
   >
-    <div class="select-box" v-if="isSelectable" @click.stop="$emit('select', message.id)">
+    <div class="select-box" v-if="isSelectable" @:click.stop="handleSelect">
       <van-checkbox 
         :model-value="isChecked"
-        @change="$emit('select', message.id)"
       />
     </div>
     <div class="avatar">
@@ -86,16 +85,16 @@ const props = defineProps<{
 }>()
 
 const isChecked = computed(() => props.isSelected)
-watch(props.isSelected , (newVal) => {
-  console.log('newVal>>>>>>', newVal)
-  isChecked.value = newVal
-})
+
 const emit = defineEmits<{
   (e: 'quote', message: Message): void
   (e: 'edit', message: Message): void
   (e: 'copy', message: Message): void
   (e: 'select', messageId: string): void
 }>()
+const handleSelect = (e: any) => {
+  emit('select', props.message.id)
+}
 
 const md = new MarkdownIt({
   highlight: function (str, lang) {

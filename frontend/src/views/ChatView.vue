@@ -9,6 +9,7 @@ import MessageQuote from '@/components/chat/MessageQuote.vue'
 import ConversationList from '@/components/chat/ConversationList.vue'
 import WelcomeScreen from '@/components/chat/WelcomeScreen.vue'
 import { useRoute, useRouter } from 'vue-router'
+import { analyzeSystemPrompt } from '@/utils/prompt'
 
 const chatStore = useChatStore()
 const containerRef = ref<HTMLElement | null>(null)
@@ -147,9 +148,8 @@ const messageSelectedState = computed(() => {
 })
 
 // 修改选择切换函数
-function toggleMessageSelection(messageId: string) {
-  console.log('toggleMessageSelection.......', messageId)
-  const newSelectedMessages = new Set(selectedMessages.value)
+function toggleMessageSelection(messageId: number) {
+  const newSelectedMessages = new Set(Array.from(selectedMessages.value))
   if (newSelectedMessages.has(messageId)) {
     newSelectedMessages.delete(messageId)
   } else {
@@ -169,7 +169,7 @@ function handleAnalyze() {
     name: 'analyze',
     params: {
       messages: JSON.stringify(messages),
-      systemPrompt: '请对这些对话内容进行分析整理,生成一篇结构化的笔记'
+      systemPrompt: analyzeSystemPrompt
     }
   })
 }
@@ -244,24 +244,25 @@ function toggleSelecting() {
                 >
                   收录到笔记
                 </van-button>
-                <div v-else>
+                <div v-else class="selection-buttons">
                   <van-button 
-                  type="primary"
-                  size="small" 
-                  @click="toggleSelecting"
+                    type="default"
+                    size="small" 
+                    @click="toggleSelecting"
+                    class="cancel-button"
                   >
-                  取消选择
+                    取消选择
                   </van-button>
 
                   <van-button
-                  type="primary"
-                  size="small"
-                  :disabled="selectedMessages.size === 0"
-                  @click="handleAnalyze"
+                    type="primary"
+                    size="small"
+                    :disabled="selectedMessages.size === 0"
+                    @click="handleAnalyze"
                   >
-                  收录完成进行分析整理 ({{ selectedMessages.size }})
+                    收录完成进行分析整理 ({{ selectedMessages.size }})
                   </van-button>
-              </div>
+                </div>
             </div>
           </template>
         </ChatInput>
@@ -321,6 +322,18 @@ function toggleSelecting() {
   
   .quoted-message {
     margin-bottom: 8px;
+  }
+}
+
+.selection-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  .cancel-button {
+    color: var(--van-gray-6);
+    background: var(--van-gray-2);
+    border: 1px solid var(--van-gray-3);
   }
 }
 </style> 
