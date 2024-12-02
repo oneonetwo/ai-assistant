@@ -1,8 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 from app.db.models import RevisionPlan, RevisionTask, Note
-from app.models.revision_schemas import RevisionPlanCreate
-from datetime import datetime, timedelta
+from app.models.revision_schemas import RevisionPlanCreate, RevisionTaskUpdate
+from datetime import datetime, timedelta, date
 from typing import List, Optional
 import json
 from sqlalchemy.sql import func
