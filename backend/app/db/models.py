@@ -118,7 +118,7 @@ class Note(Base):
     title = Column(String(200), nullable=False)
     content = Column(Text)
     message_ids = Column(JSON)  # 存储相关消息ID
-    priority = Column(Integer, default=0)
+    priority = Column(String(50), default="medium")
     status = Column(String(50), default="draft")
     is_shared = Column(Boolean, default=False)
     handbook_id = Column(Integer, ForeignKey("handbooks.id"))
