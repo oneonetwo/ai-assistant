@@ -15,8 +15,6 @@ const noteEditorStore = useNoteEditorStore()
 const noteId = route.params.id as string
 const handbookId = route.query.handbook as string
 const isNew = route.fullPath.includes('/new')
-<<<<<<< HEAD
-=======
 
 // 从 store 中获取数据
 const title = ref(noteEditorStore.draftTitle || '')
@@ -28,7 +26,6 @@ onUnmounted(() => {
   noteEditorStore.clearDraft()
 })
 
->>>>>>> 3762c67ba2a7948f605513e7893eb2a10c5450a7
 // 表单数据
 
 const selectedTags = ref<string[]>([])
