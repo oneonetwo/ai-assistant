@@ -99,6 +99,49 @@ const routes: Array<RouteRecordRaw> = [
       }
     ]
   },
+  // 复习任务相关路由
+  {
+    path: '/revision',
+    name: 'revision', 
+    component: () => import('@/views/revision/RevisionView.vue'),
+    meta: {
+      title: '复习计划'
+    },
+    children: [
+      {
+        path: '',
+        name: 'revision-plans', 
+        component: () => import('@/views/revision/PlanListView.vue'),
+        meta: {
+          title: '复习计划'
+        }
+      },
+      {
+        path: 'plans/new',
+        name: 'revision-plan-new',
+        component: () => import('@/views/revision/PlanEditorView.vue'),
+        meta: {
+          title: '新建计划'
+        }
+      },
+      {
+        path: 'plans/:id',
+        name: 'revision-plan-detail',
+        component: () => import('@/views/revision/PlanDetailView.vue'),
+        meta: {
+          title: '计划详情'
+        }
+      },
+      {
+        path: 'tasks',
+        name: 'revision-tasks',
+        component: () => import('@/views/revision/TaskListView.vue'),
+        meta: {
+          title: '复习任务'
+        }
+      }
+    ]
+  },
   {
     path: '/settings',
     name: 'settings',

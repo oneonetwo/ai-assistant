@@ -21,7 +21,7 @@ const features = [
     title: '复习助手',
     description: '系统复习，完全掌握',
     icon: 'book',
-    route: '/review'
+    route: '/revision'
   }
 ]
 </script>
