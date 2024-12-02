@@ -1,0 +1,990 @@
+2024-11-21 16:45:35.327 | ERROR    | app.services.context:create_conversation:22 - 创建对话失败: (pymysql.err.IntegrityError) (1062, "Duplicate entry 'string' for key 'conversations.ix_conversations_session_id'")
+[SQL: INSERT INTO conversations (session_id, created_at, updated_at) VALUES (%s, %s, %s)]
+[parameters: ('string', datetime.datetime(2024, 11, 21, 8, 45, 35, 323415), datetime.datetime(2024, 11, 21, 8, 45, 35, 323415))]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2024-11-21 16:45:35.339 | ERROR    | app.api.v1.context:create_conversation:24 - 创建会话失败: 500: Database error: 创建对话失败
+2024-11-21 16:45:48.593 | ERROR    | app.services.context:create_conversation:22 - 创建对话失败: (pymysql.err.IntegrityError) (1062, "Duplicate entry 'string' for key 'conversations.ix_conversations_session_id'")
+[SQL: INSERT INTO conversations (session_id, created_at, updated_at) VALUES (%s, %s, %s)]
+[parameters: ('string', datetime.datetime(2024, 11, 21, 8, 45, 48, 590179), datetime.datetime(2024, 11, 21, 8, 45, 48, 590179))]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2024-11-21 16:45:48.596 | ERROR    | app.api.v1.context:create_conversation:24 - 创建会话失败: 500: Database error: 创建对话失败
+2024-11-21 16:52:52.871 | ERROR    | app.services.context:create_conversation:23 - 创建对话失败: (pymysql.err.IntegrityError) (1062, "Duplicate entry 'string' for key 'conversations.ix_conversations_session_id'")
+[SQL: INSERT INTO conversations (session_id, created_at, updated_at) VALUES (%s, %s, %s)]
+[parameters: ('string', datetime.datetime(2024, 11, 21, 8, 52, 52, 867983), datetime.datetime(2024, 11, 21, 8, 52, 52, 867983))]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2024-11-21 16:52:52.872 | ERROR    | app.api.v1.context:create_conversation:26 - 创建会话失败: 500: Database error: 会话ID已存在
+2024-11-21 16:53:26.111 | ERROR    | app.services.context:create_conversation:23 - 创建对话失败: (pymysql.err.IntegrityError) (1062, "Duplicate entry 'string' for key 'conversations.ix_conversations_session_id'")
+[SQL: INSERT INTO conversations (session_id, created_at, updated_at) VALUES (%s, %s, %s)]
+[parameters: ('string', datetime.datetime(2024, 11, 21, 8, 53, 26, 108690), datetime.datetime(2024, 11, 21, 8, 53, 26, 108690))]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2024-11-21 16:53:26.112 | ERROR    | app.api.v1.context:create_conversation:26 - 创建会话失败: 500: Database error: 会话ID已存在
+2024-11-21 16:53:58.893 | ERROR    | app.services.context:create_conversation:23 - 创建对话失败: (pymysql.err.IntegrityError) (1062, "Duplicate entry 'string' for key 'conversations.ix_conversations_session_id'")
+[SQL: INSERT INTO conversations (session_id, created_at, updated_at) VALUES (%s, %s, %s)]
+[parameters: ('string', datetime.datetime(2024, 11, 21, 8, 53, 58, 890279), datetime.datetime(2024, 11, 21, 8, 53, 58, 890279))]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2024-11-21 16:53:58.895 | ERROR    | app.api.v1.context:create_conversation:26 - 创建会话失败: 500: Database error: 会话ID已存在
+2024-11-22 11:13:50.218 | ERROR    | app.services.ai_client:generate_stream_response:44 - AI流式响应生成失败: object Stream can't be used in 'await' expression
+2024-11-22 11:13:50.219 | ERROR    | app.services.chat:process_stream_chat:102 - 处理流式聊天请求失败: 503: API error: AI服务调用失败: object Stream can't be used in 'await' expression
+2024-11-22 11:20:03.987 | ERROR    | app.services.ai_client:generate_stream_response:44 - AI流式响应生成失败: object Stream can't be used in 'await' expression
+2024-11-22 11:20:03.988 | ERROR    | app.services.chat:process_stream_chat:102 - 处理流式聊天请求失败: 503: API error: AI服务调用失败: object Stream can't be used in 'await' expression
+2024-11-22 12:56:55.740 | ERROR    | app.services.chat:process_stream_chat:102 - 处理流式聊天请求失败: 'AIClient' object has no attribute 'generate_stream_response'
+2024-11-22 20:04:13.102 | ERROR    | app.services.ai_client:initialize_stream:53 - 初始化流式响应失败: Error code: 400 - {'error': {'code': 'invalid_parameter_error', 'param': None, 'message': '<400> InternalError.Algo.InvalidParameter: The messages list should not contain only one message with role "system". Please include at least one other role in the messages.', 'type': 'invalid_request_error'}, 'id': 'chatcmpl-242f2b9f-7809-9d29-8a7d-16d554831cfb', 'request_id': '242f2b9f-7809-9d29-8a7d-16d554831cfb'}
+2024-11-22 20:04:13.103 | ERROR    | app.services.chat:process_stream_chat:95 - 处理流式聊天请求失败: 503: API error: 初始化流式响应失败: Error code: 400 - {'error': {'code': 'invalid_parameter_error', 'param': None, 'message': '<400> InternalError.Algo.InvalidParameter: The messages list should not contain only one message with role "system". Please include at least one other role in the messages.', 'type': 'invalid_request_error'}, 'id': 'chatcmpl-242f2b9f-7809-9d29-8a7d-16d554831cfb', 'request_id': '242f2b9f-7809-9d29-8a7d-16d554831cfb'}
+2024-11-22 20:04:14.257 | ERROR    | app.services.ai_client:initialize_stream:53 - 初始化流式响应失败: Error code: 400 - {'error': {'code': 'invalid_parameter_error', 'param': None, 'message': '<400> InternalError.Algo.InvalidParameter: The messages list should not contain only one message with role "system". Please include at least one other role in the messages.', 'type': 'invalid_request_error'}, 'id': 'chatcmpl-b910de71-c780-95ec-9f7b-5d086ca6a531', 'request_id': 'b910de71-c780-95ec-9f7b-5d086ca6a531'}
+2024-11-22 20:04:14.259 | ERROR    | app.services.chat:process_stream_chat:95 - 处理流式聊天请求失败: 503: API error: 初始化流式响应失败: Error code: 400 - {'error': {'code': 'invalid_parameter_error', 'param': None, 'message': '<400> InternalError.Algo.InvalidParameter: The messages list should not contain only one message with role "system". Please include at least one other role in the messages.', 'type': 'invalid_request_error'}, 'id': 'chatcmpl-b910de71-c780-95ec-9f7b-5d086ca6a531', 'request_id': 'b910de71-c780-95ec-9f7b-5d086ca6a531'}
+2024-11-22 20:04:15.438 | ERROR    | app.services.ai_client:initialize_stream:53 - 初始化流式响应失败: Error code: 400 - {'error': {'code': 'invalid_parameter_error', 'param': None, 'message': '<400> InternalError.Algo.InvalidParameter: The messages list should not contain only one message with role "system". Please include at least one other role in the messages.', 'type': 'invalid_request_error'}, 'id': 'chatcmpl-f08732f0-f9d6-980c-b6a4-c8c1fb551eec', 'request_id': 'f08732f0-f9d6-980c-b6a4-c8c1fb551eec'}
+2024-11-22 20:04:15.439 | ERROR    | app.services.chat:process_stream_chat:95 - 处理流式聊天请求失败: 503: API error: 初始化流式响应失败: Error code: 400 - {'error': {'code': 'invalid_parameter_error', 'param': None, 'message': '<400> InternalError.Algo.InvalidParameter: The messages list should not contain only one message with role "system". Please include at least one other role in the messages.', 'type': 'invalid_request_error'}, 'id': 'chatcmpl-f08732f0-f9d6-980c-b6a4-c8c1fb551eec', 'request_id': 'f08732f0-f9d6-980c-b6a4-c8c1fb551eec'}
+2024-11-22 20:04:16.617 | ERROR    | app.services.ai_client:initialize_stream:53 - 初始化流式响应失败: Error code: 400 - {'error': {'code': 'invalid_parameter_error', 'param': None, 'message': '<400> InternalError.Algo.InvalidParameter: The messages list should not contain only one message with role "system". Please include at least one other role in the messages.', 'type': 'invalid_request_error'}, 'id': 'chatcmpl-90080044-1702-96ce-a2d5-caf49f30352e', 'request_id': '90080044-1702-96ce-a2d5-caf49f30352e'}
+2024-11-22 20:04:16.619 | ERROR    | app.services.chat:process_stream_chat:95 - 处理流式聊天请求失败: 503: API error: 初始化流式响应失败: Error code: 400 - {'error': {'code': 'invalid_parameter_error', 'param': None, 'message': '<400> InternalError.Algo.InvalidParameter: The messages list should not contain only one message with role "system". Please include at least one other role in the messages.', 'type': 'invalid_request_error'}, 'id': 'chatcmpl-90080044-1702-96ce-a2d5-caf49f30352e', 'request_id': '90080044-1702-96ce-a2d5-caf49f30352e'}
+2024-11-22 20:09:31.294 | ERROR    | app.services.chat:process_stream_chat:131 - 处理流式聊天失败: 'AIClient' object has no attribute 'get_stream_response'
+2024-11-22 20:10:47.727 | ERROR    | app.services.ai_client:initialize_stream:67 - 初始化流式响应失败: object Stream can't be used in 'await' expression
+2024-11-22 20:10:47.728 | ERROR    | app.services.chat:initialize_stream_chat:100 - 初始化流式聊天失败: 503: API error: 初始化流式响应失败: object Stream can't be used in 'await' expression
+2024-11-22 20:10:47.728 | ERROR    | app.api.v1.chat:init_stream_chat:85 - 初始化流式聊天失败: 503: API error: 初始化流式聊天失败: 503: API error: 初始化流式响应失败: object Stream can't be used in 'await' expression
+2024-11-22 20:40:35.269 | WARNING  | app.services.chat:process_stream_chat:120 - 未找到用户消息: conversation_id=32
+2024-11-22 20:40:35.287 | ERROR    | app.services.chat:process_stream_chat:175 - 处理流式聊天失败: 503: API error: 未找到相关的用户消息
+2024-11-22 20:41:48.571 | ERROR    | app.services.chat:process_stream_chat:130 - 未找到用户消息: conversation_id=32
+2024-11-22 20:41:48.572 | ERROR    | app.services.chat:process_stream_chat:185 - 处理流式聊天失败: 503: API error: 未找到相关的用户消息
+2024-11-22 20:42:08.720 | ERROR    | app.services.chat:process_stream_chat:130 - 未找到用户消息: conversation_id=32
+2024-11-22 20:42:08.721 | ERROR    | app.services.chat:process_stream_chat:185 - 处理流式聊天失败: 503: API error: 未找到相关的用户消息
+2024-11-22 20:44:25.204 | ERROR    | app.services.chat:process_stream_chat:130 - 未找到用户消息: conversation_id=32
+2024-11-22 20:44:25.204 | ERROR    | app.services.chat:process_stream_chat:185 - 处理流式聊天失败: 503: API error: 未找到相关的用户消息
+2024-11-22 20:44:52.968 | WARNING  | app.services.chat:process_stream_chat:122 - 未找到用户消息: conversation_id=32
+2024-11-22 20:44:52.969 | ERROR    | app.services.chat:process_stream_chat:147 - 处理流式聊天失败: 503: API error: 未找到相关的用户消息
+2024-11-22 20:45:09.327 | WARNING  | app.services.chat:process_stream_chat:122 - 未找到用户消息: conversation_id=32
+2024-11-22 20:45:09.328 | ERROR    | app.services.chat:process_stream_chat:171 - 处理流式聊天失败: 503: API error: 未找到相关的用户消息
+2024-11-22 20:45:23.300 | WARNING  | app.services.chat:process_stream_chat:122 - 未找到用户消息: conversation_id=32
+2024-11-22 20:45:23.301 | ERROR    | app.services.chat:process_stream_chat:171 - 处理流式聊天失败: 503: API error: 未找到相关的用户消息
+2024-11-22 20:46:16.558 | WARNING  | app.services.chat:process_stream_chat:122 - 未找到用户消息: conversation_id=32
+2024-11-22 20:46:16.559 | ERROR    | app.services.chat:process_stream_chat:147 - 处理流式聊天失败: 503: API error: 未找到相关的用户消息
+2024-11-25 17:35:29.562 | ERROR    | app.utils.cache:init:23 - Redis连接失败: module 'aioredis' has no attribute 'create_redis_pool'
+2024-11-25 17:36:28.040 | ERROR    | app.utils.cache:init:23 - Redis连接失败: module 'aioredis' has no attribute 'create_redis_pool'
+2024-11-25 17:42:50.156 | ERROR    | app.utils.cache:init:23 - Redis连接失败: module 'aioredis' has no attribute 'create_redis_pool'
+2024-11-25 17:47:17.266 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 17:47:33.363 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 17:47:54.376 | ERROR    | app.utils.cache:init:31 - Redis连接失败: Error Multiple exceptions: [Errno 10061] Connect call failed ('::1', 6379, 0, 0), [Errno 10061] Connect call failed ('127.0.0.1', 6379) connecting to localhost:6379.
+2024-11-25 17:48:43.708 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 17:52:17.776 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 17:56:33.590 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 17:57:03.348 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 17:57:05.038 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 17:57:22.838 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 17:57:24.479 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 17:57:33.600 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 18:02:06.527 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 18:34:12.386 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 18:34:23.092 | ERROR    | app.api.v1.chat:init_stream_chat:89 - 初始化流式聊天失败: 'AIClient' object has no attribute 'is_session_initialized'
+2024-11-25 18:34:49.061 | ERROR    | app.api.v1.chat:init_stream_chat:89 - 初始化流式聊天失败: 'AIClient' object has no attribute 'is_session_initialized'
+2024-11-25 18:36:22.268 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 18:37:46.051 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 18:38:05.374 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 18:38:07.055 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 18:38:12.197 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 18:38:38.800 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 18:38:43.585 | ERROR    | app.api.v1.chat:init_stream_chat:93 - 初始化流式聊天失败: 'AIClient' object has no attribute 'cleanup_stream'
+2024-11-25 18:39:23.933 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 18:39:25.613 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 18:40:01.450 | ERROR    | app.services.chat:process_stream_chat:147 - 处理流式聊天失败: 'AIClient' object has no attribute 'get_stream_response'
+2024-11-25 18:40:17.711 | ERROR    | app.services.chat:process_stream_chat:147 - 处理流式聊天失败: 'AIClient' object has no attribute 'get_stream_response'
+2024-11-25 18:42:21.931 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 18:42:23.787 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 19:34:07.668 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 19:34:09.513 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 19:34:12.647 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 19:34:14.358 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 19:34:37.800 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 19:34:39.523 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 19:45:31.308 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 19:45:33.017 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 19:45:44.089 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 19:53:06.157 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 19:53:29.490 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 19:53:31.188 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 20:10:43.631 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 20:10:45.376 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 20:11:01.630 | ERROR    | app.services.image_service:analyze_image:146 - 图片分析失败: name 'settings' is not defined
+2024-11-25 20:11:01.631 | ERROR    | app.api.v1.chat:image_chat:236 - 图片聊天处理失败: name 'settings' is not defined
+2024-11-25 20:12:47.937 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 20:12:49.865 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 20:13:00.015 | ERROR    | app.services.ai_client:_make_api_call:74 - API调用失败: Error code: 400 - {'error': {'code': 'invalid_value', 'param': "'messages.[0].content[1].type'", 'message': "Invalid value: image. Supported values are: 'text','image_url','video_url' and 'video'.", 'type': 'invalid_request_error'}, 'request_id': 'chatcmpl-fda311ff-ad88-96de-ab55-a5c689e545a5'}
+2024-11-25 20:13:04.057 | ERROR    | app.services.ai_client:_make_api_call:74 - API调用失败: Error code: 400 - {'error': {'code': 'invalid_value', 'param': "'messages.[0].content[1].type'", 'message': "Invalid value: image. Supported values are: 'text','image_url','video_url' and 'video'.", 'type': 'invalid_request_error'}, 'request_id': 'chatcmpl-f05cf144-c8a3-9945-a728-4a5eca7dc00c'}
+2024-11-25 20:13:08.104 | ERROR    | app.services.ai_client:_make_api_call:74 - API调用失败: Error code: 400 - {'error': {'code': 'invalid_value', 'param': "'messages.[0].content[1].type'", 'message': "Invalid value: image. Supported values are: 'text','image_url','video_url' and 'video'.", 'type': 'invalid_request_error'}, 'request_id': 'chatcmpl-483d9cf7-e553-9e6f-9837-33dff605a694'}
+2024-11-25 20:13:08.105 | ERROR    | app.services.ai_client:analyze_image:275 - 图片分析失败: RetryError[<Future at 0x1edcaed7b80 state=finished raised APIError>]
+2024-11-25 20:13:08.106 | ERROR    | app.services.image_service:analyze_image:147 - 图片分析失败: 503: API error: 图片分析失败: RetryError[<Future at 0x1edcaed7b80 state=finished raised APIError>]
+2024-11-25 20:13:08.106 | ERROR    | app.api.v1.chat:image_chat:236 - 图片聊天处理失败: 503: API error: 图片分析失败: RetryError[<Future at 0x1edcaed7b80 state=finished raised APIError>]
+2024-11-25 20:13:16.140 | ERROR    | app.services.ai_client:_make_api_call:74 - API调用失败: Error code: 400 - {'error': {'code': 'invalid_value', 'param': "'messages.[0].content[1].type'", 'message': "Invalid value: image. Supported values are: 'text','image_url','video_url' and 'video'.", 'type': 'invalid_request_error'}, 'request_id': 'chatcmpl-0f6e4541-918f-9c3d-9f43-6db43c52cc11'}
+2024-11-25 20:13:20.187 | ERROR    | app.services.ai_client:_make_api_call:74 - API调用失败: Error code: 400 - {'error': {'code': 'invalid_value', 'param': "'messages.[0].content[1].type'", 'message': "Invalid value: image. Supported values are: 'text','image_url','video_url' and 'video'.", 'type': 'invalid_request_error'}, 'request_id': 'chatcmpl-52088fe5-ac82-9fc8-a1fc-8b60cfd02cb5'}
+2024-11-25 20:13:24.222 | ERROR    | app.services.ai_client:_make_api_call:74 - API调用失败: Error code: 400 - {'error': {'code': 'invalid_value', 'param': "'messages.[0].content[1].type'", 'message': "Invalid value: image. Supported values are: 'text','image_url','video_url' and 'video'.", 'type': 'invalid_request_error'}, 'request_id': 'chatcmpl-f0b2757b-f510-9358-9219-0875e23c6f6a'}
+2024-11-25 20:13:24.224 | ERROR    | app.services.ai_client:analyze_image:275 - 图片分析失败: RetryError[<Future at 0x1edcaedd9c0 state=finished raised APIError>]
+2024-11-25 20:13:24.224 | ERROR    | app.services.image_service:analyze_image:147 - 图片分析失败: 503: API error: 图片分析失败: RetryError[<Future at 0x1edcaedd9c0 state=finished raised APIError>]
+2024-11-25 20:13:24.225 | ERROR    | app.api.v1.chat:image_chat:236 - 图片聊天处理失败: 503: API error: 图片分析失败: RetryError[<Future at 0x1edcaedd9c0 state=finished raised APIError>]
+2024-11-25 20:14:47.217 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 20:14:48.906 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 20:19:06.923 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 20:19:08.888 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 20:19:10.310 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 20:19:12.035 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 20:19:17.378 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 20:19:19.178 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 20:20:04.533 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 20:20:06.288 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-25 20:20:11.526 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-25 20:20:13.258 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 13:09:27.663 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:25:01.926 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:25:04.199 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:25:06.023 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:25:07.856 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:25:10.182 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:25:11.945 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:25:13.680 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:25:16.615 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:25:18.415 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:25:21.742 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:25:23.530 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:25:25.297 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:25:32.348 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:26:29.261 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:34:09.931 | ERROR    | app.services.file_service:save_file:70 - 文件保存失败: 400: 不支持的文件类型: application/octet-stream
+2024-11-26 14:34:09.932 | ERROR    | app.api.v1.chat:image_chat:274 - 图片聊天处理失败: 500: 文件保存失败: 400: 不支持的文件类型: application/octet-stream
+2024-11-26 14:36:52.266 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:36:54.221 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:36:56.152 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:36:57.963 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:36:59.805 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:37:12.630 | ERROR    | app.api.v1.chat:image_chat:286 - 图片聊天处理失败: 400: 无效的图片格式
+2024-11-26 14:38:40.003 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:38:41.799 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:46:54.856 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:46:56.737 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:46:58.548 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:47:39.985 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:47:41.855 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:47:45.687 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:47:47.533 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:47:49.350 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:49:48.472 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:49:50.363 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 14:49:58.014 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 14:49:59.799 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-26 15:03:24.261 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-26 19:57:23.568 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 09:09:20.716 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 09:22:30.516 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 09:24:28.638 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 09:24:49.233 | ERROR    | app.services.ai_client:_make_api_call:75 - API调用失败: openai.resources.chat.completions.AsyncCompletions.create() got multiple values for keyword argument 'model'
+2024-11-27 09:24:53.240 | ERROR    | app.services.ai_client:_make_api_call:75 - API调用失败: openai.resources.chat.completions.AsyncCompletions.create() got multiple values for keyword argument 'model'
+2024-11-27 09:24:57.229 | ERROR    | app.services.ai_client:_make_api_call:75 - API调用失败: openai.resources.chat.completions.AsyncCompletions.create() got multiple values for keyword argument 'model'
+2024-11-27 09:24:57.229 | ERROR    | app.services.ai_client:analyze_image:279 - 图片分析失败: RetryError[<Future at 0x19a8a192e30 state=finished raised APIError>]
+2024-11-27 09:24:57.230 | ERROR    | app.services.image_service:analyze_image_from_url:189 - 从URL分析图片失败: 503: API error: 图片分析失败: RetryError[<Future at 0x19a8a192e30 state=finished raised APIError>]
+2024-11-27 09:24:57.230 | ERROR    | app.api.v1.chat:image_chat:221 - 图片聊天处理失败: 图片分析失败: 503: API error: 图片分析失败: RetryError[<Future at 0x19a8a192e30 state=finished raised APIError>]
+2024-11-27 09:25:58.903 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 09:26:00.786 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 09:36:50.011 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 09:36:52.172 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 09:37:07.064 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 09:37:08.945 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 09:37:18.006 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 09:37:19.897 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 09:38:10.880 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 09:38:12.742 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 09:38:14.614 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 09:40:49.665 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 09:40:51.534 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 09:41:06.630 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 09:41:08.464 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 09:43:52.818 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 09:43:54.684 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 09:52:39.825 | ERROR    | app.api.v1.chat:init_image_stream_chat:350 - 初始化流式图片聊天失败: name 'MessageCreate' is not defined
+2024-11-27 09:53:29.563 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 09:53:31.393 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 09:53:39.382 | ERROR    | app.api.v1.chat:init_image_stream_chat:350 - 初始化流式图片聊天失败: name 'add_message' is not defined
+2024-11-27 09:54:46.576 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 10:04:08.959 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 10:04:10.799 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 10:04:25.980 | ERROR    | app.api.v1.chat:init_image_stream_chat:360 - 初始化流式图片聊天失败: 'MessageCreate' object has no attribute 'id'
+2024-11-27 10:05:31.259 | ERROR    | app.api.v1.chat:init_image_stream_chat:360 - 初始化流式图片聊天失败: 'MessageCreate' object has no attribute 'id'
+2024-11-27 10:05:45.211 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 10:06:02.721 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 10:06:15.403 | ERROR    | app.api.v1.chat:init_image_stream_chat:360 - 初始化流式图片聊天失败: 'MessageCreate' object has no attribute 'id'
+2024-11-27 10:06:25.280 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 10:06:32.670 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 10:07:21.526 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 10:07:23.394 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 10:07:25.255 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 10:07:25.298 | ERROR    | app.api.v1.chat:init_image_stream_chat:360 - 初始化流式图片聊天失败: 'MessageCreate' object has no attribute 'id'
+2024-11-27 10:08:30.694 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 10:08:32.527 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 10:08:58.060 | ERROR    | app.api.v1.chat:init_image_stream_chat:360 - 初始化流式图片聊天失败: 'MessageCreate' object has no attribute 'id'
+2024-11-27 10:10:43.328 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 10:10:45.277 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 10:10:58.700 | ERROR    | app.api.v1.chat:init_image_stream_chat:365 - 初始化流式图片聊天失败: name 'settings' is not defined
+2024-11-27 10:12:17.743 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 10:12:19.623 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 10:12:21.391 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 10:12:22.810 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 10:12:24.613 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 10:12:55.665 | ERROR    | app.api.v1.chat:init_file_stream_chat:516 - 初始化流式文件聊天失败: Incorrect padding
+2024-11-27 10:13:05.667 | ERROR    | app.api.v1.chat:init_file_stream_chat:516 - 初始化流式文件聊天失败: Incorrect padding
+2024-11-27 10:13:29.222 | ERROR    | app.api.v1.chat:init_file_stream_chat:516 - 初始化流式文件聊天失败: Incorrect padding
+2024-11-27 10:13:45.201 | ERROR    | app.api.v1.chat:init_image_stream_chat:365 - 初始化流式图片聊天失败: name 'settings' is not defined
+2024-11-27 10:15:05.217 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 10:15:07.181 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 10:15:32.385 | ERROR    | app.api.v1.chat:init_image_stream_chat:366 - 初始化流式图片聊天失败: 'AIClient' object has no attribute 'initialize_image_stream'
+2024-11-27 10:16:08.928 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 10:16:10.802 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 10:16:20.641 | ERROR    | app.services.ai_client:_make_api_call:79 - API调用失败: AsyncCompletions.create() got an unexpected keyword argument 'image'
+2024-11-27 10:16:24.633 | ERROR    | app.services.ai_client:_make_api_call:79 - API调用失败: AsyncCompletions.create() got an unexpected keyword argument 'image'
+2024-11-27 10:16:28.638 | ERROR    | app.services.ai_client:_make_api_call:79 - API调用失败: AsyncCompletions.create() got an unexpected keyword argument 'image'
+2024-11-27 10:16:28.639 | ERROR    | app.services.ai_client:initialize_image_stream:423 - 初始化图片流式响应失败: RetryError[<Future at 0x280a2c0ecb0 state=finished raised APIError>]
+2024-11-27 10:16:28.640 | ERROR    | app.api.v1.chat:init_image_stream_chat:366 - 初始化流式图片聊天失败: 503: API error: 初始化图片流式响应失败: RetryError[<Future at 0x280a2c0ecb0 state=finished raised APIError>]
+2024-11-27 10:16:42.581 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 10:16:48.852 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 10:17:02.574 | ERROR    | app.services.ai_client:_make_api_call:79 - API调用失败: AsyncCompletions.create() got an unexpected keyword argument 'image'
+2024-11-27 10:17:06.581 | ERROR    | app.services.ai_client:_make_api_call:79 - API调用失败: AsyncCompletions.create() got an unexpected keyword argument 'image'
+2024-11-27 10:17:10.586 | ERROR    | app.services.ai_client:_make_api_call:79 - API调用失败: AsyncCompletions.create() got an unexpected keyword argument 'image'
+2024-11-27 10:17:10.587 | ERROR    | app.services.ai_client:initialize_image_stream:423 - 初始化图片流式响应失败: RetryError[<Future at 0x1d99146a5f0 state=finished raised APIError>]
+2024-11-27 10:17:10.587 | ERROR    | app.api.v1.chat:init_image_stream_chat:366 - 初始化流式图片聊天失败: 503: API error: 初始化图片流式响应失败: RetryError[<Future at 0x1d99146a5f0 state=finished raised APIError>]
+2024-11-27 10:18:57.930 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 10:18:59.793 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 10:20:36.670 | ERROR    | app.api.v1.chat:init_file_stream_chat:517 - 初始化流式文件聊天失败: Incorrect padding
+2024-11-27 10:23:01.765 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 10:23:03.710 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 10:23:28.145 | ERROR    | app.api.v1.chat:init_file_stream_chat:517 - 初始化流式文件聊天失败: Incorrect padding
+2024-11-27 10:24:17.896 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 10:24:19.726 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 10:24:22.740 | ERROR    | app.api.v1.chat:init_file_stream_chat:517 - 初始化流式文件聊天失败: Incorrect padding
+2024-11-27 10:25:34.703 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 10:25:36.557 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 10:25:56.471 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 10:25:58.312 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 10:26:16.553 | ERROR    | app.services.file_service:save_file:70 - 文件保存失败: (pymysql.err.DataError) (1406, "Data too long for column 'file_type' at row 1")
+[SQL: INSERT INTO files (file_id, original_name, file_path, file_type, mime_type, file_size, created_at, user_session_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)]
+[parameters: ('bad390b4-ad4f-4189-bbd6-687f53c5fca3', '2024.6_杨景渊周报.docx', 'application\\vnd.openxmlformats-officedocument.wordprocessingml.documents\\2024\\11\\27\\bad390b4-ad4f-4189-bbd6-687f53c5fca3_2024.6_杨景渊周报.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/octet-stream', 80, datetime.datetime(2024, 11, 27, 2, 26, 16, 549208), '2ef8f9cb-a146-4b18-983b-41f081378c0f')]
+(Background on this error at: https://sqlalche.me/e/20/9h9h)
+2024-11-27 10:26:16.555 | ERROR    | app.api.v1.chat:init_file_stream_chat:507 - 初始化流式文件聊天失败: 500: 文件保存失败: (pymysql.err.DataError) (1406, "Data too long for column 'file_type' at row 1")
+[SQL: INSERT INTO files (file_id, original_name, file_path, file_type, mime_type, file_size, created_at, user_session_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)]
+[parameters: ('bad390b4-ad4f-4189-bbd6-687f53c5fca3', '2024.6_杨景渊周报.docx', 'application\\vnd.openxmlformats-officedocument.wordprocessingml.documents\\2024\\11\\27\\bad390b4-ad4f-4189-bbd6-687f53c5fca3_2024.6_杨景渊周报.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/octet-stream', 80, datetime.datetime(2024, 11, 27, 2, 26, 16, 549208), '2ef8f9cb-a146-4b18-983b-41f081378c0f')]
+(Background on this error at: https://sqlalche.me/e/20/9h9h)
+2024-11-27 10:30:32.070 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 10:30:33.941 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 10:30:40.824 | ERROR    | app.services.chat:init_file_stream_chat:300 - 初始化流式文件聊天失败: 'AIClient' object has no attribute 'chat_model'
+2024-11-27 10:30:40.825 | ERROR    | app.api.v1.chat:init_file_stream_chat:502 - 初始化流式文件聊天失败: 503: API error: 初始化流式文件聊天失败: 'AIClient' object has no attribute 'chat_model'
+2024-11-27 11:35:40.408 | ERROR    | app.services.chat:init_file_stream_chat:300 - 初始化流式文件聊天失败: 'AIClient' object has no attribute 'chat_model'
+2024-11-27 11:35:40.676 | ERROR    | app.api.v1.chat:init_file_stream_chat:502 - 初始化流式文件聊天失败: 503: API error: 初始化流式文件聊天失败: 'AIClient' object has no attribute 'chat_model'
+2024-11-27 11:38:42.778 | ERROR    | app.services.chat:init_file_stream_chat:300 - 初始化流式文件聊天失败: 'AIClient' object has no attribute 'chat_model'
+2024-11-27 11:38:42.779 | ERROR    | app.api.v1.chat:init_file_stream_chat:502 - 初始化流式文件聊天失败: 503: API error: 初始化流式文件聊天失败: 'AIClient' object has no attribute 'chat_model'
+2024-11-27 11:39:06.189 | ERROR    | app.services.chat:init_file_stream_chat:300 - 初始化流式文件聊天失败: 'AIClient' object has no attribute 'chat_model'
+2024-11-27 11:39:06.201 | ERROR    | app.api.v1.chat:init_file_stream_chat:502 - 初始化流式文件聊天失败: 503: API error: 初始化流式文件聊天失败: 'AIClient' object has no attribute 'chat_model'
+2024-11-27 11:39:39.701 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 11:40:09.781 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 11:40:31.461 | ERROR    | app.services.chat:init_file_stream_chat:300 - 初始化流式文件聊天失败: AIClient.initialize_stream() got an unexpected keyword argument 'model'
+2024-11-27 11:40:31.462 | ERROR    | app.api.v1.chat:init_file_stream_chat:502 - 初始化流式文件聊天失败: 503: API error: 初始化流式文件聊天失败: AIClient.initialize_stream() got an unexpected keyword argument 'model'
+2024-11-27 11:41:19.783 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 11:41:21.654 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 11:41:31.115 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 11:41:32.974 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 11:41:34.959 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 11:41:43.541 | ERROR    | app.services.document_service:extract_text:44 - 文本提取失败: 'str' object has no attribute 'suffix'
+2024-11-27 11:50:41.777 | ERROR    | app.services.document_service:extract_text:44 - 文本提取失败: 'str' object has no attribute 'suffix'
+2024-11-27 11:58:41.779 | ERROR    | app.services.document_service:extract_text:44 - 文本提取失败: 'str' object has no attribute 'suffix'
+2024-11-27 12:16:24.836 | ERROR    | app.services.document_service:extract_text:44 - 文本提取失败: 'str' object has no attribute 'suffix'
+2024-11-27 15:10:30.260 | ERROR    | app.services.document_service:extract_text:44 - 文本提取失败: 'str' object has no attribute 'suffix'
+2024-11-27 15:55:26.921 | ERROR    | app.services.document_service:extract_text:44 - 文本提取失败: 'str' object has no attribute 'suffix'
+2024-11-27 16:05:12.994 | ERROR    | app.services.document_service:extract_text:44 - 文本提取失败: 'str' object has no attribute 'suffix'
+2024-11-27 16:06:43.948 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 16:06:50.817 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 16:07:37.889 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 16:07:39.761 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 16:07:41.612 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 16:07:58.594 | ERROR    | app.services.document_service:extract_text:44 - 文本提取失败: 'str' object has no attribute 'suffix'
+2024-11-27 16:10:07.259 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 16:10:09.157 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 16:10:24.657 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 16:10:26.515 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 16:10:28.339 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 16:16:33.561 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 16:16:35.488 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 16:17:53.123 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 16:17:54.955 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 16:20:24.139 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 16:20:25.964 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 16:20:36.542 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 16:20:38.608 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 16:23:49.052 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 16:23:50.924 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 16:23:52.681 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 16:24:06.170 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 17:54:39.237 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 17:54:55.836 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 17:54:57.719 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 17:54:59.596 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 17:56:09.234 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 17:56:11.179 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 17:56:33.610 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 17:56:35.479 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 17:56:37.247 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 17:56:44.600 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 17:56:46.497 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 17:57:01.688 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 17:57:03.554 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 17:57:05.340 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 17:57:15.806 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 17:57:17.651 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 17:57:19.457 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:02:19.760 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:02:21.645 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:02:44.468 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:02:46.295 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:02:48.827 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:02:50.639 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:05:30.148 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:05:56.076 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:05:58.125 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:08:10.948 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:08:12.907 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:08:15.013 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:08:43.984 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:08:45.934 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:09:09.033 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:09:11.082 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:09:13.051 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:09:15.048 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:09:17.019 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:10:08.882 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:10:29.958 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:10:31.774 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:10:39.324 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:10:41.182 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:10:51.302 | ERROR    | app.services.context:add_message:68 - 添加消息失败: 'MessageCreate' object has no attribute 'file_id'
+2024-11-27 18:10:51.303 | ERROR    | app.services.chat:initialize_stream_chat:102 - 初始化流式聊天失败: 500: Database error: 添加消息失败
+2024-11-27 18:10:51.303 | ERROR    | app.api.v1.chat:init_stream_chat:123 - 初始化流式聊天失败: 503: API error: 初始化流式聊天失败: 500: Database error: 添加消息失败
+2024-11-27 18:26:09.424 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:26:26.288 | ERROR    | app.services.context:add_message:68 - 添加消息失败: 'MessageCreate' object has no attribute 'file_id'
+2024-11-27 18:26:26.289 | ERROR    | app.services.chat:initialize_stream_chat:102 - 初始化流式聊天失败: 500: Database error: 添加消息失败
+2024-11-27 18:26:26.289 | ERROR    | app.api.v1.chat:init_stream_chat:123 - 初始化流式聊天失败: 503: API error: 初始化流式聊天失败: 500: Database error: 添加消息失败
+2024-11-27 18:27:42.789 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:27:44.724 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:27:46.646 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:27:48.479 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:32:43.475 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:32:45.376 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:32:50.518 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:32:52.479 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:32:54.343 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:36:04.835 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:36:06.806 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:36:12.150 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:36:14.011 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:36:15.852 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:36:34.069 | INFO     | app.services.chat:process_stream_chat:177 - 成功保存AI回复消息: conversation_id=4, parent_message_id=10, content_preview=这是一张抽象艺术风格的图像，主要由红色和橙色构成。
+
+在左上角到右下角有一条从深红渐变至亮黄的斜线，这条线条占据了整个画面的一半以上，并且有明显的弯曲弧度。
+背景是纯红色，与黄色曲线形成了鲜明对比，使...
+2024-11-27 18:37:05.669 | INFO     | app.services.chat:process_stream_chat:177 - 成功保存AI回复消息: conversation_id=5, parent_message_id=15, content_preview=这是一张包含两个按钮的图像，每个按钮都带有中文文字。
+
+第一个橙色渐变背景的按钮上写着“去发小红书”，而第二个紫色渐变背景的按钮则显示着“已发小红书？提交审核”。
+
+这些信息可能与某种社交媒体或应用程...
+2024-11-27 18:40:09.633 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:40:11.586 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:40:19.841 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:40:22.044 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:44:35.856 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:44:37.767 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:53:16.787 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:53:18.688 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:53:20.496 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:53:37.996 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:54:31.395 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:54:37.552 | ERROR    | app.api.v1.context:get_all_conversations:150 - 获取会话列表失败: The unique() method must be invoked on this Result, as it contains results that include joined eager loads against collections
+2024-11-27 18:54:37.635 | ERROR    | app.api.v1.context:get_all_conversations:150 - 获取会话列表失败: The unique() method must be invoked on this Result, as it contains results that include joined eager loads against collections
+2024-11-27 18:55:18.022 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:55:19.865 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 18:57:00.573 | ERROR    | app.services.document_service:extract_text_from_url:262 - 从URL提取文本失败: 不支持的文件类型: https://ai-assistant-wen.oss-cn-beijing.aliyuncs.com/chat/uploads/1732705019975-3ad47e4c-9a5c-40c2-bb97-7ca8fc21a834.txt
+2024-11-27 18:57:45.238 | ERROR    | app.services.document_service:extract_text_from_url:262 - 从URL提取文本失败: 不支持的文件类型: https://ai-assistant-wen.oss-cn-beijing.aliyuncs.com/chat/uploads/1732705064669-120884cc-3926-4881-b323-56b5be1d9314.txt
+2024-11-27 18:59:36.648 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 18:59:38.531 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:00:00.940 | ERROR    | app.services.document_service:extract_text_from_url:262 - 从URL提取文本失败: 不支持的文件类型: https://ai-assistant-wen.oss-cn-beijing.aliyuncs.com/chat/uploads/1732705200126-d3735012-edc6-44f9-9566-df3511faa6c5.txt
+2024-11-27 19:01:41.456 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:01:43.327 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:22:08.756 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:22:10.650 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:22:12.468 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:23:02.744 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:23:04.570 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:23:06.358 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:23:28.886 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:23:30.962 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:28:04.403 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:28:06.363 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:28:08.233 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:28:09.930 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:28:27.754 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:30:39.168 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:30:41.043 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:30:51.912 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:30:53.748 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:31:04.515 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:31:06.332 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:39:32.261 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:39:34.206 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:39:36.031 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:42:16.176 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:42:18.008 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:42:34.900 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:42:36.685 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:42:39.414 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:42:41.261 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:43:25.891 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:43:27.752 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:43:29.608 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:44:22.644 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:44:26.518 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:47:58.559 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:48:00.402 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:53:25.132 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:53:27.021 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:53:45.333 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:53:47.181 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:53:56.342 | ERROR    | app.services.chat:init_image_stream_chat:267 - 初始化流式图片聊天失败: 'MessageResponse' object has no attribute 'file_id'
+2024-11-27 19:53:56.343 | ERROR    | app.api.v1.chat:init_image_stream_chat:369 - 初始化流式图片聊天失败: 503: API error: 初始化流式图片聊天失败: 'MessageResponse' object has no attribute 'file_id'
+2024-11-27 19:54:56.840 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:56:28.086 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:56:35.900 | ERROR    | app.services.chat:init_image_stream_chat:267 - 初始化流式图片聊天失败: name 'File' is not defined
+2024-11-27 19:56:35.901 | ERROR    | app.api.v1.chat:init_image_stream_chat:369 - 初始化流式图片聊天失败: 503: API error: 初始化流式图片聊天失败: name 'File' is not defined
+2024-11-27 19:57:20.061 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:57:21.904 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:57:30.263 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:57:32.102 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 19:57:37.539 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 19:57:39.343 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:03:25.692 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:03:27.556 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:03:36.107 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:03:37.924 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:04:22.711 | INFO     | app.services.chat:process_stream_chat:177 - 成功保存AI回复消息: conversation_id=19, parent_message_id=83, content_preview=看起来您提到要分析的文件并没有成功上传或显示。如果您能尝试重新上传文件，或者提供文件的具体内容（如文本内容或图片描述），我将能够更好地帮助您进行分析。请告诉我更多细节！...
+2024-11-27 20:07:35.423 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:07:37.288 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:09:10.381 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:09:12.330 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:09:28.774 | ERROR    | app.api.v1.chat:stream_file_chat:535 - 处理文件分析流失败: 400: 会话未初始化，请先调用初始化接口
+2024-11-27 20:09:46.972 | ERROR    | app.api.v1.chat:stream_file_chat:535 - 处理文件分析流失败: 400: 会话未初始化，请先调用初始化接口
+2024-11-27 20:11:00.176 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:11:02.173 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:13:21.483 | ERROR    | app.api.v1.chat:handle_file_stream_chat:507 - 初始化流式文件聊天失败: (pymysql.err.DataError) (1406, "Data too long for column 'file_type' at row 1")
+[SQL: INSERT INTO files (file_id, original_name, file_path, file_type, mime_type, file_size, user_session_id, created_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)]
+[parameters: ('a02fd4df-ba1b-4485-b78c-625f8e08fb5c', 'ai赋能.docx', 'https://ai-assistant-wen.oss-cn-beijing.aliyuncs.com/chat/uploads/1732709601376-b3b0f7e6-a01c-40a3-a1a9-877cc645167f.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 0, 'd43f43bb-9491-4ba9-9cdd-4cb6c6552d04', datetime.datetime(2024, 11, 27, 12, 13, 21, 482669))]
+(Background on this error at: https://sqlalche.me/e/20/9h9h)
+2024-11-27 20:13:40.528 | ERROR    | app.api.v1.chat:handle_file_stream_chat:507 - 初始化流式文件聊天失败: (pymysql.err.DataError) (1406, "Data too long for column 'file_type' at row 1")
+[SQL: INSERT INTO files (file_id, original_name, file_path, file_type, mime_type, file_size, user_session_id, created_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)]
+[parameters: ('2e4f9b8f-7eca-40ed-bb39-a08de736cf53', 'ai赋能.docx', 'https://ai-assistant-wen.oss-cn-beijing.aliyuncs.com/chat/uploads/1732709620461-ba5dc702-d821-44e3-bf25-5bdc82881594.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 0, 'd43f43bb-9491-4ba9-9cdd-4cb6c6552d04', datetime.datetime(2024, 11, 27, 12, 13, 40, 527933))]
+(Background on this error at: https://sqlalche.me/e/20/9h9h)
+2024-11-27 20:18:33.065 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:18:34.948 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:18:45.414 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:18:47.309 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:18:53.049 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:18:54.925 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:23:18.073 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:23:19.931 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:23:41.057 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:23:42.877 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:24:01.013 | ERROR    | app.api.v1.chat:handle_file_stream_chat:513 - 处理文件流式聊天失败: extract_text() missing 1 required positional argument: 'file_path'
+2024-11-27 20:24:12.530 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:24:14.334 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:24:31.529 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:24:33.392 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:24:52.397 | ERROR    | app.api.v1.chat:handle_file_stream_chat:513 - 处理文件流式聊天失败: extract_text() missing 1 required positional argument: 'file_path'
+2024-11-27 20:25:34.007 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:25:35.910 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:25:49.290 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:25:51.149 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:26:13.074 | ERROR    | app.api.v1.chat:handle_file_stream_chat:508 - 处理文件流式聊天失败: 'content' is an invalid keyword argument for File
+2024-11-27 20:27:45.528 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:27:47.409 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:28:00.323 | ERROR    | app.services.chat:init_file_stream_chat:334 - 初始化流式文件聊天失败: 'File' object has no attribute 'content'
+2024-11-27 20:28:00.324 | ERROR    | app.api.v1.chat:handle_file_stream_chat:516 - 处理文件流式聊天失败: 503: API error: 初始化流式文件聊天失败: 'File' object has no attribute 'content'
+2024-11-27 20:30:28.275 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:30:30.135 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:34:19.106 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:34:20.993 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:34:55.690 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:34:57.510 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:36:49.135 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:36:51.003 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:37:09.235 | ERROR    | app.services.chat:extract_text:384 - 文本提取失败: 'utf-8' codec can't decode byte 0x91 in position 15: invalid start byte
+2024-11-27 20:38:03.473 | ERROR    | app.services.chat:extract_text:384 - 文本提取失败: 'utf-8' codec can't decode byte 0x91 in position 15: invalid start byte
+2024-11-27 20:39:17.484 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:39:19.375 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:47:56.073 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:47:57.911 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:54:28.829 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:54:30.777 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:54:31.943 | ERROR    | app.api.v1.context:get_all_conversations:157 - 获取会话列表失败: 4 validation errors for FileResponse
+file_id
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+original_name
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_type
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_path
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-27 20:54:31.994 | ERROR    | app.api.v1.context:get_all_conversations:157 - 获取会话列表失败: 4 validation errors for FileResponse
+file_id
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+original_name
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_type
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_path
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-27 20:54:59.234 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:55:01.380 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:55:03.269 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:55:06.978 | ERROR    | app.api.v1.context:get_all_conversations:157 - 获取会话列表失败: 4 validation errors for FileResponse
+file_id
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+original_name
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_type
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_path
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-27 20:55:07.099 | ERROR    | app.api.v1.context:get_all_conversations:157 - 获取会话列表失败: 4 validation errors for FileResponse
+file_id
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+original_name
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_type
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_path
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-27 20:55:32.721 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:55:34.656 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:55:35.914 | ERROR    | app.api.v1.context:get_all_conversations:157 - 获取会话列表失败: 4 validation errors for FileResponse
+file_id
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+original_name
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_type
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_path
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-27 20:55:35.967 | ERROR    | app.api.v1.context:get_all_conversations:157 - 获取会话列表失败: 4 validation errors for FileResponse
+file_id
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+original_name
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_type
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_path
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-27 20:55:51.552 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:55:53.570 | INFO     | app.utils.cache:init:29 - Redis连接成功
+<<<<<<< HEAD
+2024-11-28 15:46:03.264 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 15:47:10.364 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 15:47:13.548 | INFO     | app.utils.cache:init:29 - Redis连接成功
+=======
+2024-11-27 20:55:55.435 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:57:43.911 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:57:45.881 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:57:46.557 | ERROR    | app.api.v1.context:get_all_conversations:157 - 获取会话列表失败: 4 validation errors for FileResponse
+file_id
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+original_name
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_type
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_path
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-27 20:57:46.613 | ERROR    | app.api.v1.context:get_all_conversations:157 - 获取会话列表失败: 4 validation errors for FileResponse
+file_id
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+original_name
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_type
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+file_path
+  Field required [type=missing, input_value={'id': '12450dc4-5a77-470...: '2024-11-27T12:43:41'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-27 20:58:27.223 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:58:29.069 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:58:54.616 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:58:56.435 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:59:34.009 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:59:35.909 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:59:38.008 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:59:49.258 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 20:59:51.185 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:59:53.082 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:59:54.988 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 20:59:57.008 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 21:00:42.437 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 21:00:44.291 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-27 21:00:45.107 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-27 21:00:47.043 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 14:40:34.942 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 14:41:15.961 | ERROR    | app.services.chat:init_image_stream_chat:268 - 初始化流式图片聊天失败: 4 validation errors for FileResponse
+id
+  Field required [type=missing, input_value={'file_id': '63d2aeab-b09...-a18f-15e3893bbe0c.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+name
+  Field required [type=missing, input_value={'file_id': '63d2aeab-b09...-a18f-15e3893bbe0c.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+type
+  Field required [type=missing, input_value={'file_id': '63d2aeab-b09...-a18f-15e3893bbe0c.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+url
+  Field required [type=missing, input_value={'file_id': '63d2aeab-b09...-a18f-15e3893bbe0c.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-28 14:41:15.961 | ERROR    | app.api.v1.chat:init_image_stream_chat:369 - 初始化流式图片聊天失败: 503: API error: 初始化流式图片聊天失败: 4 validation errors for FileResponse
+id
+  Field required [type=missing, input_value={'file_id': '63d2aeab-b09...-a18f-15e3893bbe0c.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+name
+  Field required [type=missing, input_value={'file_id': '63d2aeab-b09...-a18f-15e3893bbe0c.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+type
+  Field required [type=missing, input_value={'file_id': '63d2aeab-b09...-a18f-15e3893bbe0c.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+url
+  Field required [type=missing, input_value={'file_id': '63d2aeab-b09...-a18f-15e3893bbe0c.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-28 14:41:51.993 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 14:41:55.414 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 14:42:04.147 | ERROR    | app.services.chat:init_image_stream_chat:268 - 初始化流式图片聊天失败: 4 validation errors for FileResponse
+id
+  Field required [type=missing, input_value={'file_id': 'dbc1b4d5-380...-9aa3-076aed29051a.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+name
+  Field required [type=missing, input_value={'file_id': 'dbc1b4d5-380...-9aa3-076aed29051a.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+type
+  Field required [type=missing, input_value={'file_id': 'dbc1b4d5-380...-9aa3-076aed29051a.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+url
+  Field required [type=missing, input_value={'file_id': 'dbc1b4d5-380...-9aa3-076aed29051a.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-28 14:42:04.155 | ERROR    | app.api.v1.chat:init_image_stream_chat:369 - 初始化流式图片聊天失败: 503: API error: 初始化流式图片聊天失败: 4 validation errors for FileResponse
+id
+  Field required [type=missing, input_value={'file_id': 'dbc1b4d5-380...-9aa3-076aed29051a.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+name
+  Field required [type=missing, input_value={'file_id': 'dbc1b4d5-380...-9aa3-076aed29051a.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+type
+  Field required [type=missing, input_value={'file_id': 'dbc1b4d5-380...-9aa3-076aed29051a.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+url
+  Field required [type=missing, input_value={'file_id': 'dbc1b4d5-380...-9aa3-076aed29051a.jpg'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-28 14:42:16.621 | ERROR    | app.services.chat:init_image_stream_chat:268 - 初始化流式图片聊天失败: 4 validation errors for FileResponse
+id
+  Field required [type=missing, input_value={'file_id': '5fae1c98-f83...-9de0-300020a9c46d.png'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+name
+  Field required [type=missing, input_value={'file_id': '5fae1c98-f83...-9de0-300020a9c46d.png'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+type
+  Field required [type=missing, input_value={'file_id': '5fae1c98-f83...-9de0-300020a9c46d.png'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+url
+  Field required [type=missing, input_value={'file_id': '5fae1c98-f83...-9de0-300020a9c46d.png'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-28 14:42:16.621 | ERROR    | app.api.v1.chat:init_image_stream_chat:369 - 初始化流式图片聊天失败: 503: API error: 初始化流式图片聊天失败: 4 validation errors for FileResponse
+id
+  Field required [type=missing, input_value={'file_id': '5fae1c98-f83...-9de0-300020a9c46d.png'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+name
+  Field required [type=missing, input_value={'file_id': '5fae1c98-f83...-9de0-300020a9c46d.png'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+type
+  Field required [type=missing, input_value={'file_id': '5fae1c98-f83...-9de0-300020a9c46d.png'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+url
+  Field required [type=missing, input_value={'file_id': '5fae1c98-f83...-9de0-300020a9c46d.png'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-28 14:42:38.675 | ERROR    | app.services.chat:init_file_stream_chat:334 - 初始化流式文件聊天失败: 4 validation errors for FileResponse
+id
+  Field required [type=missing, input_value={'file_id': '66062ddc-d10...-b390-a93368c35082.txt'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+name
+  Field required [type=missing, input_value={'file_id': '66062ddc-d10...-b390-a93368c35082.txt'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+type
+  Field required [type=missing, input_value={'file_id': '66062ddc-d10...-b390-a93368c35082.txt'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+url
+  Field required [type=missing, input_value={'file_id': '66062ddc-d10...-b390-a93368c35082.txt'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-28 14:42:38.687 | ERROR    | app.api.v1.chat:handle_file_stream_chat:516 - 处理文件流式聊天失败: 503: API error: 初始化流式文件聊天失败: 4 validation errors for FileResponse
+id
+  Field required [type=missing, input_value={'file_id': '66062ddc-d10...-b390-a93368c35082.txt'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+name
+  Field required [type=missing, input_value={'file_id': '66062ddc-d10...-b390-a93368c35082.txt'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+type
+  Field required [type=missing, input_value={'file_id': '66062ddc-d10...-b390-a93368c35082.txt'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+url
+  Field required [type=missing, input_value={'file_id': '66062ddc-d10...-b390-a93368c35082.txt'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.10/v/missing
+2024-11-28 14:46:30.738 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+>>>>>>> 93876ff... feat: 总结文档
+2024-11-28 16:19:01.207 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 16:20:33.046 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 16:20:36.274 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 16:21:06.962 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 16:22:09.363 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 16:22:22.259 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 16:25:18.383 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 16:25:20.700 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 16:25:22.483 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 18:43:29.615 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 18:45:56.420 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 18:45:58.341 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 18:46:00.266 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 18:46:02.126 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 18:47:13.668 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 18:47:57.163 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 18:49:59.335 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 18:50:22.392 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 18:53:07.293 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 18:54:26.540 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 19:35:25.536 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 19:35:32.612 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 19:35:40.698 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 19:39:41.456 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 19:39:43.883 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 19:39:46.393 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 19:40:12.050 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 19:40:14.030 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 19:40:16.052 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 19:40:16.668 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 19:40:18.611 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 19:40:22.344 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 19:40:28.977 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 19:41:04.876 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-28 19:41:29.816 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-28 19:41:43.975 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 09:28:15.739 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 09:47:04.645 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 09:47:06.633 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 09:47:26.457 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 09:47:28.395 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 09:47:31.534 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 09:47:33.379 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 09:48:10.806 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 09:48:12.810 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 09:48:14.749 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 09:48:38.295 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 09:48:40.222 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 09:48:42.089 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 09:49:46.371 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 09:49:48.430 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 09:49:50.342 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 09:49:53.980 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 09:49:55.940 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 09:49:57.791 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 09:50:04.647 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 09:50:06.613 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 09:52:22.819 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 09:52:24.690 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 09:52:36.467 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 09:52:38.353 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 10:01:39.113 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 10:03:05.466 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 10:03:42.096 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 11:16:04.989 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 12:34:56.793 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 12:35:00.731 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 12:35:02.735 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 12:46:43.926 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 12:47:57.301 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 13:01:41.327 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 13:08:40.481 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 13:11:33.241 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 13:56:43.879 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 13:56:54.776 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 14:08:50.945 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 14:15:30.519 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 14:15:31.473 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 14:15:36.957 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 14:16:04.882 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 14:16:33.720 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 14:16:43.878 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 14:24:56.524 | ERROR    | app.api.v1.handbooks:get_categories:47 - 获取分类列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'categories.updated_at' in 'field list'")
+[SQL: SELECT categories.id, categories.name, categories.created_at, categories.updated_at 
+FROM categories]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 14:26:22.803 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 14:29:28.170 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 15:57:08.037 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 15:58:34.969 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 17:27:17.709 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 17:28:11.467 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 17:36:10.128 | ERROR    | app.api.v1.handbooks:update_handbook:144 - 更新手册失败: The unique() method must be invoked on this Result, as it contains results that include joined eager loads against collections
+2024-11-29 17:37:34.720 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 17:37:36.757 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 17:37:38.784 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 17:37:57.902 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 17:37:59.941 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 17:38:01.170 | ERROR    | app.api.v1.handbooks:update_handbook:152 - 更新手册失败: name 'Handbook' is not defined
+2024-11-29 17:38:09.298 | ERROR    | app.api.v1.handbooks:update_handbook:152 - 更新手册失败: name 'Handbook' is not defined
+2024-11-29 17:38:53.914 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 17:38:55.857 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 17:39:03.195 | ERROR    | app.api.v1.handbooks:update_handbook:152 - 更新手册失败: name 'Handbook' is not defined
+2024-11-29 17:40:30.348 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 17:40:32.276 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 17:51:55.575 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 17:51:58.731 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 17:52:15.634 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 17:53:42.709 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 17:53:44.601 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 17:53:46.429 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:01:22.736 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:01:27.761 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:01:29.693 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:01:31.663 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:01:33.675 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:01:40.530 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:01:42.430 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:01:44.351 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:02:58.136 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:04:36.656 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:04:52.001 | ERROR    | app.api.v1.notes:get_notes:60 - 获取笔记列表失败: 'NoteService' object has no attribute 'get_notes'
+2024-11-29 18:06:18.697 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:06:20.609 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:06:26.059 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:06:27.944 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:06:31.683 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:06:33.650 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:08:24.130 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:08:26.076 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:08:31.433 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:08:33.356 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:08:37.802 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:08:39.755 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:08:41.775 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:08:44.009 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:08:45.937 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:08:50.830 | ERROR    | app.services.note_service:get_notes:164 - 获取笔记列表失败: Error creating backref 'notes' on relationship 'Note.tags': property of that name exists on mapper 'Mapper[Tag(tags)]'
+2024-11-29 18:08:50.831 | ERROR    | app.api.v1.notes:get_notes:65 - 获取笔记列表失败: 500: 获取笔记列表失败: Error creating backref 'notes' on relationship 'Note.tags': property of that name exists on mapper 'Mapper[Tag(tags)]'
+2024-11-29 18:08:50.833 | ERROR    | app.services.handbook_service:get_handbook:88 - 获取手册详情失败: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Note(notes)]'. Original exception was: Error creating backref 'notes' on relationship 'Note.tags': property of that name exists on mapper 'Mapper[Tag(tags)]'
+2024-11-29 18:10:06.504 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:10:08.428 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:10:32.441 | ERROR    | app.services.note_service:get_notes:164 - 获取笔记列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'tags_1.updated_at' in 'field list'")
+[SQL: SELECT anon_1.id, anon_1.title, anon_1.content, anon_1.message_ids, anon_1.priority, anon_1.status, anon_1.is_shared, anon_1.handbook_id, anon_1.created_at, anon_1.updated_at, tags_1.id AS id_1, tags_1.name, tags_1.created_at AS created_at_1, tags_1.updated_at AS updated_at_1, note_attachments_1.id AS id_2, note_attachments_1.note_id, note_attachments_1.file_id, note_attachments_1.created_at AS created_at_2 
+FROM (SELECT notes.id AS id, notes.title AS title, notes.content AS content, notes.message_ids AS message_ids, notes.priority AS priority, notes.status AS status, notes.is_shared AS is_shared, notes.handbook_id AS handbook_id, notes.created_at AS created_at, notes.updated_at AS updated_at 
+FROM notes 
+WHERE notes.handbook_id = %s ORDER BY notes.created_at DESC 
+ LIMIT %s, %s) AS anon_1 LEFT OUTER JOIN (note_tags AS note_tags_1 INNER JOIN tags AS tags_1 ON tags_1.id = note_tags_1.tag_id) ON anon_1.id = note_tags_1.note_id LEFT OUTER JOIN note_attachments AS note_attachments_1 ON anon_1.id = note_attachments_1.note_id ORDER BY anon_1.created_at DESC]
+[parameters: (1, 0, 10)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 18:10:32.444 | ERROR    | app.api.v1.notes:get_notes:65 - 获取笔记列表失败: 500: 获取笔记列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'tags_1.updated_at' in 'field list'")
+[SQL: SELECT anon_1.id, anon_1.title, anon_1.content, anon_1.message_ids, anon_1.priority, anon_1.status, anon_1.is_shared, anon_1.handbook_id, anon_1.created_at, anon_1.updated_at, tags_1.id AS id_1, tags_1.name, tags_1.created_at AS created_at_1, tags_1.updated_at AS updated_at_1, note_attachments_1.id AS id_2, note_attachments_1.note_id, note_attachments_1.file_id, note_attachments_1.created_at AS created_at_2 
+FROM (SELECT notes.id AS id, notes.title AS title, notes.content AS content, notes.message_ids AS message_ids, notes.priority AS priority, notes.status AS status, notes.is_shared AS is_shared, notes.handbook_id AS handbook_id, notes.created_at AS created_at, notes.updated_at AS updated_at 
+FROM notes 
+WHERE notes.handbook_id = %s ORDER BY notes.created_at DESC 
+ LIMIT %s, %s) AS anon_1 LEFT OUTER JOIN (note_tags AS note_tags_1 INNER JOIN tags AS tags_1 ON tags_1.id = note_tags_1.tag_id) ON anon_1.id = note_tags_1.note_id LEFT OUTER JOIN note_attachments AS note_attachments_1 ON anon_1.id = note_attachments_1.note_id ORDER BY anon_1.created_at DESC]
+[parameters: (1, 0, 10)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 18:10:53.520 | ERROR    | app.services.note_service:get_notes:164 - 获取笔记列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'tags_1.updated_at' in 'field list'")
+[SQL: SELECT anon_1.id, anon_1.title, anon_1.content, anon_1.message_ids, anon_1.priority, anon_1.status, anon_1.is_shared, anon_1.handbook_id, anon_1.created_at, anon_1.updated_at, tags_1.id AS id_1, tags_1.name, tags_1.created_at AS created_at_1, tags_1.updated_at AS updated_at_1, note_attachments_1.id AS id_2, note_attachments_1.note_id, note_attachments_1.file_id, note_attachments_1.created_at AS created_at_2 
+FROM (SELECT notes.id AS id, notes.title AS title, notes.content AS content, notes.message_ids AS message_ids, notes.priority AS priority, notes.status AS status, notes.is_shared AS is_shared, notes.handbook_id AS handbook_id, notes.created_at AS created_at, notes.updated_at AS updated_at 
+FROM notes 
+WHERE notes.handbook_id = %s ORDER BY notes.created_at DESC 
+ LIMIT %s, %s) AS anon_1 LEFT OUTER JOIN (note_tags AS note_tags_1 INNER JOIN tags AS tags_1 ON tags_1.id = note_tags_1.tag_id) ON anon_1.id = note_tags_1.note_id LEFT OUTER JOIN note_attachments AS note_attachments_1 ON anon_1.id = note_attachments_1.note_id ORDER BY anon_1.created_at DESC]
+[parameters: (1, 0, 10)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 18:10:53.524 | ERROR    | app.api.v1.notes:get_notes:65 - 获取笔记列表失败: 500: 获取笔记列表失败: (pymysql.err.OperationalError) (1054, "Unknown column 'tags_1.updated_at' in 'field list'")
+[SQL: SELECT anon_1.id, anon_1.title, anon_1.content, anon_1.message_ids, anon_1.priority, anon_1.status, anon_1.is_shared, anon_1.handbook_id, anon_1.created_at, anon_1.updated_at, tags_1.id AS id_1, tags_1.name, tags_1.created_at AS created_at_1, tags_1.updated_at AS updated_at_1, note_attachments_1.id AS id_2, note_attachments_1.note_id, note_attachments_1.file_id, note_attachments_1.created_at AS created_at_2 
+FROM (SELECT notes.id AS id, notes.title AS title, notes.content AS content, notes.message_ids AS message_ids, notes.priority AS priority, notes.status AS status, notes.is_shared AS is_shared, notes.handbook_id AS handbook_id, notes.created_at AS created_at, notes.updated_at AS updated_at 
+FROM notes 
+WHERE notes.handbook_id = %s ORDER BY notes.created_at DESC 
+ LIMIT %s, %s) AS anon_1 LEFT OUTER JOIN (note_tags AS note_tags_1 INNER JOIN tags AS tags_1 ON tags_1.id = note_tags_1.tag_id) ON anon_1.id = note_tags_1.note_id LEFT OUTER JOIN note_attachments AS note_attachments_1 ON anon_1.id = note_attachments_1.note_id ORDER BY anon_1.created_at DESC]
+[parameters: (1, 0, 10)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2024-11-29 18:12:25.478 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:12:27.439 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:12:39.022 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:12:40.924 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:12:44.976 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:12:46.896 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:14:34.764 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 18:14:36.739 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 18:15:05.220 | INFO     | app.utils.cache:close:37 - Redis连接已关闭
+2024-11-29 19:13:43.504 | ERROR    | app.utils.cache:init:31 - Redis连接失败: Error Multiple exceptions: [Errno 10061] Connect call failed ('::1', 6379, 0, 0), [Errno 10061] Connect call failed ('127.0.0.1', 6379) connecting to localhost:6379.
+2024-11-29 19:14:29.375 | ERROR    | app.utils.cache:init:31 - Redis连接失败: Error Multiple exceptions: [Errno 10061] Connect call failed ('::1', 6379, 0, 0), [Errno 10061] Connect call failed ('127.0.0.1', 6379) connecting to localhost:6379.
+2024-11-29 19:17:13.776 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 19:36:58.779 | INFO     | app.utils.cache:init:29 - Redis连接成功
+2024-11-29 19:54:39.892 | INFO     | app.utils.cache:close:37 - Redis连接已关闭

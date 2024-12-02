@@ -181,38 +181,38 @@ function getFilePreview(file: File) {
 
 <template>
   <div class="chat-input">
-    <!-- 引用消息 -->
-    <div v-if="quotedMessage" class="quoted-message">
-      <div class="quote-content">
-        <span class="quote-text">{{ quotedMessage.content }}</span>
-        <van-icon name="cross" @click="removeQuote" />
-      </div>
+    <div class="toolbar">
+      
+      <van-uploader
+      accept=".txt,.pdf,.docx,.epub,.md,image/*"
+      :max-size="2000 * 1024"
+      :max-count="1"
+      :before-read="beforeUpload"
+      :after-read="handleFileUpload"
+      >
+      <van-button size="small" icon="photograph">
+        上传文件
+      </van-button>
+    </van-uploader>
+    
+    <VoiceInput @input="handleVoiceInput" />
+    <!-- 选择模式切换按钮 -->
+    <slot name="toolbar-right" />
     </div>
     
     <div class="input-area">
-      <div class="toolbar">
-        <van-uploader
-          accept=".txt,.pdf,.docx,.epub,.md,image/*"
-          :max-size="2000 * 1024"
-          :max-count="1"
-          :before-read="beforeUpload"
-          :after-read="handleFileUpload"
-        >
-          <van-button size="small" icon="photograph">
-            上传文件
-          </van-button>
-        </van-uploader>
-        
-        <VoiceInput @input="handleVoiceInput" />
-      </div>
-
       <van-field
         v-model="messageText"
         type="textarea"
         placeholder="输入消息，Shift + Enter 换行"
         rows="3"
         autosize
-        @keydown.enter.prevent="handleSend"
+        @keydown.enter="(e: KeyboardEvent) => {
+          if (!e.shiftKey) {
+            e.preventDefault()
+            handleSend()
+          }
+        }"
         ref="inputRef"
       >
         <template #button>

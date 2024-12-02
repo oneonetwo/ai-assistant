@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useHandbookStore } from '@/stores/handbook'
+import { useNoteEditorStore } from '@/stores/noteEditor'
 import { showToast } from 'vant'
 import type { Note, NotePriority, NoteStatus } from '@/types/handbook'
 import TagSelector from './TagSelector.vue'
@@ -9,16 +10,31 @@ import TagSelector from './TagSelector.vue'
 const route = useRoute()
 const router = useRouter()
 const store = useHandbookStore()
+const noteEditorStore = useNoteEditorStore()
+
 const noteId = route.params.id as string
 const handbookId = route.query.handbook as string
 const isNew = route.fullPath.includes('/new')
+<<<<<<< HEAD
+=======
+
+// 从 store 中获取数据
+const title = ref(noteEditorStore.draftTitle || '')
+const content = ref(noteEditorStore.draftContent || '')
+const messageIds = ref(noteEditorStore.draftMessageIds || [])
+
+// 在组件卸载时清除草稿数据
+onUnmounted(() => {
+  noteEditorStore.clearDraft()
+})
+
+>>>>>>> 3762c67ba2a7948f605513e7893eb2a10c5450a7
 // 表单数据
-const title = ref('')
-const content = ref('')
+
 const selectedTags = ref<string[]>([])
 const priority = ref<NotePriority>('medium')
 const status = ref<NoteStatus>('待复习')
-const isShared = ref(false)
+const canShare = ref(true)
 const newTagName = ref('')
 
 // 文件上传
@@ -29,6 +45,10 @@ onMounted(async () => {
   await store.fetchTags()
   if (!isNew) {
     await loadNote()
+  } else {
+    // 新建笔记时默认设置为待复习
+    status.value = '待复习'
+    canShare.value = true
   }
 })
 
@@ -41,7 +61,7 @@ async function loadNote() {
     selectedTags.value = note.tags.map(tag => tag.name)
     priority.value = note.priority
     status.value = note.status
-    isShared.value = note.is_shared
+    canShare.value = note.is_shared
     // 加载附件列表
     fileList.value = note.attachments.map(attachment => ({
       url: attachment.file_path,
@@ -107,7 +127,8 @@ async function handleSave() {
       tags: selectedTags.value,
       priority: priority.value,
       status: status.value,
-      is_shared: isShared.value,
+      is_shared: canShare.value,
+      message_ids: messageIds.value,
       attachments: fileList.value.map(file => ({
         url: file.url,
         file_name: file.name
@@ -190,17 +211,14 @@ async function handleSave() {
             </van-radio-group>
           </template>
         </van-field>
-
         <van-field
           label="状态"
           readonly
         >
           <template #input>
-            <van-radio-group v-model="status" direction="horizontal">
-              <van-radio name="待复习">待复习</van-radio>
-              <van-radio name="复习中">复习中</van-radio>
-              <van-radio name="已完成">已完成</van-radio>
-            </van-radio-group>
+            <div class="status-cell">
+              <span :class="['status-text', `status-${status}`]">{{ status }}</span>
+            </div>
           </template>
         </van-field>
       </van-cell-group>
@@ -233,9 +251,9 @@ async function handleSave() {
 
       <!-- 分享设置 -->
       <van-cell-group>
-        <van-cell title="公开分享">
+        <van-cell title="是否能进行分享">
           <template #right-icon>
-            <van-switch v-model="isShared" />
+            <van-switch v-model="canShare" />
           </template>
         </van-cell>
       </van-cell-group>
@@ -274,6 +292,60 @@ async function handleSave() {
     
     .attachment-list {
       margin-top: var(--van-padding-md);
+    }
+  }
+
+  .status-text {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    
+    &.status-待复习 {
+      background-color: #fef0f0;
+      color: #f56c6c;
+    }
+    
+    &.status-复习中 {
+      background-color: #e6f7ff;
+      color: #1890ff;
+    }
+    
+    &.status-已完成 {
+      background-color: #f6ffed;
+      color: #52c41a;
+    }
+  }
+
+  .status-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .status-label {
+      white-space: nowrap;
+    }
+
+    .status-text {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 14px;
+      
+      &.status-待复习 {
+        background-color: #fef0f0;
+        color: #f56c6c;
+      }
+      
+      &.status-复习中 {
+        background-color: #e6f7ff;
+        color: #1890ff;
+      }
+      
+      &.status-已完成 {
+        background-color: #f6ffed;
+        color: #52c41a;
+      }
     }
   }
 }

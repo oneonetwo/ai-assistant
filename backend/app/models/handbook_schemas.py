@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional, Dict, Any
 from datetime import datetime
+from app.models.schemas import MessageResponse  # 导入消息响应模型
 
 class CategoryBase(BaseModel):
     name: str = Field(..., max_length=50)
@@ -38,8 +39,9 @@ class HandbookResponse(HandbookBase):
 class TagBase(BaseModel):
     name: str = Field(..., max_length=50)
 
-class TagCreate(TagBase):
-    pass
+class TagCreate(BaseModel):
+    """创建标签请求模型"""
+    name: str = Field(..., min_length=1, max_length=50, description="标签名称")
 
 class TagResponse(BaseModel):
     id: int
@@ -65,6 +67,16 @@ class FileResponse(BaseModel):
     mime_type: Optional[str] = None
     file_size: Optional[int] = None
 
+class NoteAttachmentResponse(BaseModel):
+    id: int
+    note_id: int
+    file_id: str
+    created_at: datetime
+    file: Optional[FileResponse] = None
+
+    class Config:
+        from_attributes = True
+
 class NoteBase(BaseModel):
     title: str = Field(..., max_length=200)
     content: Optional[str] = None
@@ -87,13 +99,19 @@ class NoteUpdate(BaseModel):
     is_shared: Optional[bool] = None
     tags: Optional[List[str]] = None
 
-class NoteResponse(NoteBase):
+class NoteResponse(BaseModel):
     id: int
-    times: int
-    tags: List[TagResponse]
-    attachments: List[FileResponse] = []
+    title: str
+    content: Optional[str]
+    messages: List[MessageResponse] = []  # 修改为messages字段,使用MessageResponse模型
+    priority: Optional[str] = "medium"
+    status: Optional[str] = "draft"
+    is_shared: Optional[bool] = False
+    handbook_id: int
     created_at: datetime
     updated_at: datetime
+    tags: List[TagResponse] = []
+    attachments: List[NoteAttachmentResponse] = []
 
     class Config:
         from_attributes = True

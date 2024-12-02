@@ -1,3 +1,4 @@
+import type { Message } from '@/types/chat'
 import { request } from '@/utils/request'
 
 const API_BASE_URL = '/api/v1'
@@ -73,8 +74,8 @@ export class ChatClient {
   private sessionId: string
   private baseUrl: string
 
-  constructor(sessionId: string) {
-    this.sessionId = sessionId
+  constructor(sessionId?: string) {
+    this.sessionId = sessionId || ''
     this.baseUrl = `${API_BASE_URL}/chat`
   }
 
@@ -143,6 +144,68 @@ export class ChatClient {
 
     } catch (error) {
       onError(error as Error)
+    }
+  }
+
+  async streamAnalyze(
+    messages: Pick<Message, 'role' | 'content' | 'id'>[],
+    systemPrompt: string,
+    callbacks: {
+      onStart?: () => void
+      onChunk?: (content: string, section: string, fullText: string) => void
+      onEnd?: () => void
+      onError?: (error: Error) => void
+    } = {}
+  ) {
+    try {
+      // 初始化分析
+      const response = await request.post(`${this.baseUrl}/analyze/stream/init`, {
+        messages,
+        system_prompt: systemPrompt
+      })
+
+      // 建立 SSE 连接
+      const url = new URL(`${window.location.origin}/api${this.baseUrl}/analyze/stream/${response.session_id}`)
+      const eventSource = new EventSource(url.toString())
+      let fullText = ''
+      eventSource.onmessage = (event) => {
+        try {
+          const response = JSON.parse(event.data)
+          
+          switch (response.type) {
+            case 'start':
+              callbacks.onStart?.()
+              break
+              
+            case 'chunk':
+              callbacks.onChunk?.(
+                response.data.content, 
+                response.data.section,
+                response.data.full_text
+              )
+              break
+              
+            case 'end':
+              callbacks.onEnd?.()
+              eventSource.close()
+              break
+              
+            case 'error':
+              throw new Error(response.data.message)
+          }
+        } catch (error) {
+          eventSource.close()
+          callbacks.onError?.(error as Error)
+        }
+      }
+
+      eventSource.onerror = (error) => {
+        eventSource.close()
+        callbacks.onError?.(error as Error)
+      }
+
+    } catch (error) {
+      callbacks.onError?.(error as Error)
     }
   }
 }

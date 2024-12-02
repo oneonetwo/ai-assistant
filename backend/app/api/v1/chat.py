@@ -26,7 +26,7 @@ from app.core.config import settings
 import json
 import asyncio
 import uuid
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import base64
 from io import BytesIO
 import imghdr
@@ -34,6 +34,7 @@ import aiohttp
 import io
 from docx import Document
 from pathlib import Path
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -611,6 +612,94 @@ async def handle_file_stream_chat(
 
     except Exception as e:
         app_logger.error(f"处理文件流式聊天失败: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        ) 
+
+class Message(BaseModel):
+    role: str
+    content: str
+    id: int
+
+class MessageAnalysisRequest(BaseModel):
+    messages: List[Message]
+    system_prompt: Optional[str] = None
+
+class MessageAnalysisInitResponse(BaseModel):
+    status: str
+    session_id: str
+
+@router.post("/analyze/stream/init",
+    response_model=MessageAnalysisInitResponse,
+    summary="初始化消息分析流",
+    description="初始化一个或多个消息的分析流")
+async def init_message_analysis_stream(
+    request: MessageAnalysisRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    初始化消息分析流
+    
+    - **messages**: 消息内容列表
+    - **system_prompt**: 可选的系统提示
+    
+    Returns:
+        MessageAnalysisInitResponse: 包含初始化状态和会话ID
+    """
+    try:
+        # 转换消息格式
+        messages = [
+            {
+                "role": msg.role,
+                "content": msg.content,
+                "id": msg.id
+            }
+            for msg in request.messages
+        ]
+        
+        # 获取会话ID
+        session_id = await chat_service.initialize_message_analysis_stream(
+            messages=messages,
+            system_prompt=request.system_prompt
+        )
+        
+        return MessageAnalysisInitResponse(
+            status="initialized",
+            session_id=session_id
+        )
+    except Exception as e:
+        app_logger.error(f"初始化消息分析流失败: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="初始化消息分析流失败"
+        )
+
+@router.get("/analyze/stream/{session_id}",
+    response_class=StreamingResponse,
+    summary="获取消息分析流式响应"
+)
+async def get_message_analysis_stream(session_id: str):
+    """获取消息分析的流式响应
+    
+    Args:
+        session_id: 分析会话ID
+    """
+    try:
+        return StreamingResponse(
+            chat_service.get_message_analysis_stream(session_id),  # 传入session_id
+            media_type='text/event-stream',
+            headers={
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+                'Content-Type': 'text/event-stream',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type',
+            }
+        )
+    except Exception as e:
+        app_logger.error(f"获取消息分析流失败: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)

@@ -82,6 +82,14 @@ const routes: Array<RouteRecordRaw> = [
         }
       },
       {
+        path: 'notes/:id/detail',
+        name: 'note-detail',
+        component: () => import('@/views/handbook/NoteDetailView.vue'),
+        meta: {
+          title: '笔记详情'
+        }
+      },
+      {
         path: 'tags',
         name: 'tags',
         component: () => import('@/views/handbook/TagManagerView.vue'),
@@ -97,6 +105,14 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/SettingsView.vue'),
     meta: {
       title: '设置'
+    }
+  },
+  {
+    path: '/analyze',
+    name: 'analyze',
+    component: () => import('@/views/analyze/AnalyzeView.vue'),
+    meta: {
+      title: '分析整理'
     }
   },
   {

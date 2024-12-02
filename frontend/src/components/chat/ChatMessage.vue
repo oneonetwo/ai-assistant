@@ -1,5 +1,18 @@
 <template>
-  <div class="message" :class="message.role">
+  <div 
+    class="message" 
+    :class="[
+      message.role,
+      { 'selectable': isSelectable },
+      { 'selected': isSelected }
+    ]"
+    @click="handleMessageClick"
+  >
+    <div class="select-box" v-if="isSelectable" @:click.stop="handleSelect">
+      <van-checkbox 
+        :model-value="isChecked"
+      />
+    </div>
     <div class="avatar">
       {{ message.role === 'assistant' ? 'AI' : '你' }}
     </div>
@@ -29,7 +42,7 @@
         <div class="markdown-body" v-html="renderedContent" />
       </div>
       <Transition name="fade">
-        <div v-if="showActions" class="actions">
+        <div v-if="showActions && !isSelectable" class="actions">
           <van-button size="mini" @click="$emit('quote', message)">
             <template #icon><svg-icon name="quote" /></template>
             引用
@@ -60,13 +73,28 @@ const props = defineProps<{
     id: string
     role: 'user' | 'assistant'
     content: string
-    file: {
+    file?: {
       file_path: string
       original_name: string
       file_type: string
     }
   }
+  showActions?: boolean
+  isSelectable?: boolean
+  isSelected?: boolean
 }>()
+
+const isChecked = computed(() => props.isSelected)
+
+const emit = defineEmits<{
+  (e: 'quote', message: Message): void
+  (e: 'edit', message: Message): void
+  (e: 'copy', message: Message): void
+  (e: 'select', messageId: string): void
+}>()
+const handleSelect = (e: any) => {
+  emit('select', props.message.id)
+}
 
 const md = new MarkdownIt({
   highlight: function (str, lang) {
@@ -122,6 +150,12 @@ watch(
     // 处理 content 变化的逻辑
   }
 )
+
+function handleMessageClick() {
+  if (props.isSelectable) {
+    emit('select', props.message.id)
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -245,6 +279,67 @@ watch(
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+  }
+}
+
+.message {
+  position: relative;
+  
+  &.selectable {
+    padding-right: 40px;
+    
+    &:hover {
+      background: var(--van-background-2);
+    }
+    
+    &.selected {
+      background: var(--van-primary-light);
+    }
+  }
+  
+  .select-box {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.2s;
+    
+    .van-checkbox {
+      padding: 4px;
+      border-radius: 4px;
+      background: var(--van-background);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+  
+  .select-box {
+    opacity: 1;
+  }
+  
+  &.selected .select-box {
+    opacity: 1;
+  }
+}
+
+.select-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 8px 0;
+  
+  .van-button {
+    border-radius: 16px;
+    padding: 0 16px;
+    
+    &--primary {
+      background: var(--van-primary-color);
+      border: none;
+      
+      &:disabled {
+        opacity: 0.6;
+      }
     }
   }
 }

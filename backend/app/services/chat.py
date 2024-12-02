@@ -1,4 +1,4 @@
-from typing import List, Dict, AsyncGenerator, Optional
+from typing import List, Dict, Any, Optional, AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.services.context import get_conversation, add_message, get_context_messages
 from app.models.schemas import MessageCreate
@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 import aiofiles
 import aiohttp
+import uuid
 
 async def process_chat(
     db: AsyncSession,
@@ -74,7 +75,7 @@ async def initialize_stream_chat(
     """初始化流式聊天"""
     conversation = await get_conversation(db, session_id)
     if not conversation:
-        raise NotFoundError(detail=f"会话 {session_id} 不存在")
+        raise NotFoundError(detail=f"话 {session_id} 不存在")
 
     try:
         # 保存用户消息
@@ -236,7 +237,7 @@ async def init_image_stream_chat(
         messages = []
         for msg in context_messages[:-1]:  # 排除最后条消息
             message_data = {"role": msg.role, "content": msg.content}
-            if msg.file_id:  # 如果消息有关联文件，添加文件信息
+            if msg.file_id:  # 如果消息关联文件，添加文件信息
                 # 获取文件信息
                 file_query = select(File).where(File.file_id == msg.file_id)
                 result = await db.execute(file_query)
@@ -265,7 +266,7 @@ async def init_image_stream_chat(
         )
 
     except Exception as e:
-        app_logger.error(f"初始化流式图片聊天失败: {str(e)}")
+        app_logger.error(f"始化流式图片聊天失败: {str(e)}")
         raise APIError(detail=f"初始化流式图片聊天失败: {str(e)}")
 
 async def init_file_stream_chat(
@@ -397,3 +398,112 @@ async def extract_text(file_path: str) -> str:
     except Exception as e:
         app_logger.error(f"文本提取失败: {str(e)}")
         return f"文本提取失败: {str(e)}"
+
+async def initialize_message_analysis_stream(
+    messages: List[Dict[str, Any]],
+    system_prompt: Optional[str] = None
+) -> str:
+    """初始化消息分析流
+    
+    Args:
+        messages: 消息列表，每个消息包含 role 和 content
+        system_prompt: 可选的系统提示
+    
+    Returns:
+        str: 分析会话ID
+    """
+    try:
+        print("process_message_analysis_stream***********************")
+        # 构建分析提示
+        message_texts = []
+        for msg in messages:
+            # 使用字典访问语法获取role和content
+            formatted_msg = f"{msg['role']}: {msg['content']}"
+            message_texts.append(formatted_msg)
+            
+        combined_message = "\n".join(message_texts)
+        analysis_prompt = f"""请分析以下对话内容:
+{combined_message}
+
+请提供:
+1. 一个不超过30个字的精简标题
+2. 提取有效的关键字
+3. 请分析内容，结构清晰，内容完整
+
+输出格式:
+标题: <标题>
+
+关键字: <关键字>
+
+ <分析内容>"""
+
+        # 构建消息列表
+        prompt_messages = []
+        if system_prompt:
+            prompt_messages.append({"role": "system", "content": system_prompt})
+        prompt_messages.append({"role": "user", "content": analysis_prompt})
+        # 初始化分析流并返回会话ID
+        session_id = await ai_client.initialize_analysis_stream(
+            messages=prompt_messages,
+            temperature=0.7
+        )
+        app_logger.info(f"成功初始化消息分析流，会话ID: {session_id}")
+        return session_id
+    except Exception as e:
+        app_logger.error(f"初始化消息分析流失败: {str(e)}")
+        raise APIError(f"初始化消息分析流失败: {str(e)}")
+
+async def get_message_analysis_stream(session_id: str) -> AsyncGenerator[str, None]:
+    """获取消息分析的流式响应"""
+    try:
+        # 发送开始事件
+        yield f"data: {json.dumps({'type': 'start', 'data': {}}, ensure_ascii=False)}\n\n"
+        
+        # 检查会话是否存在
+        is_active = await ai_client.is_session_active(session_id)
+        if not is_active:
+            error_data = {
+                'type': 'error',
+                'data': {
+                    'message': '会话未初始化或已过期'
+                }
+            }
+            yield f"data: {json.dumps(error_data, ensure_ascii=False)}\n\n"
+            return
+
+        full_response = ""
+        async for chunk in ai_client.get_analysis_stream(session_id):
+            # 确保chunk是UTF-8编码
+            if isinstance(chunk, bytes):
+                chunk = chunk.decode('utf-8')
+            
+            full_response += chunk
+            # 构建数据块事件并确保使用UTF-8编码
+            chunk_data = {
+                'type': 'chunk',
+                'data': {
+                    'content': chunk,
+                    'section': 'analysis',
+                    'full_text': full_response
+                }
+            }
+            yield f"data: {json.dumps(chunk_data, ensure_ascii=False)}\n\n".encode('utf-8').decode('utf-8')
+
+        # 发送结束事件
+        end_data = {
+            'type': 'end',
+            'data': {
+                'full_text': full_response
+            }
+        }
+        yield f"data: {json.dumps(end_data, ensure_ascii=False)}\n\n".encode('utf-8').decode('utf-8')
+
+    except Exception as e:
+        app_logger.error(f"获取消息分析流失败: {str(e)}")
+        error_data = {
+            'type': 'error',
+            'data': {
+                'message': str(e)
+            }
+        }
+        yield f"data: {json.dumps(error_data, ensure_ascii=False)}\n\n"

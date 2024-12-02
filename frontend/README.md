@@ -312,3 +312,24 @@ UI 框架：Vant
    - [ ] 性能优化
    - [ ] 单元测试
    - [ ] UI/UX优化
+   
+###  1. 现在进行v1.2.1 功能的开发  2024-12-01
+1. AI聊天助手页面点击‘收录到笔记’按钮，可以对自己或者ai回答的message进行多条选择，有选择的条目之后，‘收录完成进行分析整理’按钮可以进行操作，点击‘收录完成进行分析整理’按钮，进入到一个新的分析整理的页面
+2. 到达分析整理的页面，发送请求到后端，是个流式响应的接口， /api/v1/chat/analyze/stream/init  post,  参数是 {
+  "messages": [
+    {message对象}
+  ],
+  "system_prompt": "string"
+} 
+sse接口/api/v1/chat/analyze/stream
+3. 后端处理完成之后，返回格式如下               onChunk(
+                response.data.content, 
+                response.data.section,
+                fullText
+              )， 
+4. 等后端处理完成之后，出现下拉选择框，取消按钮，创建笔记按钮，取消按钮则返回ai聊天页面，创建笔记按钮则进入到创建笔记页面。把生成的title，content，messageIds，handbookId带到创建笔记页面。
+system_protmpt:
+You are an AI assistant skilled in summarizing conversations. You will be provided with several dialogues between a user (who is a lifelong learner, student) and GPT. Your task is to extract the key insights and main ideas from each dialogue and provide a cohesive summary of all the conversations. Focus on identifying important concepts, any overarching themes, and key takeaways from the dialogues, while disregarding irrelevant or minor details. The summary should provide clarity and focus on the essence of the discussions, even if the viewpoints are diverse.
+Please ensure that the summary reflects the intellectual depth and learning journey of the user, capturing how their thoughts have evolved over the course of the conversations. 
+你是人工智能助手，擅长概括对话内容。你将获得几段用户（终身学习者）与 GPT 之间的对话。你的任务是从每个对话中提取关键见解和主要思想，并提供所有对话的连贯总结。重点在于识别重要概念、任何贯穿始终的主题以及对话的关键要点，同时忽略无关或次要的细节。总结应提供清晰度，并专注于讨论的本质，即使观点多样。
+请确保摘要能够反映用户的思维深度和学习历程，捕捉他们在对话过程中思想的演变过程。

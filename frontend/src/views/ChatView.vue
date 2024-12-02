@@ -8,6 +8,10 @@ import MessageSkeleton from '@/components/chat/MessageSkeleton.vue'
 import MessageQuote from '@/components/chat/MessageQuote.vue'
 import ConversationList from '@/components/chat/ConversationList.vue'
 import WelcomeScreen from '@/components/chat/WelcomeScreen.vue'
+import { useRoute, useRouter } from 'vue-router'
+import { analyzeSystemPrompt } from '@/utils/prompt'
+import type { Message } from '@/types/chat'
+import AnalyzeOverlay from '@/components/analyze/AnalyzeOverlay.vue'
 
 const chatStore = useChatStore()
 const containerRef = ref<HTMLElement | null>(null)
@@ -15,6 +19,11 @@ const inputRef = ref<InstanceType<typeof ChatInput>>()
 const quotedMessage = ref<Message | null>(null)
 const isInitialLoading = ref(true)
 const inputText = ref('')
+const selectedMessages = ref<Set<string>>(new Set())
+const isSelecting = ref(false)
+const route = useRoute()
+const router = useRouter()
+const showAnalyze = ref(false)
 
 onMounted(async () => {
   try {
@@ -135,14 +144,49 @@ watch(() => chatStore.isLoading, (newVal, oldVal) => {
     })
   }
 })
+
+// 计算属性: 消息选中状态
+const messageSelectedState = computed(() => {
+  return (messageId: string) => selectedMessages.value.has(messageId)
+})
+
+// 修改选择切换函数
+function toggleMessageSelection(messageId: number) {
+  const newSelectedMessages = new Set(Array.from(selectedMessages.value))
+  if (newSelectedMessages.has(messageId)) {
+    newSelectedMessages.delete(messageId)
+  } else {
+    newSelectedMessages.add(messageId)
+  }
+  selectedMessages.value = newSelectedMessages
+}
+
+function handleAnalyze() {
+  if (selectedMessages.value.size === 0) return
+  
+  const messages = chatStore.currentMessages.filter(
+    msg => selectedMessages.value.has(msg.id)
+  )
+  showAnalyze.value = true
+}
+function handleCloseAnalyze() {
+  showAnalyze.value = false
+}
+// 切换选择模式
+function toggleSelecting() {
+  isSelecting.value = !isSelecting.value
+  if (!isSelecting.value) {
+    selectedMessages.value.clear()
+  }
+}
 </script>
 
 <template>
   <div class="chat-view">
-    <!-- 欢迎界面 -->
+    <!-- 保留现有的欢迎界面 -->
     <WelcomeScreen v-if="!chatStore.currentMessages.length" @select="handleFeatureSelect" />
     
-    <!-- 消息列表 -->
+    <!-- 修改消息列表部分 -->
     <div v-else class="chat-container">
       <div 
         ref="containerRef"
@@ -154,12 +198,16 @@ watch(() => chatStore.isLoading, (newVal, oldVal) => {
             :key="message.id"
             :message="message"
             :show-actions="true"
+            :is-selectable="isSelecting"
+            :is-selected="messageSelectedState(message.id)"
             @quote="handleQuote"
+            @select="toggleMessageSelection"
           />
         </template>
         <MessageSkeleton v-else />
       </div>
 
+      <!-- 保留现有的输入区域 -->
       <div class="input-wrapper">
         <MessageQuote
           v-if="quotedMessage"
@@ -174,15 +222,66 @@ watch(() => chatStore.isLoading, (newVal, oldVal) => {
             />
           </template>
         </MessageQuote>
-        
+      
         <ChatInput
           ref="inputRef"
           v-model="inputText"
           :loading="chatStore.isLoading"
+          :disabled="isSelecting"
           @send="handleSend"
-        />
+        >
+          <template #toolbar-right>
+              <!-- 添加工具栏 -->
+        <div class="toolbar-right">
+          <van-button
+              v-if="chatStore.currentMessages.length && !isInitialLoading && !isSelecting"
+                  class="select-toggle"
+                  type="primary"
+                  size="small"
+                  @click="toggleSelecting"
+                >
+                  收录到笔记
+                </van-button>
+                <div v-else class="selection-buttons">
+                  <van-button 
+                    type="default"
+                    size="small" 
+                    @click="toggleSelecting"
+                    class="cancel-button"
+                  >
+                    取消选择
+                  </van-button>
+
+                  <van-button
+                    type="primary"
+                    size="small"
+                    :disabled="selectedMessages.size === 0"
+                    @click="handleAnalyze"
+                  >
+                    收录完成进行分析整理 ({{ selectedMessages.size }})
+                  </van-button>
+                </div>
+            </div>
+          </template>
+        </ChatInput>
       </div>
     </div>
+
+    <!-- 添加选择模式切换按钮 -->
+    <teleport to="body">
+      <AnalyzeOverlay
+        v-if="showAnalyze"
+          :messages="chatStore.currentMessages.filter(
+          msg => selectedMessages.has(msg.id)
+        ).map(msg=>({
+          role: msg.role,
+          content: msg.content,
+          id: msg.id,
+        }))"
+        :system-prompt="analyzeSystemPrompt"
+        @close="handleCloseAnalyze"
+      />
+    </teleport>
   </div>
 </template>
 
@@ -191,6 +290,21 @@ watch(() => chatStore.isLoading, (newVal, oldVal) => {
   height: 100%;
   display: flex;
   flex-direction: column;
+  
+  .toolbar {
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--van-border-color);
+    display: flex;
+    gap: 8px;
+    background: var(--van-background-2);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  .select-toggle {
+    margin-top: 2px;
+  }
 }
 
 .chat-container {
@@ -220,6 +334,18 @@ watch(() => chatStore.isLoading, (newVal, oldVal) => {
   
   .quoted-message {
     margin-bottom: 8px;
+  }
+}
+
+.selection-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  .cancel-button {
+    color: var(--van-gray-6);
+    background: var(--van-gray-2);
+    border: 1px solid var(--van-gray-3);
   }
 }
 </style> 

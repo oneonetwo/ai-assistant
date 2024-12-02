@@ -32,6 +32,8 @@ class Message(Base):
     # 添加与 Conversation 的关系
     conversation = relationship("Conversation", back_populates="messages")
     parent_message = relationship("Message", remote_side=[id], backref="child_messages")
+    # 添加与 File 的关系
+    file = relationship("File", lazy="joined")
 
 class File(Base):
     __tablename__ = "files"
@@ -120,8 +122,8 @@ class Note(Base):
 
     # 关系定义
     handbook = relationship("Handbook", back_populates="notes")
-    tags = relationship("Tag", secondary="note_tags", back_populates="notes_relation")
-    attachments = relationship("NoteAttachment", back_populates="note")
+    tags = relationship("Tag", secondary="note_tags", back_populates="notes_relation", lazy="selectin")
+    attachments = relationship("NoteAttachment", back_populates="note", lazy="selectin")
 
 class NoteAttachment(Base):
     __tablename__ = "note_attachments"
