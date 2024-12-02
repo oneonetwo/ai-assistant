@@ -6,7 +6,7 @@ from app.core.config import settings
 from app.core.logging import setup_logging
 from app.db.database import engine
 from app.db.models import Base
-from app.api.v1 import context, chat, image_analysis, document_analysis, upload, handbooks, notes
+from app.api.v1 import context, chat, image_analysis, document_analysis, upload, handbooks, notes, revisions, revision_settings
 from app.middleware.upload import validate_upload_size
 from app.utils.cache import cache_manager
 import uvicorn
@@ -62,6 +62,8 @@ app.include_router(document_analysis.router, prefix=settings.API_V1_PREFIX)
 app.include_router(upload.router, prefix="/api/v1")
 app.include_router(handbooks.router, prefix=settings.API_V1_PREFIX)
 app.include_router(notes.router, prefix=settings.API_V1_PREFIX)
+app.include_router(revisions.router, prefix=settings.API_V1_PREFIX)
+app.include_router(revision_settings.router, prefix=settings.API_V1_PREFIX)
 
 def handle_interrupt(signum, frame):
     print("\nGracefully shutting down...")
