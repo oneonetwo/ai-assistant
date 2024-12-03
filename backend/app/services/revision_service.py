@@ -116,10 +116,14 @@ class RevisionService:
     ) -> RevisionTask:
         """更新复习任务状态"""
         try:
-            # 查询任务
-            stmt = select(RevisionTask).where(RevisionTask.id == task_id)
+            # 查询任务,同时加载关联的note
+            stmt = (
+                select(RevisionTask)
+                .options(joinedload(RevisionTask.note))
+                .where(RevisionTask.id == task_id)
+            )
             result = await db.execute(stmt)
-            task = result.scalar_one_or_none()
+            task = result.unique().scalar_one_or_none()
             
             if not task:
                 raise HTTPException(
