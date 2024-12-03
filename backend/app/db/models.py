@@ -174,7 +174,7 @@ class RevisionTask(Base):
     note_id = Column(Integer, ForeignKey("notes.id"))
     scheduled_date = Column(DateTime(timezone=True), nullable=False)
     status = Column(String(50), default="pending")  # pending, completed, skipped
-    mastery_level = Column(String(50), nullable=True)  # not_mastered, partially_mastered, fully_mastered
+    mastery_level = Column(String(50), nullable=True)  # not_mastered, partially_mastered, mastered
     revision_count = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
     completed_at = Column(DateTime(timezone=True), nullable=True)

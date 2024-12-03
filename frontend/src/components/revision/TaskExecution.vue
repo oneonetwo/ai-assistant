@@ -8,7 +8,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'status-change', taskId: number, status: RevisionTask['status'], masteryLevel: RevisionTask['mastery_level']): void
+  (e: 'status-change', taskId: number, masteryLevel: RevisionTask['mastery_level']): void
 }>()
 
 const showContent = ref(false)
@@ -20,7 +20,7 @@ const renderedContent = computed(() => {
 
 const masteryColor = computed(() => {
   switch (props.task.mastery_level) {
-    case 'fully_mastered':
+    case 'mastered':
       return 'success'
     case 'partially_mastered':
       return 'warning'
@@ -32,7 +32,7 @@ const masteryColor = computed(() => {
 })
 
 function handleMasteryChange(masteryLevel: RevisionTask['mastery_level']) {
-  emit('status-change', props.task, masteryLevel)
+  emit('status-change', props.task.id, masteryLevel)
 }
 </script>
 
@@ -41,9 +41,18 @@ function handleMasteryChange(masteryLevel: RevisionTask['mastery_level']) {
     <div class="task-header">
       <h3>{{ task.note.title }}</h3>
       <van-tag :type="masteryColor" round>
-        {{ task.mastery_level === 'fully_mastered' ? '完全掌握' :
+        {{ task.mastery_level === 'mastered' ? '已掌握' :
            task.mastery_level === 'partially_mastered' ? '部分掌握' :
            task.mastery_level === 'not_mastered' ? '未掌握' : '待评估' }}
+      </van-tag>
+    </div>
+
+    <div class="task-meta">
+      <van-tag plain type="primary">复习次数: {{ task.revision_count }}</van-tag>
+      <van-tag plain :type="task.note.priority === 'high' ? 'danger' : 
+                            task.note.priority === 'medium' ? 'warning' : 'primary'">
+        {{ task.note.priority === 'high' ? '高优先级' :
+           task.note.priority === 'medium' ? '中优先级' : '低优先级' }}
       </van-tag>
     </div>
 
@@ -67,19 +76,19 @@ function handleMasteryChange(masteryLevel: RevisionTask['mastery_level']) {
           :type="task.mastery_level === 'not_mastered' ? 'danger' : 'default'"
           @click="handleMasteryChange('not_mastered')"
         >
-          跳过
+          未掌握
         </van-button>
         <van-button 
           :type="task.mastery_level === 'partially_mastered' ? 'warning' : 'default'"
           @click="handleMasteryChange('partially_mastered')"
         >
-          记不清
+          部分掌握
         </van-button>
         <van-button 
-          :type="task.mastery_level === 'fully_mastered' ? 'success' : 'default'"
-          @click="handleMasteryChange('fully_mastered')"
+          :type="task.mastery_level === 'mastered' ? 'success' : 'default'"
+          @click="handleMasteryChange('mastered')"
         >
-          记住了
+          已掌握
         </van-button>
       </div>
     </div>
@@ -100,6 +109,12 @@ function handleMasteryChange(masteryLevel: RevisionTask['mastery_level']) {
       font-size: 16px;
       font-weight: 500;
     }
+  }
+
+  .task-meta {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
   }
 
   .task-actions {

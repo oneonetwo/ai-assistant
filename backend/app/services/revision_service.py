@@ -1,12 +1,13 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
-from app.db.models import RevisionPlan, RevisionTask, Note
+from app.db.models import RevisionPlan, RevisionTask, Note, RevisionHistory
 from app.models.revision_schemas import RevisionPlanCreate, RevisionTaskUpdate
 from datetime import datetime, timedelta, date
 from typing import List, Optional
 import json
 from sqlalchemy.sql import func
 from sqlalchemy.orm import joinedload
+from fastapi import HTTPException
 
 class RevisionService:
     @staticmethod
@@ -111,33 +112,45 @@ class RevisionService:
     async def update_task(
         db: AsyncSession,
         task_id: int,
-        update: RevisionTaskUpdate
-    ) -> Optional[RevisionTask]:
-        """更新任务状态"""
-        result = await db.execute(
-            select(RevisionTask).filter(RevisionTask.id == task_id)
-        )
-        task = result.scalar_one_or_none()
-        
-        if not task:
-            return None
+        update_data: RevisionTaskUpdate
+    ) -> RevisionTask:
+        """更新复习任务状态"""
+        try:
+            # 查询任务
+            stmt = select(RevisionTask).where(RevisionTask.id == task_id)
+            result = await db.execute(stmt)
+            task = result.scalar_one_or_none()
             
-        if update.status:
-            task.status = update.status
-            if update.status == "completed":
+            if not task:
+                raise HTTPException(
+                    status_code=404,
+                    detail="复习任务不存在"
+                )
+            
+            # 更新任务状态
+            if update_data.mastery_level is not None:
+                task.mastery_level = update_data.mastery_level
                 task.completed_at = datetime.utcnow()
-                task.revision_count += 1
                 
-        if update.mastery_level:
-            task.mastery_level = update.mastery_level
+                # 创建历史记录
+                history = RevisionHistory(
+                    note_id=task.note_id,
+                    task_id=task.id,
+                    mastery_level=update_data.mastery_level,
+                    revision_date=datetime.utcnow()
+                )
+                db.add(history)
             
-            # 如果未完全掌握，生成额外的复习任务
-            if update.mastery_level in ["not_mastered", "partially_mastered"]:
-                await RevisionService._create_additional_task(db, task)
-        
-        await db.commit()
-        await db.refresh(task)
-        return task
+            await db.commit()
+            await db.refresh(task)
+            return task
+            
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail=f"更新任务失败: {str(e)}"
+            )
 
     @staticmethod
     async def _create_additional_task(

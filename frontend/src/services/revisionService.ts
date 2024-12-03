@@ -53,7 +53,7 @@ export class RevisionAPI {
     masteryLevel: RevisionTask['mastery_level']
   ): Promise<RevisionTask> {
     const response = await request.patch(`${API_BASE_URL}/tasks/${taskId}`, {
-      mastery_level:masteryLevel
+      mastery_level: masteryLevel
     })
     return response
   }

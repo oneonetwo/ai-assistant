@@ -86,17 +86,30 @@ async def get_plan_tasks(
     """
     return await RevisionService.get_plan_tasks(db, plan_id, date, status)
 
-@router.patch("/tasks/{task_id}", response_model=RevisionTaskResponse)
-async def update_task_status(
+@router.patch("/tasks/{task_id}", response_model=RevisionTaskResponse,
+    summary="更新复习任务",
+    description="更新复习任务的掌握程度等状态")
+async def update_task(
     task_id: int,
-    update: RevisionTaskUpdate,
+    update_data: RevisionTaskUpdate,
     db: AsyncSession = Depends(get_db)
 ):
-    """更新任务状态和掌握程度"""
-    task = await RevisionService.update_task(db, task_id, update)
-    if not task:
-        raise HTTPException(status_code=404, detail="任务不存在")
-    return task
+    """
+    更新复习任务状态
+    
+    - **task_id**: 任务ID
+    - **mastery_level**: 掌握程度 (not_mastered/partially_mastered/mastered)
+    """
+    try:
+        updated_task = await RevisionService.update_task(db, task_id, update_data)
+        return updated_task
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"更新任务失败: {str(e)}"
+        )
 
 @router.get("/daily-tasks", response_model=List[RevisionTaskResponse])
 async def get_daily_tasks(

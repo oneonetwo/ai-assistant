@@ -82,7 +82,7 @@ const progress = computed(() => {
   const total = store.planTasks.length
   if (total === 0) return 0
   const completed = store.planTasks.filter(task => 
-    task.status === 'mastered' || task.status === 'partially_mastered'
+    task.mastery_level === 'mastered' || task.mastery_level === 'partially_mastered'
   ).length
   return Math.round((completed / total) * 100)
 })
@@ -92,13 +92,12 @@ function handleTaskClick(task: RevisionTask) {
   showTaskExecution.value = true
 }
 
-async function handleTaskStatusChange(task: RevisionTask, masteryLevel  : RevisionTask['status']) {
+async function handleTaskStatusChange(taskId: number, masteryLevel  : RevisionTask['mastery_level']) {
   try {
-
-    await store.updateTaskStatus(task.id, masteryLevel)
-    const taskIndex = store.planTasks.findIndex(t => t.id === task.id)
+    await store.updateTaskStatus(taskId, masteryLevel)
+    const taskIndex = store.planTasks.findIndex(t => t.id === taskId)
     if (taskIndex !== -1) {
-      store.planTasks[taskIndex].status = status
+      store.planTasks[taskIndex].mastery_level = masteryLevel
     }
   } catch (error) {
     showToast('更新任务状态失败')
