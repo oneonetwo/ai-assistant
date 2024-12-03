@@ -1,11 +1,13 @@
 export interface RevisionPlan {
   id: number
-  title: string
+  name: string
+  start_date: string
+  end_date: string
   handbook_ids: number[]
-  category_ids?: number[]
-  tag_ids?: number[]
-  duration: number
-  priority: 'high' | 'medium' | 'low'
+  category_ids: number[]
+  tag_ids: number[]
+  note_statuses: string[]
+  status: string
   created_at: string
   updated_at: string
 }

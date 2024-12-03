@@ -39,12 +39,13 @@ export const useRevisionStore = defineStore('revision', () => {
   }
 
   async function createPlan(planData: {
-    title: string
+    name: string
+    start_date: string
+    end_date: string
     handbook_ids: number[]
     category_ids?: number[]
     tag_ids?: number[]
-    duration: number
-    priority?: 'high' | 'medium' | 'low'
+    note_statuses?: string[]
   }) {
     try {
       isLoading.value = true

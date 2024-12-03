@@ -6,12 +6,13 @@ const API_BASE_URL = '/api/v1/revisions'
 export class RevisionAPI {
   // 创建复习计划
   static async createPlan(data: {
-    title: string
+    name: string
+    start_date: string
+    end_date: string
     handbook_ids: number[]
     category_ids?: number[]
     tag_ids?: number[]
-    duration: number
-    priority?: 'high' | 'medium' | 'low'
+    note_statuses?: string[]
   }): Promise<RevisionPlan> {
     const response = await request.post(`${API_BASE_URL}/plans`, data)
     return response

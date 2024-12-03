@@ -11,12 +11,13 @@ const revisionStore = useRevisionStore()
 const handbookStore = useHandbookStore()
 
 const formData = ref({
-  title: '',
+  name: '',
+  start_date: '',
+  end_date: '',
   handbook_ids: [] as number[],
   category_ids: [] as number[],
   tag_ids: [] as number[],
-  duration: 7,
-  priority: 'medium' as RevisionPlan['priority']
+  note_statuses: [] as string[]
 })
 
 // 加载手册数据
@@ -33,8 +34,8 @@ onMounted(async () => {
 // 提交表单
 async function handleSubmit() {
   try {
-    if (!formData.value.title.trim()) {
-      showToast('请输入计划标题')
+    if (!formData.value.name.trim()) {
+      showToast('请输入计划名称')
       return
     }
     if (formData.value.handbook_ids.length === 0) {
@@ -63,10 +64,24 @@ async function handleSubmit() {
       <van-form @submit="handleSubmit">
         <van-cell-group inset>
           <van-field
-            v-model="formData.title"
-            label="计划标题"
-            placeholder="请输入计划标题"
-            :rules="[{ required: true, message: '请输入计划标题' }]"
+            v-model="formData.name"
+            label="计划名称"
+            placeholder="请输入计划名称"
+            :rules="[{ required: true, message: '请输入计划名称' }]"
+          />
+
+          <van-field
+            v-model="formData.start_date"
+            label="开始日期"
+            type="date"
+            :rules="[{ required: true, message: '请选择开始日期' }]"
+          />
+
+          <van-field
+            v-model="formData.end_date"
+            label="结束日期"
+            type="date"
+            :rules="[{ required: true, message: '请选择结束日期' }]"
           />
 
           <van-field name="handbook" label="选择手册">
@@ -111,24 +126,13 @@ async function handleSubmit() {
             </template>
           </van-field>
 
-          <van-field name="duration" label="复习周期">
+          <van-field name="note_statuses" label="笔记状态">
             <template #input>
-              <van-stepper
-                v-model="formData.duration"
-                :min="1"
-                :max="30"
-              />
-              <span class="duration-unit">天</span>
-            </template>
-          </van-field>
-
-          <van-field name="priority" label="优先级">
-            <template #input>
-              <van-radio-group v-model="formData.priority" direction="horizontal">
-                <van-radio name="high">高</van-radio>
-                <van-radio name="medium">中</van-radio>
-                <van-radio name="low">低</van-radio>
-              </van-radio-group>
+              <van-checkbox-group v-model="formData.note_statuses">
+                <van-checkbox name="draft">草稿</van-checkbox>
+                <van-checkbox name="published">已发布</van-checkbox>
+                <van-checkbox name="archived">已归档</van-checkbox>
+              </van-checkbox-group>
             </template>
           </van-field>
         </van-cell-group>
