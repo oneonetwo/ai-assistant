@@ -8,11 +8,17 @@ interface FetchPlansParams {
   status?: string
 }
 
+interface GetPlanTasksParams {
+  date?: string
+  status?: 'pending' | 'completed' | 'skipped'
+}
+
 export const useRevisionStore = defineStore('revision', () => {
   // 状态
   const plans = ref<RevisionPlan[]>([])
   const currentPlan = ref<RevisionPlan | null>(null)
   const dailyTasks = ref<RevisionTask[]>([])
+  const planTasks = ref<RevisionTask[]>([])
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
@@ -88,9 +94,9 @@ export const useRevisionStore = defineStore('revision', () => {
     }
   }
 
-  async function updateTaskStatus(taskId: number, status: RevisionTask['status']) {
+  async function updateTaskStatus(taskId: number, masteryLevel: RevisionTask['mastery_level']) {
     try {
-      const updatedTask = await RevisionAPI.updateTaskStatus(taskId, status)
+      const updatedTask = await RevisionAPI.updateTaskStatus(taskId, masteryLevel)
       const index = dailyTasks.value.findIndex(task => task.id === taskId)
       if (index !== -1) {
         dailyTasks.value[index] = updatedTask
@@ -102,10 +108,25 @@ export const useRevisionStore = defineStore('revision', () => {
     }
   }
 
+  async function fetchPlanTasks(planId: number, params: GetPlanTasksParams = {}) {
+    try {
+      isLoading.value = true
+      const tasks = await RevisionAPI.getPlanTasks(planId, params)
+      planTasks.value = tasks
+      return tasks
+    } catch (err) {
+      error.value = '获取计划任务失败'
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   function reset() {
     plans.value = []
     currentPlan.value = null
     dailyTasks.value = []
+    planTasks.value = []
     isLoading.value = false
     error.value = null
   }
@@ -115,6 +136,7 @@ export const useRevisionStore = defineStore('revision', () => {
     plans,
     currentPlan,
     dailyTasks,
+    planTasks,
     isLoading,
     error,
     
@@ -129,6 +151,7 @@ export const useRevisionStore = defineStore('revision', () => {
     fetchPlan,
     fetchDailyTasks,
     updateTaskStatus,
+    fetchPlanTasks,
     reset
   }
 }) 

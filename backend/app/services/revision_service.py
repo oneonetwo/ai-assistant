@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, date
 from typing import List, Optional
 import json
 from sqlalchemy.sql import func
+from sqlalchemy.orm import joinedload
 
 class RevisionService:
     @staticmethod
@@ -92,7 +93,11 @@ class RevisionService:
         status: Optional[str] = None
     ) -> List[RevisionTask]:
         """获取计划的任务列表"""
-        query = select(RevisionTask).filter(RevisionTask.plan_id == plan_id)
+        query = (
+            select(RevisionTask)
+            .options(joinedload(RevisionTask.note))
+            .filter(RevisionTask.plan_id == plan_id)
+        )
         
         if date:
             query = query.filter(func.date(RevisionTask.scheduled_date) == date)
@@ -100,7 +105,7 @@ class RevisionService:
             query = query.filter(RevisionTask.status == status)
             
         result = await db.execute(query)
-        return result.scalars().all()
+        return result.unique().scalars().all()
 
     @staticmethod
     async def update_task(

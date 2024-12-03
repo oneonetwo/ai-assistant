@@ -1,15 +1,21 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRevisionStore } from '@/stores/revision'
-import { RevisionAPI } from '@/services/revisionService'
 import { showToast } from 'vant'
 import type { RevisionTask } from '@/types/revision'
+import { formatDate } from '@/utils/date'
+import TaskExecution from '@/components/revision/TaskExecution.vue'
 
 const route = useRoute()
 const router = useRouter()
 const store = useRevisionStore()
-const planTasks = ref<RevisionTask[]>([])
+const showTaskExecution = ref(false)
+const currentTask = ref<RevisionTask | null>(null)
+
+// 筛选条件
+const filterDate = ref('')
+const filterStatus = ref<'pending' | 'completed' | 'skipped' | ''>('')
 
 const planId = Number(route.params.id)
 const planDetails = ref({
@@ -20,26 +26,79 @@ const planDetails = ref({
 })
 
 onMounted(async () => {
-  try {
-    const plan = await RevisionAPI.getPlan(planId)
-    planDetails.value = plan
-    const tasks = await RevisionAPI.getPlanTasks(planId)
-    planTasks.value = tasks
-  } catch (error) {
-    showToast('加载计划详情失败')
-    router.back()
-  }
+  await fetchPlanDetails()
+  await fetchPlanTasks()
 })
 
-async function handleTaskStatusChange(task: RevisionTask, status: RevisionTask['status']) {
+async function fetchPlanDetails() {
   try {
-    await store.updateTaskStatus(task.id, status)
-    const index = planTasks.value.findIndex(t => t.id === task.id)
-    if (index !== -1) {
-      planTasks.value[index] = {
-        ...planTasks.value[index],
-        status
-      }
+    const plan = await store.fetchPlan(planId)
+    planDetails.value = {
+      name: plan.name,
+      start_date: formatDate(new Date(plan.start_date).getTime()),
+      end_date: formatDate(new Date(plan.end_date).getTime()),
+      status: plan.status
+    }
+  } catch (error) {
+    showToast('获取计划详情失败')
+  }
+}
+
+async function fetchPlanTasks() {
+  try {
+    const params = {
+      ...(filterDate.value && { date: filterDate.value }),
+      ...(filterStatus.value && { status: filterStatus.value })
+    }
+    await store.fetchPlanTasks(planId, params)
+  } catch (error) {
+    showToast('获取计划任务失败')
+  }
+}
+
+// 筛选变化时重新获取数据
+async function handleFilterChange() {
+  await fetchPlanTasks()
+}
+
+const groupedTasks = computed(() => {
+  const groups: Record<string, RevisionTask[]> = {}
+  store.planTasks.forEach(task => {
+    const date = task.scheduled_date ? 
+      formatDate(new Date(task.scheduled_date).getTime()) : 
+      'Unknown Date'
+    if (!groups[date]) {
+      groups[date] = []
+    }
+    groups[date].push(task)
+  })
+  return Object.entries(groups).map(([date, tasks]) => ({
+    date,
+    tasks
+  }))
+})
+
+const progress = computed(() => {
+  const total = store.planTasks.length
+  if (total === 0) return 0
+  const completed = store.planTasks.filter(task => 
+    task.status === 'mastered' || task.status === 'partially_mastered'
+  ).length
+  return Math.round((completed / total) * 100)
+})
+
+function handleTaskClick(task: RevisionTask) {
+  currentTask.value = task
+  showTaskExecution.value = true
+}
+
+async function handleTaskStatusChange(task: RevisionTask, masteryLevel  : RevisionTask['status']) {
+  try {
+
+    await store.updateTaskStatus(task.id, masteryLevel)
+    const taskIndex = store.planTasks.findIndex(t => t.id === task.id)
+    if (taskIndex !== -1) {
+      store.planTasks[taskIndex].status = status
     }
   } catch (error) {
     showToast('更新任务状态失败')
@@ -54,45 +113,93 @@ async function handleTaskStatusChange(task: RevisionTask, status: RevisionTask['
       left-arrow
       @click-left="router.back()"
     />
-
+    
     <div class="detail-content">
-      <van-cell-group title="计划信息">
-        <van-cell title="开始日期" :value="planDetails.start_date" />
-        <van-cell title="结束日期" :value="planDetails.end_date" />
-        <van-cell title="状态" :value="planDetails.status" />
-      </van-cell-group>
-
-      <van-cell-group title="任务列表">
-        <van-cell
-          v-for="task in planTasks"
-          :key="task.id"
-          :title="task.title"
-        >
+      <!-- Plan Overview -->
+      <van-cell-group inset class="plan-overview">
+        <van-cell title="计划进度">
           <template #value>
-            <van-tag
-              :type="task.status === 'mastered' ? 'success' :
-                     task.status === 'partially_mastered' ? 'warning' : 'danger'"
-            >
-              {{ task.status === 'mastered' ? '已掌握' :
-                 task.status === 'partially_mastered' ? '部分掌握' : '未掌握' }}
-            </van-tag>
+            <van-progress 
+              :percentage="progress"
+              :pivot-text="`${progress}%`"
+            />
           </template>
-          <template #right-icon>
-            <van-dropdown-menu>
-              <van-dropdown-item
-                v-model="task.status"
-                :options="[
-                  { text: '未掌握', value: 'not_mastered' },
-                  { text: '部分掌握', value: 'partially_mastered' },
-                  { text: '已掌握', value: 'mastered' }
-                ]"
-                @change="(value) => handleTaskStatusChange(task, value)"
-              />
-            </van-dropdown-menu>
+        </van-cell>
+        <van-cell title="计划时间">
+          <template #value>
+            {{ planDetails.start_date }} 至 {{ planDetails.end_date }}
           </template>
         </van-cell>
       </van-cell-group>
+
+      <!-- Filters -->
+      <van-cell-group inset class="filters">
+        <van-field
+          v-model="filterDate"
+          label="日期筛选"
+          type="date"
+          @change="handleFilterChange"
+        />
+        <van-cell title="状态筛选">
+          <van-radio-group v-model="filterStatus" direction="horizontal" @change="handleFilterChange">
+            <van-radio name="">全部</van-radio>
+            <van-radio name="pending">待完成</van-radio>
+            <van-radio name="completed">已完成</van-radio>
+            <van-radio name="skipped">已跳过</van-radio>
+          </van-radio-group>
+        </van-cell>
+      </van-cell-group>
+
+      <!-- Task List -->
+      <div v-if="store.planTasks.length" class="task-list">
+        <div v-for="group in groupedTasks" :key="group.date" class="task-group">
+          <div class="group-header">{{ group.date }}</div>
+          <van-cell-group inset>
+            <van-cell
+              v-for="task in group.tasks"
+              :key="task.id"
+              :title="task.note.title"
+              is-link
+              @click="handleTaskClick(task)"
+            >
+              <template #value>
+                <van-tag
+                  :type="task.status === 'mastered' ? 'success' : 
+                         task.status === 'partially_mastered' ? 'warning' : 'danger'"
+                  round
+                >
+                  {{ task.status === 'mastered' ? '已掌握' :
+                     task.status === 'partially_mastered' ? '部分掌握' : '未掌握' }}
+                </van-tag>
+              </template>
+            </van-cell>
+          </van-cell-group>
+        </div>
+      </div>
+      
+      <van-empty 
+        v-else-if="!store.isLoading" 
+        description="暂无任务" 
+      />
+
+      <!-- Loading State -->
+      <div v-if="store.isLoading" class="loading-state">
+        <van-loading type="spinner">加载中...</van-loading>
+      </div>
     </div>
+
+    <!-- Task Execution Popup -->
+    <van-popup
+      v-model:show="showTaskExecution"
+      :style="{ width: '90%', height: '70%' }"
+      round
+    >
+      <TaskExecution
+        v-if="currentTask"
+        :task="currentTask"
+        @status-change="handleTaskStatusChange"
+      />
+    </van-popup>
   </div>
 </template>
 
@@ -106,9 +213,48 @@ async function handleTaskStatusChange(task: RevisionTask, status: RevisionTask['
     flex: 1;
     overflow-y: auto;
     padding: 16px;
+    
+    .plan-overview,
+    .filters {
+      margin-bottom: 20px;
+    }
 
-    .van-cell-group {
-      margin-bottom: 16px;
+    .task-group {
+      margin-bottom: 20px;
+
+      .group-header {
+        padding: 0 16px;
+        margin-bottom: 8px;
+        font-size: 14px;
+        color: var(--van-gray-6);
+        font-weight: 500;
+      }
+    }
+
+    .loading-state {
+      display: flex;
+      justify-content: center;
+      padding: 20px 0;
+    }
+
+    .plan-overview {
+      :deep(.van-cell__value) {
+        display: flex;
+        align-items: center;
+        
+        .van-progress {
+          flex: 1;
+        }
+      }
+    }
+
+    .filters {
+      :deep(.van-radio-group) {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+      }
     }
   }
 }

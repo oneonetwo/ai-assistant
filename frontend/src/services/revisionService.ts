@@ -3,6 +3,11 @@ import type { RevisionPlan, RevisionTask } from '@/types/revision'
 
 const API_BASE_URL = '/api/v1/revisions'
 
+interface GetPlanTasksParams {
+  date?: string
+  status?: 'pending' | 'completed' | 'skipped'
+}
+
 export class RevisionAPI {
   // 创建复习计划
   static async createPlan(data: {
@@ -32,18 +37,23 @@ export class RevisionAPI {
   }
 
   // 获取计划任务列表
-  static async getPlanTasks(planId: number): Promise<RevisionTask[]> {
-    const response = await request.get(`${API_BASE_URL}/plans/${planId}/tasks`)
+  static async getPlanTasks(
+    planId: number, 
+    params: GetPlanTasksParams = {}
+  ): Promise<RevisionTask[]> {
+    const response = await request.get(`${API_BASE_URL}/plans/${planId}/tasks`, {
+      params
+    })
     return response
   }
 
   // 更新任务状态
   static async updateTaskStatus(
     taskId: number,
-    status: 'not_mastered' | 'partially_mastered' | 'mastered'
+    masteryLevel: RevisionTask['mastery_level']
   ): Promise<RevisionTask> {
     const response = await request.patch(`${API_BASE_URL}/tasks/${taskId}`, {
-      status
+      mastery_level:masteryLevel
     })
     return response
   }

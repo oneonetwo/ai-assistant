@@ -17,7 +17,8 @@ export interface RevisionTask {
   plan_id: number
   note_id: number
   title: string
-  status: 'not_mastered' | 'partially_mastered' | 'mastered'
+  status: 'pending' | 'completed' | 'skipped'
+  mastery_level: 'not_mastered' | 'partially_mastered' | 'fully_mastered' | null
   due_date: string
   completed_at?: string
 }

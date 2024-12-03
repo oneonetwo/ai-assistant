@@ -1,68 +1,87 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import type { RevisionTask } from '@/types/revision'
+import MarkdownIt from 'markdown-it'
 
 const props = defineProps<{
   task: RevisionTask
 }>()
 
 const emit = defineEmits<{
-  (e: 'status-change', status: RevisionTask['status']): void
+  (e: 'status-change', taskId: number, status: RevisionTask['status'], masteryLevel: RevisionTask['mastery_level']): void
 }>()
 
 const showContent = ref(false)
+const md = new MarkdownIt()
 
-const statusOptions = [
-  { text: '未掌握', value: 'not_mastered' },
-  { text: '部分掌握', value: 'partially_mastered' },
-  { text: '已掌握', value: 'mastered' }
-]
+const renderedContent = computed(() => {
+  return md.render(props.task.note.content)
+})
 
-const statusColor = computed(() => {
-  switch (props.task.status) {
-    case 'mastered':
+const masteryColor = computed(() => {
+  switch (props.task.mastery_level) {
+    case 'fully_mastered':
       return 'success'
     case 'partially_mastered':
       return 'warning'
-    default:
+    case 'not_mastered':
       return 'danger'
+    default:
+      return 'default'
   }
 })
+
+function handleMasteryChange(masteryLevel: RevisionTask['mastery_level']) {
+  emit('status-change', props.task, masteryLevel)
+}
 </script>
 
 <template>
   <div class="task-execution">
     <div class="task-header">
-      <h3>{{ task.title }}</h3>
-      <van-tag :type="statusColor">
-        {{ statusOptions.find(opt => opt.value === task.status)?.text }}
+      <h3>{{ task.note.title }}</h3>
+      <van-tag :type="masteryColor" round>
+        {{ task.mastery_level === 'fully_mastered' ? '完全掌握' :
+           task.mastery_level === 'partially_mastered' ? '部分掌握' :
+           task.mastery_level === 'not_mastered' ? '未掌握' : '待评估' }}
       </van-tag>
     </div>
 
     <div class="task-actions">
-      <van-button
-        block
+      <van-button 
+        block 
+        :type="showContent ? 'default' : 'primary'"
         @click="showContent = !showContent"
       >
-        {{ showContent ? '隐藏内容' : '显示内容' }}
+        {{ showContent ? '隐藏内容' : '查看内容' }}
       </van-button>
     </div>
 
     <div v-show="showContent" class="task-content">
-      <div class="markdown-body" v-html="task.content" />
+      <div class="markdown-body" v-html="renderedContent" />
     </div>
 
     <div class="status-buttons">
-      <van-button-group>
-        <van-button
-          v-for="option in statusOptions"
-          :key="option.value"
-          :type="task.status === option.value ? statusColor : 'default'"
-          @click="emit('status-change', option.value)"
+      <div class="button-group">
+        <van-button 
+          :type="task.mastery_level === 'not_mastered' ? 'danger' : 'default'"
+          @click="handleMasteryChange('not_mastered')"
         >
-          {{ option.text }}
+          跳过
         </van-button>
-      </van-button-group>
+        <van-button 
+          :type="task.mastery_level === 'partially_mastered' ? 'warning' : 'default'"
+          @click="handleMasteryChange('partially_mastered')"
+        >
+          记不清
+        </van-button>
+        <van-button 
+          :type="task.mastery_level === 'fully_mastered' ? 'success' : 'default'"
+          @click="handleMasteryChange('fully_mastered')"
+        >
+          记住了
+        </van-button>
+      </div>
     </div>
   </div>
 </template>
@@ -95,9 +114,15 @@ const statusColor = computed(() => {
   }
 
   .status-buttons {
-    .van-button-group {
+    padding: 16px;
+    
+    .button-group {
       display: flex;
       gap: 8px;
+      
+      .van-button {
+        flex: 1;
+      }
     }
   }
 }
