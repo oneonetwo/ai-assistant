@@ -19,10 +19,11 @@ export class RevisionAPI {
   }
 
   // 获取计划列表
-  static async getPlans(): Promise<RevisionPlan[]> {
-    const response = await request.get(`${API_BASE_URL}/plans`)
+  static async getPlans(params: GetPlansParams = {}): Promise<RevisionPlan[]> {
+    const response = await request.get(`${API_BASE_URL}/plans`, { params })
     return response
   }
+
 
   // 获取计划详情
   static async getPlan(planId: number): Promise<RevisionPlan> {

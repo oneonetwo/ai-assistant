@@ -20,6 +20,20 @@ const formData = ref({
   note_statuses: [] as string[]
 })
 
+const statusOptions = [
+  { text: '草稿', value: 'draft' },
+  { text: '已发布', value: 'published' },
+  { text: '已归档', value: 'archived' }
+]
+
+// 表单验证
+function validateDates() {
+  if (!formData.value.start_date || !formData.value.end_date) return true
+  const start = new Date(formData.value.start_date)
+  const end = new Date(formData.value.end_date)
+  return end >= start
+}
+
 // 加载手册数据
 onMounted(async () => {
   try {
@@ -74,14 +88,20 @@ async function handleSubmit() {
             v-model="formData.start_date"
             label="开始日期"
             type="date"
-            :rules="[{ required: true, message: '请选择开始日期' }]"
+            :rules="[
+              { required: true, message: '请选择开始日期' },
+              { validator: validateDates, message: '结束日期不能早于开始日期' }
+            ]"
           />
 
           <van-field
             v-model="formData.end_date"
             label="结束日期"
             type="date"
-            :rules="[{ required: true, message: '请选择结束日期' }]"
+            :rules="[
+              { required: true, message: '请选择结束日期' },
+              { validator: validateDates, message: '结束日期不能早于开始日期' }
+            ]"
           />
 
           <van-field name="handbook" label="选择手册">
@@ -129,9 +149,13 @@ async function handleSubmit() {
           <van-field name="note_statuses" label="笔记状态">
             <template #input>
               <van-checkbox-group v-model="formData.note_statuses">
-                <van-checkbox name="draft">草稿</van-checkbox>
-                <van-checkbox name="published">已发布</van-checkbox>
-                <van-checkbox name="archived">已归档</van-checkbox>
+                <van-checkbox
+                  v-for="option in statusOptions"
+                  :key="option.value"
+                  :name="option.value"
+                >
+                  {{ option.text }}
+                </van-checkbox>
               </van-checkbox-group>
             </template>
           </van-field>

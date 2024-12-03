@@ -4,6 +4,10 @@ import { RevisionAPI } from '@/services/revisionService'
 import type { RevisionPlan, RevisionTask, RevisionStatus } from '@/types/revision'
 import { showToast } from 'vant'
 
+interface FetchPlansParams {
+  status?: string
+}
+
 export const useRevisionStore = defineStore('revision', () => {
   // 状态
   const plans = ref<RevisionPlan[]>([])
@@ -25,14 +29,11 @@ export const useRevisionStore = defineStore('revision', () => {
   )
 
   // 方法
-  async function fetchPlans() {
+  async function fetchPlans(params: FetchPlansParams = {}) {
+    isLoading.value = true
     try {
-      isLoading.value = true
-      const data = await RevisionAPI.getPlans()
-      plans.value = data
-    } catch (err) {
-      error.value = '获取复习计划失败'
-      throw err
+      const response = await RevisionAPI.getPlans(params)
+      plans.value = response
     } finally {
       isLoading.value = false
     }

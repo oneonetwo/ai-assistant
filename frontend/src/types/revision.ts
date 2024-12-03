@@ -7,7 +7,7 @@ export interface RevisionPlan {
   category_ids: number[]
   tag_ids: number[]
   note_statuses: string[]
-  status: string
+  status: 'active' | 'completed' | 'cancelled'
   created_at: string
   updated_at: string
 }

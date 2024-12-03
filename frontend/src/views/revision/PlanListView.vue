@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRevisionStore } from '@/stores/revision'
 import { showToast } from 'vant'
@@ -7,14 +7,30 @@ import type { RevisionPlan } from '@/types/revision'
 
 const router = useRouter()
 const store = useRevisionStore()
+const currentStatus = ref<string>('active')
 
-onMounted(async () => {
+const statusOptions = [
+  { text: '进行中', value: 'active' },
+  { text: '已完成', value: 'completed' },
+  { text: '已取消', value: 'cancelled' }
+]
+
+async function fetchPlans(status: string) {
   try {
-    await store.fetchPlans()
+    await store.fetchPlans({ status })
   } catch (error) {
     showToast('加载复习计划失败')
   }
+}
+
+onMounted(() => {
+  fetchPlans(currentStatus.value)
 })
+
+async function handleStatusChange(status: string) {
+  currentStatus.value = status
+  await fetchPlans(status)
+}
 
 function handleCreatePlan() {
   router.push({ name: 'revision-plan-new' })
@@ -26,11 +42,21 @@ function handlePlanClick(plan: RevisionPlan) {
     params: { id: plan.id }
   })
 }
+
+function formatDate(dateString: string): string {
+  return new Date(dateString).toLocaleDateString('zh-CN')
+}
+
+function calculateDuration(start: string, end: string): number {
+  const startDate = new Date(start)
+  const endDate = new Date(end)
+  return Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
+}
 </script>
 
 <template>
   <div class="revision-plan-list">
-    <van-nav-bar title="复习计划">
+    <van-nav-bar title="我的计划列表">
       <template #right>
         <van-button 
           type="primary" 
@@ -42,24 +68,37 @@ function handlePlanClick(plan: RevisionPlan) {
       </template>
     </van-nav-bar>
 
+    <div class="filter-section">
+      <van-tabs v-model:active="currentStatus" @change="handleStatusChange">
+        <van-tab 
+          v-for="option in statusOptions"
+          :key="option.value"
+          :name="option.value"
+          :title="option.text"
+        />
+      </van-tabs>
+    </div>
+
     <div class="plan-list" v-if="store.plans.length">
       <van-cell-group>
         <van-cell
           v-for="plan in store.plans"
           :key="plan.id"
-          :title="plan.title"
+          :title="plan.name"
           is-link
           @click="handlePlanClick(plan)"
         >
           <template #label>
             <div class="plan-info">
-              <span class="duration">{{ plan.duration }}天</span>
-              <van-tag 
-                :type="plan.priority === 'high' ? 'danger' : 
-                       plan.priority === 'medium' ? 'warning' : 'success'"
-              >
-                {{ plan.priority === 'high' ? '高优先级' :
-                   plan.priority === 'medium' ? '中优先级' : '低优先级' }}
+              <div class="date-range">
+                {{ formatDate(plan.start_date) }} - {{ formatDate(plan.end_date) }}
+              </div>
+              <div class="duration">
+                {{ calculateDuration(plan.start_date, plan.end_date) }}天
+              </div>
+              <van-tag :type="plan.status === 'active' ? 'primary' : 'default'">
+                {{ plan.status === 'active' ? '进行中' : 
+                   plan.status === 'completed' ? '已完成' : '已取消' }}
               </van-tag>
             </div>
           </template>
@@ -88,12 +127,17 @@ function handlePlanClick(plan: RevisionPlan) {
   .plan-info {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
     margin-top: 4px;
+    font-size: 14px;
+    color: var(--van-gray-6);
+
+    .date-range {
+      flex: 1;
+    }
 
     .duration {
-      color: var(--van-gray-6);
-      font-size: 14px;
+      white-space: nowrap;
     }
   }
 
@@ -102,6 +146,14 @@ function handlePlanClick(plan: RevisionPlan) {
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .filter-section {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--van-background);
+    border-bottom: 1px solid var(--van-border-color);
   }
 }
 </style> 

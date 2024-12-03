@@ -12,10 +12,17 @@ const store = useRevisionStore()
 const planTasks = ref<RevisionTask[]>([])
 
 const planId = Number(route.params.id)
+const planDetails = ref({
+  name: '',
+  start_date: '',
+  end_date: '',
+  status: ''
+})
 
 onMounted(async () => {
   try {
-    await store.fetchPlan(planId)
+    const plan = await RevisionAPI.getPlan(planId)
+    planDetails.value = plan
     const tasks = await RevisionAPI.getPlanTasks(planId)
     planTasks.value = tasks
   } catch (error) {
@@ -43,25 +50,16 @@ async function handleTaskStatusChange(task: RevisionTask, status: RevisionTask['
 <template>
   <div class="plan-detail">
     <van-nav-bar
-      :title="store.currentPlan?.title"
+      :title="planDetails.name"
       left-arrow
       @click-left="router.back()"
     />
 
     <div class="detail-content">
       <van-cell-group title="计划信息">
-        <van-cell title="优先级">
-          <template #value>
-            <van-tag 
-              :type="store.currentPlan?.priority === 'high' ? 'danger' : 
-                     store.currentPlan?.priority === 'medium' ? 'warning' : 'success'"
-            >
-              {{ store.currentPlan?.priority === 'high' ? '高' :
-                 store.currentPlan?.priority === 'medium' ? '中' : '低' }}
-            </van-tag>
-          </template>
-        </van-cell>
-        <van-cell title="复习周期" :value="`${store.currentPlan?.duration}天`" />
+        <van-cell title="开始日期" :value="planDetails.start_date" />
+        <van-cell title="结束日期" :value="planDetails.end_date" />
+        <van-cell title="状态" :value="planDetails.status" />
       </van-cell-group>
 
       <van-cell-group title="任务列表">
