@@ -49,16 +49,43 @@ class NoteBasicInfo(BaseModel):
 class RevisionTaskResponse(BaseModel):
     """复习任务响应模型"""
     id: int
+    plan_id: int
     note_id: int
     scheduled_date: datetime
-    mastery_level: Optional[MasteryLevel] = Field(
-        None,
-        description="掌握程度: not_mastered(未掌握) / partially_mastered(部分掌握) / mastered(完全掌握)"
-    )
-    revision_count: int
-    created_at: datetime
+    status: str
+    mastery_level: Optional[str]
+    revision_mode: Optional[str]
+    priority: Optional[int]
     completed_at: Optional[datetime]
+    revision_count: Optional[int] = 0
     note: Optional[NoteBasicInfo] = None
     
     class Config:
-        from_attributes = True 
+        from_attributes = True
+
+class TaskHistoryResponse(BaseModel):
+    id: int
+    note_id: int
+    task_id: int
+    mastery_level: str
+    revision_mode: str
+    revision_date: datetime
+    time_spent: Optional[int]
+    comments: Optional[str]
+    
+    class Config:
+        from_attributes = True
+
+class BatchTaskUpdate(BaseModel):
+    task_ids: List[int]
+    status: str
+    mastery_level: Optional[str]
+    revision_mode: str
+    time_spent: Optional[int]
+    comments: Optional[str]
+
+class TaskAdjustment(BaseModel):
+    task_id: int
+    new_date: datetime
+    priority: Optional[int]
+    comments: Optional[str] 

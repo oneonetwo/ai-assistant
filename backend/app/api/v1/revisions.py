@@ -1,15 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Path
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.database import get_db
 from app.models.revision_schemas import (
     RevisionPlanCreate,
     RevisionPlanResponse,
     RevisionTaskUpdate,
-    RevisionTaskResponse
+    RevisionTaskResponse,
+    BatchTaskUpdate,
+    TaskAdjustment,
+    TaskHistoryResponse
 )
 from app.services.revision_service import RevisionService
-from typing import List
+from typing import List, Optional
 from datetime import date, datetime
+from fastapi.responses import JSONResponse
 
 router = APIRouter(prefix="/revisions", tags=["revisions"])
 
@@ -117,4 +121,97 @@ async def get_daily_tasks(
     db: AsyncSession = Depends(get_db)
 ):
     """获取每日任务清单"""
-    return await RevisionService.get_daily_tasks(db, date or datetime.now().date()) 
+    return await RevisionService.get_daily_tasks(db, date or datetime.now().date())
+
+@router.get("/tasks/next",
+    response_model=RevisionTaskResponse,
+    summary="获取下一个待复习任务",
+    description="""
+    获取下一个待复习的任务，支持以下功能：
+    - 可选择指定计划ID
+    - 支持普通模式和快速复习模式
+    - 按优先级和计划时间排序
+    """)
+async def get_next_task(
+    plan_id: Optional[int] = Query(None, description="计划ID"),
+    mode: str = Query("normal", description="复习模式: normal/quick"),
+    db: AsyncSession = Depends(get_db)
+):
+    """获取下一个待复习任务"""
+    task = await RevisionService.get_next_task(db, plan_id, mode)
+    if not task:
+        raise HTTPException(
+            status_code=404,
+            detail="没有待复习的任务"
+        )
+    return task
+
+@router.post("/tasks/batch",
+    response_model=List[RevisionTaskResponse],
+    summary="批量更新任务状态",
+    description="""
+    批量更新任务状态，支持：
+    - 更新多个任务的状态
+    - 记录掌握程度
+    - 记录复习模式和时间
+    """)
+async def batch_update_tasks(
+    updates: BatchTaskUpdate,
+    db: AsyncSession = Depends(get_db)
+):
+    """批量更新任务状态"""
+    return await RevisionService.batch_update_tasks(db, updates)
+
+@router.get("/tasks/{task_id}/history",
+    response_model=List[TaskHistoryResponse],
+    summary="获取任务复习历史",
+    description="获取指定任务的所有复习历史记录")
+async def get_task_history(
+    task_id: int = Path(..., description="任务ID"),
+    db: AsyncSession = Depends(get_db)
+):
+    """获取任务复习历史"""
+    return await RevisionService.get_task_history(db, task_id)
+
+@router.post("/tasks/adjust",
+    response_model=RevisionTaskResponse,
+    summary="调整任务计划",
+    description="""
+    调整任务复习计划，支持：
+    - 修改计划日期
+    - 调整优先级
+    - 添加调整说明
+    """)
+async def adjust_task_schedule(
+    adjustment: TaskAdjustment,
+    db: AsyncSession = Depends(get_db)
+):
+    """调整任务计划"""
+    return await RevisionService.adjust_task_schedule(db, adjustment)
+
+@router.get("/tasks/daily/summary",
+    summary="获取每日任务统计",
+    description="获取指定日期的任务统计信息")
+async def get_daily_summary(
+    date: Optional[date] = Query(None, description="指定日期，默认为今天"),
+    db: AsyncSession = Depends(get_db)
+):
+    """获取每日任务统计"""
+    target_date = date or datetime.now().date()
+    tasks = await RevisionService.get_daily_tasks(db, target_date)
+    
+    # 统计信息
+    summary = {
+        "date": target_date.isoformat(),
+        "total": len(tasks),
+        "completed": sum(1 for t in tasks if t.status == "completed"),
+        "pending": sum(1 for t in tasks if t.status == "pending"),
+        "skipped": sum(1 for t in tasks if t.status == "skipped"),
+        "mastery_levels": {
+            "mastered": sum(1 for t in tasks if t.mastery_level == "mastered"),
+            "partially_mastered": sum(1 for t in tasks if t.mastery_level == "partially_mastered"),
+            "not_mastered": sum(1 for t in tasks if t.mastery_level == "not_mastered")
+        }
+    }
+    
+    return JSONResponse(content=summary) 

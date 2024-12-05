@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { RevisionAPI } from '@/services/revisionService'
-import type { RevisionPlan, RevisionTask, RevisionStatus } from '@/types/revision'
+import type { RevisionPlan, RevisionTask, RevisionStatus, RevisionHistory, RevisionSummary } from '@/types/revision'
 import { showToast } from 'vant'
 
 interface FetchPlansParams {
@@ -21,6 +21,8 @@ export const useRevisionStore = defineStore('revision', () => {
   const planTasks = ref<RevisionTask[]>([])
   const isLoading = ref(false)
   const error = ref<string | null>(null)
+  const reviewHistory = ref<RevisionHistory[]>([])
+  const dailySummary = ref<RevisionSummary | null>(null)
 
   // 计算属性
   const completedTasksCount = computed(() => 
@@ -131,6 +133,85 @@ export const useRevisionStore = defineStore('revision', () => {
     error.value = null
   }
 
+  async function getNextTask(params: { 
+    plan_id?: number
+    mode?: 'normal' | 'quick' 
+  }) {
+    try {
+      isLoading.value = true
+      return await RevisionAPI.getNextTask(params)
+    } catch (err) {
+      error.value = '获取下一个任务失败'
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function batchUpdateTasks(data: {
+    task_ids: number[]
+    status: 'completed' | 'skipped'
+    mastery_level: RevisionTask['mastery_level']
+    revision_mode: 'normal' | 'quick'
+    time_spent?: number
+    comments?: string
+  }) {
+    try {
+      const updatedTasks = await RevisionAPI.batchUpdateTaskStatus(data)
+      // 更新本地状态
+      updatedTasks.forEach(task => {
+        const index = dailyTasks.value.findIndex(t => t.id === task.id)
+        if (index !== -1) {
+          dailyTasks.value[index] = task
+        }
+      })
+      return updatedTasks
+    } catch (err) {
+      error.value = '批量更新任务失败'
+      throw err
+    }
+  }
+
+  async function getTaskHistory(taskId: number) {
+    try {
+      isLoading.value = true
+      reviewHistory.value = await RevisionAPI.getTaskHistory(taskId)
+      return reviewHistory.value
+    } catch (err) {
+      error.value = '获取任务历史失败'
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function adjustTaskSchedule(data: {
+    task_id: number
+    new_date: string
+    priority?: number
+    comments?: string
+  }) {
+    try {
+      return await RevisionAPI.adjustTaskSchedule(data)
+    } catch (err) {
+      error.value = '调整任务计划失败'
+      throw err
+    }
+  }
+
+  async function fetchDailySummary(date?: string) {
+    try {
+      isLoading.value = true
+      dailySummary.value = await RevisionAPI.getDailySummary(date)
+      return dailySummary.value
+    } catch (err) {
+      error.value = '获取每日统计失败'
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   return {
     // 状态
     plans,
@@ -139,6 +220,8 @@ export const useRevisionStore = defineStore('revision', () => {
     planTasks,
     isLoading,
     error,
+    reviewHistory,
+    dailySummary,
     
     // 计算属性
     completedTasksCount,
@@ -152,6 +235,11 @@ export const useRevisionStore = defineStore('revision', () => {
     fetchDailyTasks,
     updateTaskStatus,
     fetchPlanTasks,
-    reset
+    reset,
+    getNextTask,
+    batchUpdateTasks,
+    getTaskHistory,
+    adjustTaskSchedule,
+    fetchDailySummary
   }
 }) 

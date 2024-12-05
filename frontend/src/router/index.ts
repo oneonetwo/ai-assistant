@@ -139,6 +139,16 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           title: '复习任务'
         }
+      },
+      {
+        path: 'quick-review',
+        name: 'revision-quick-review',
+        component: () => import('@/views/revision/QuickReviewView.vue')
+      },
+      {
+        path: 'plans/:planId/review',
+        name: 'revision-task-review',
+        component: () => import('@/views/revision/TaskReviewView.vue')
       }
     ]
   },

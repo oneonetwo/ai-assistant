@@ -174,10 +174,12 @@ class RevisionTask(Base):
     note_id = Column(Integer, ForeignKey("notes.id"))
     scheduled_date = Column(DateTime(timezone=True), nullable=False)
     status = Column(String(50), default="pending")  # pending, completed, skipped
-    mastery_level = Column(String(50), nullable=True)  # not_mastered, partially_mastered, mastered
-    revision_count = Column(Integer, default=0)
-    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+    mastery_level = Column(String(20), nullable=True)  # not_mastered, partially_mastered, mastered
+    revision_mode = Column(String(20), default="normal")  # normal, quick
+    priority = Column(Integer, default=0)  # 优先级，用于排序
     completed_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+    updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # 关系
     plan = relationship("RevisionPlan", back_populates="tasks")
@@ -200,7 +202,9 @@ class RevisionHistory(Base):
     note_id = Column(Integer, ForeignKey("notes.id"))
     task_id = Column(Integer, ForeignKey("revision_tasks.id"))
     mastery_level = Column(String(20), nullable=False)
+    revision_mode = Column(String(20), nullable=False)  # normal, quick
     revision_date = Column(DateTime(timezone=True), default=datetime.utcnow)
+    time_spent = Column(Integer, nullable=True)  # 花费时间(秒)
     comments = Column(Text, nullable=True)
     
     # 关系

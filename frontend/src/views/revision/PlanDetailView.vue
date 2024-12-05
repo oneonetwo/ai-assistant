@@ -199,6 +199,27 @@ async function handleTaskStatusChange(taskId: number, masteryLevel  : RevisionTa
         @status-change="handleTaskStatusChange"
       />
     </van-popup>
+
+    <div class="review-actions">
+      <van-button 
+        type="primary" 
+        block 
+        @click="router.push({ 
+          name: 'revision-task-review', 
+          params: { planId }
+        })"
+      >
+        开始逐条复习
+      </van-button>
+      
+      <van-button 
+        type="success" 
+        block 
+        @click="router.push({ name: 'revision-quick-review' })"
+      >
+        快速复习模式
+      </van-button>
+    </div>
   </div>
 </template>
 
@@ -256,5 +277,16 @@ async function handleTaskStatusChange(taskId: number, masteryLevel  : RevisionTa
       }
     }
   }
+}
+
+.review-actions {
+  position: sticky;
+  bottom: 0;
+  padding: 16px;
+  background: var(--van-background);
+  border-top: 1px solid var(--van-border-color);
+  
+  display: flex;
+  gap: 16px;
 }
 </style> 
