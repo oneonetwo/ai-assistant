@@ -195,119 +195,105 @@ class RevisionService:
         try:
             print(f"\n[DEBUG] Starting get_next_task with mode={mode}, plan_id={plan_id}")
             
-            # 首先检查是否有匹配的任务
-            check_query = (
-                select(func.count())
-                .select_from(RevisionTask)
-                .filter(
-                    and_(
-                        RevisionTask.status == "pending",
-                        RevisionTask.revision_mode == mode
+            # 首先验证计划是否存在
+            if plan_id:
+                plan_query = select(RevisionPlan).filter(RevisionPlan.id == plan_id)
+                plan_result = await db.execute(plan_query)
+                plan = plan_result.scalar_one_or_none()
+                if not plan:
+                    raise HTTPException(
+                        status_code=404,
+                        detail=f"计划 ID {plan_id} 不存在"
                     )
+                print(f"[DEBUG] Found plan: {plan.id} - {plan.name}")
+
+            # 检查任务状态
+            tasks_query = select(RevisionTask)
+            if plan_id:
+                tasks_query = tasks_query.filter(RevisionTask.plan_id == plan_id)
+            
+            tasks_result = await db.execute(tasks_query)
+            tasks = tasks_result.scalars().all()
+            print(f"\n[DEBUG] Current tasks status:")
+            for task in tasks:
+                print(f"Task {task.id}:")
+                print(f"  - status: {task.status}")
+                print(f"  - mode: {task.revision_mode}")
+                print(f"  - scheduled_date: {task.scheduled_date}")
+                print(f"  - priority: {task.priority}")
+
+            # 查询待处理的任务
+            query = (
+                select(RevisionTask)
+                .options(joinedload(RevisionTask.note))
+                .filter(
+                    RevisionTask.status == "pending",
+                    RevisionTask.revision_mode == mode
+                )
+                .order_by(
+                    RevisionTask.priority.desc(),
+                    RevisionTask.scheduled_date
                 )
             )
-            if plan_id:
-                check_query = check_query.filter(RevisionTask.plan_id == plan_id)
             
-            try:
-                result = await db.execute(check_query)
-                count = result.scalar()
-                print(f"[DEBUG] Found {count} tasks with mode '{mode}'")
-            except Exception as e:
-                print(f"[ERROR] Failed to check existing tasks: {str(e)}")
-                raise
+            if plan_id:
+                query = query.filter(RevisionTask.plan_id == plan_id)
 
-            # 如果没有匹配的任务，将部分pending任务更新为请求的模式
-            if count == 0:
-                print(f"[DEBUG] Attempting to update tasks to mode '{mode}'")
-                try:
-                    # 先查找可更新的任务
-                    pending_query = (
-                        select(RevisionTask)
-                        .filter(
-                            and_(
-                                RevisionTask.status == "pending",
-                                or_(
-                                    RevisionTask.revision_mode.is_(None),
-                                    RevisionTask.revision_mode == "normal"
-                                )
+            print(f"\n[DEBUG] Executing query for pending tasks")
+            print(f"[DEBUG] Query SQL: {query.compile(compile_kwargs={'literal_binds': True})}")
+            
+            result = await db.execute(query)
+            task = result.scalars().first()
+            
+            if task:
+                print(f"\n[DEBUG] Found next task:")
+                print(f"  - id: {task.id}")
+                print(f"  - status: {task.status}")
+                print(f"  - mode: {task.revision_mode}")
+                print(f"  - scheduled_date: {task.scheduled_date}")
+            else:
+                print("\n[DEBUG] No pending task found")
+                # 如果没有找到任务，尝试更新任务模式
+                update_query = (
+                    update(RevisionTask)
+                    .where(
+                        and_(
+                            RevisionTask.status == "pending",
+                            RevisionTask.plan_id == plan_id if plan_id else True,
+                            or_(
+                                RevisionTask.revision_mode.is_(None),
+                                RevisionTask.revision_mode != mode
                             )
                         )
                     )
-                    if plan_id:
-                        pending_query = pending_query.filter(RevisionTask.plan_id == plan_id)
-                    
-                    pending_result = await db.execute(pending_query)
-                    pending_tasks = pending_result.scalars().all()
-                    print(f"[DEBUG] Found {len(pending_tasks)} pending tasks to update")
-
-                    # 更新这些任务
-                    if pending_tasks:
-                        update_stmt = (
-                            update(RevisionTask)
-                            .where(RevisionTask.id.in_([t.id for t in pending_tasks]))
-                            .values(revision_mode=mode)
-                        )
-                        await db.execute(update_stmt)
-                        await db.commit()
-                        print(f"[DEBUG] Successfully updated tasks to mode '{mode}'")
-                    
-                except Exception as e:
-                    print(f"[ERROR] Failed to update tasks: {str(e)}")
-                    await db.rollback()
-                    raise
-
-            # 查询任务
-            try:
-                query = (
-                    select(RevisionTask)
-                    .options(joinedload(RevisionTask.note))
-                    .filter(
-                        and_(
-                            RevisionTask.status == "pending",
-                            RevisionTask.revision_mode == mode
-                        )
-                    )
-                    .order_by(
-                        RevisionTask.priority.desc(),
-                        RevisionTask.scheduled_date
-                    )
+                    .values(revision_mode=mode)
                 )
+                await db.execute(update_query)
+                await db.commit()
+                print(f"[DEBUG] Updated tasks to mode: {mode}")
                 
-                if plan_id:
-                    query = query.filter(RevisionTask.plan_id == plan_id)
-
-                print(f"[DEBUG] Executing final query")
+                # 再次尝试查询
                 result = await db.execute(query)
                 task = result.scalars().first()
-                
-                print(f"[DEBUG] Query completed. Task found: {task is not None}")
                 if task:
-                    print(f"[DEBUG] Task details:")
+                    print(f"\n[DEBUG] Found task after update:")
                     print(f"  - id: {task.id}")
-                    print(f"  - scheduled_date: {task.scheduled_date}")
                     print(f"  - status: {task.status}")
-                    print(f"  - revision_mode: {task.revision_mode}")
+                    print(f"  - mode: {task.revision_mode}")
+                    print(f"  - scheduled_date: {task.scheduled_date}")
+
+            if not task:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"没有待复习的任务 (plan_id: {plan_id}, mode: {mode})"
+                )
                 
-                if not task:
-                    raise HTTPException(
-                        status_code=404,
-                        detail=f"没有待复习的任务 (mode: {mode})"
-                    )
-                    
-                return task
-                
-            except Exception as e:
-                print(f"[ERROR] Failed to query task: {str(e)}")
-                raise
+            return task
                 
         except HTTPException:
             raise
         except Exception as e:
-            print(f"[ERROR] Unexpected error in get_next_task: {str(e)}")
-            print(f"[ERROR] Error type: {type(e)}")
-            import traceback
-            print(f"[ERROR] Traceback: {traceback.format_exc()}")
+            print(f"[ERROR] Unexpected error: {str(e)}")
             raise HTTPException(
                 status_code=500,
                 detail=f"获取下一个任务失败: {str(e)}"
