@@ -103,27 +103,25 @@ function handleTitleClick(event: Event) {
       <div class="markdown-body" v-html="renderedContent" />
     </div>
 
-    <div class="status-buttons">
-      <div class="button-group">
-        <van-button 
-          :type="task.mastery_level === 'not_mastered' ? 'danger' : 'default'"
-          @click="handleMasteryChange('not_mastered')"
-        >
-          记不清
-        </van-button>
-        <van-button 
-          :type="task.mastery_level === 'partially_mastered' ? 'warning' : 'default'"
-          @click="handleMasteryChange('partially_mastered')"
-        >
-          部分掌握
-        </van-button>
-        <van-button 
-          :type="task.mastery_level === 'mastered' ? 'success' : 'default'"
-          @click="handleMasteryChange('mastered')"
-        >
-          已熟记，跳过
-        </van-button>
-      </div>
+    <div v-if="mode !== 'quick'" class="mastery-controls">
+      <van-button 
+        type="danger" 
+        @click="handleMasteryChange('not_mastered')"
+      >
+        不熟悉
+      </van-button>
+      <van-button 
+        type="warning" 
+        @click="handleMasteryChange('partially_mastered')"
+      >
+        学习中
+      </van-button>
+      <van-button 
+        type="success" 
+        @click="handleMasteryChange('mastered')"
+      >
+        已掌握
+      </van-button>
     </div>
   </div>
 </template>
@@ -179,17 +177,11 @@ function handleTitleClick(event: Event) {
     border-radius: 8px;
   }
 
-  .status-buttons {
-    padding: 16px;
-    
-    .button-group {
-      display: flex;
-      gap: 8px;
-      
-      .van-button {
-        flex: 1;
-      }
-    }
+  .mastery-controls {
+    margin-top: var(--van-padding-md);
+    display: flex;
+    gap: var(--van-padding-xs);
+    justify-content: center;
   }
 }
 </style> 

@@ -57,12 +57,23 @@ class RevisionService:
             for days in revision_points:
                 scheduled_date = plan.start_date + timedelta(days=days)
                 if scheduled_date <= plan.end_date:
-                    task = RevisionTask(
+                    # 创建普通模式任务
+                    normal_task = RevisionTask(
                         plan_id=plan.id,
                         note_id=note.id,
-                        scheduled_date=scheduled_date
+                        scheduled_date=scheduled_date,
+                        revision_mode="normal"
                     )
-                    db.add(task)
+                    db.add(normal_task)
+                    
+                    # 同时创建快速模式任务
+                    quick_task = RevisionTask(
+                        plan_id=plan.id,
+                        note_id=note.id,
+                        scheduled_date=scheduled_date,
+                        revision_mode="quick"
+                    )
+                    db.add(quick_task)
         
         await db.commit() 
 
@@ -241,18 +252,21 @@ class RevisionService:
         try:
             app_logger.info(f"获取下一个待复习任务: plan_id={plan_id}, mode={mode}")
             
-            # 使用 joinedload 预加载关联的 note
+            # 构建基础查询条件
+            conditions = [
+                RevisionTask.plan_id == plan_id,
+                RevisionTask.status == "pending",
+                RevisionTask.scheduled_date <= datetime.utcnow()
+            ]
+            
+            # 只有在 normal 模式下才添加 revision_mode 的过滤条件
+            if mode == "normal":
+                conditions.append(RevisionTask.revision_mode == "normal")
+            
             stmt = (
                 select(RevisionTask)
                 .options(joinedload(RevisionTask.note))
-                .where(
-                    and_(
-                        RevisionTask.plan_id == plan_id,
-                        RevisionTask.status == "pending",
-                        RevisionTask.revision_mode == mode,
-                        RevisionTask.scheduled_date <= datetime.utcnow()
-                    )
-                )
+                .where(and_(*conditions))
                 .order_by(
                     desc(RevisionTask.priority),
                     RevisionTask.scheduled_date
@@ -389,7 +403,7 @@ class RevisionService:
         db: AsyncSession,
         adjustment: TaskAdjustment
     ) -> RevisionTask:
-        """调整���务计划"""
+        """调整任务计划"""
         try:
             app_logger.info(f"开始调整任务计划: {adjustment.model_dump()}")
             
@@ -531,7 +545,7 @@ class RevisionService:
             existing_tasks = result.unique().scalars().all()
             existing_plan_ids = {task.plan_id for task in existing_tasks}
 
-            # 创建任务
+            # 建任务
             created_tasks = []
             failed_plans = []
             
