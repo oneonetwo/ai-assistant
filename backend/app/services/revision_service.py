@@ -8,8 +8,9 @@ from app.models.revision_schemas import (
 from datetime import datetime, timedelta, date
 from typing import List, Optional, Dict
 from sqlalchemy.sql import func
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 from fastapi import HTTPException
+from app.core.logging import app_logger
 
 class RevisionService:
     @staticmethod
@@ -305,39 +306,39 @@ class RevisionService:
     ) -> List[RevisionTask]:
         """批量更新任务状态"""
         try:
+            app_logger.info(f"开始批量更新任务: {updates.model_dump()}")
             tasks = []
-            for task_id in updates.task_ids:
-                task = await db.get(RevisionTask, task_id)
-                if not task:
-                    continue
-                
-                # 更新任务状态
+            
+            # 使用 joinedload 预加载关联的 note
+            stmt = (
+                select(RevisionTask)
+                .options(joinedload(RevisionTask.note))
+                .where(RevisionTask.id.in_(updates.task_ids))
+            )
+            result = await db.execute(stmt)
+            db_tasks = result.unique().scalars().all()
+            
+            for task in db_tasks:
+                app_logger.debug(f"更新任务 {task.id} 的状态")
                 task.status = updates.status
-                if updates.mastery_level:
-                    task.mastery_level = updates.mastery_level
-                task.completed_at = datetime.utcnow()
-                
-                # 创建历史记录
-                history = RevisionHistory(
-                    note_id=task.note_id,
-                    task_id=task.id,
-                    mastery_level=updates.mastery_level or task.mastery_level,
-                    revision_mode=updates.revision_mode,
-                    time_spent=updates.time_spent,
-                    comments=updates.comments
-                )
-                db.add(history)
-                
-                # 如果未完全掌握，创建后续任务
-                if updates.mastery_level in ["not_mastered", "partially_mastered"]:
-                    await RevisionService._create_followup_task(db, task)
-                
+                task.mastery_level = updates.mastery_level
+                task.revision_mode = updates.revision_mode
+                task.time_spent = updates.time_spent
+                task.comments = updates.comments
+                task.completed_at = datetime.utcnow() if updates.status == "completed" else None
                 tasks.append(task)
-            
+
+                # 如果任务完成且未完全掌握，创建后续任务
+                if updates.status == "completed" and updates.mastery_level != "mastered":
+                    app_logger.debug(f"为任务 {task.id} 创建后续复习任务")
+                    await RevisionService._create_followup_task(db, task)
+
             await db.commit()
+            app_logger.info(f"成功更新 {len(tasks)} 个任务")
             return tasks
-            
+
         except Exception as e:
+            app_logger.error(f"批量更新任务失败: {str(e)}")
             await db.rollback()
             raise HTTPException(
                 status_code=500,

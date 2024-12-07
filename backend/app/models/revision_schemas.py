@@ -78,11 +78,11 @@ class TaskHistoryResponse(BaseModel):
 
 class BatchTaskUpdate(BaseModel):
     task_ids: List[int]
-    status: str
-    mastery_level: Optional[str]
-    revision_mode: str
-    time_spent: Optional[int]
-    comments: Optional[str]
+    status: str = Field(..., pattern="^(pending|completed|skipped)$")
+    mastery_level: str = Field(..., pattern="^(not_mastered|partially_mastered|mastered)$")
+    revision_mode: str = Field(..., pattern="^(normal|intensive|review)$")
+    time_spent: Optional[int] = Field(None, ge=0)
+    comments: Optional[str] = None
 
 class TaskAdjustment(BaseModel):
     task_id: int
