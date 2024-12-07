@@ -82,18 +82,23 @@ async def get_revision_plan(
 )
 async def get_plan_tasks(
     plan_id: int,
-    date: date = Query(None, description="按日期筛选任务"),
     status: str = Query(None, description="按状态筛选 (pending/completed/skipped)"),
+    date: date = Query(None, description="按日期筛选任务"),
     db: AsyncSession = Depends(get_db)
 ):
     """
     获取计划任务列表
     
     - **plan_id**: 计划ID
-    - **date**: 可选的日期筛选
     - **status**: 可选的状态筛选
+    - **date**: 可选的日期筛选
     """
-    return await RevisionService.get_plan_tasks(db, plan_id, date, status)
+    return await RevisionService.get_plan_tasks(
+        db=db,
+        plan_id=plan_id,
+        status=status,
+        date=date
+    )
 
 @router.patch("/tasks/{task_id}", response_model=RevisionTaskResponse,
     summary="更新复习任务",

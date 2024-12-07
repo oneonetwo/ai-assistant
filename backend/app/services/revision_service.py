@@ -103,21 +103,22 @@ class RevisionService:
                 select(RevisionTask)
                 .options(joinedload(RevisionTask.note))  # 预加载笔记信息
                 .where(RevisionTask.plan_id == plan_id)
-                .order_by(RevisionTask.scheduled_date)
             )
 
-            # 添加过滤条件
+            # 分别添加过滤条件
             if status:
                 query = query.where(RevisionTask.status == status)
             if date:
                 query = query.where(func.date(RevisionTask.scheduled_date) == date)
+
+            # 添加排序
+            query = query.order_by(RevisionTask.scheduled_date)
 
             result = await db.execute(query)
             tasks = result.unique().scalars().all()
 
             # 设置默认值和补充信息
             for task in tasks:
-                # 设置任务默认值
                 if task.status is None:
                     task.status = "pending"
                 if task.mastery_level is None:
@@ -222,7 +223,7 @@ class RevisionService:
         db: AsyncSession,
         date: date
     ) -> List[RevisionTask]:
-        """获取指定期的所有任务"""
+        """取指定期的所有任务"""
         query = (
             select(RevisionTask)
             .filter(func.date(RevisionTask.scheduled_date) == date)
@@ -263,6 +264,34 @@ class RevisionService:
             task = result.unique().scalar_one_or_none()
             
             if task:
+                # 设置默认值
+                if task.status is None:
+                    task.status = "pending"
+                if task.mastery_level is None:
+                    task.mastery_level = "not_mastered"
+                if task.revision_mode is None:
+                    task.revision_mode = "normal"
+                if task.priority is None:
+                    task.priority = 0
+                    
+                # 确保笔记信息完整
+                if task.note:
+                    if task.note.status is None:
+                        task.note.status = "active"
+                    if task.note.priority is None:
+                        task.note.priority = "normal"
+                    if task.note.content is None:
+                        task.note.content = ""
+                    if task.note.title is None:
+                        task.note.title = ""
+                    
+                # 获取复习次数
+                history_count = await db.execute(
+                    select(func.count(RevisionHistory.id))
+                    .where(RevisionHistory.task_id == task.id)
+                )
+                task.revision_count = history_count.scalar() or 0
+                
                 app_logger.info(f"找到下一个任务: {task.id}")
             else:
                 app_logger.info(f"没有找到待复习的任务 (plan_id: {plan_id}, mode: {mode})")
@@ -360,7 +389,7 @@ class RevisionService:
         db: AsyncSession,
         adjustment: TaskAdjustment
     ) -> RevisionTask:
-        """调整任务计划"""
+        """调整���务计划"""
         try:
             app_logger.info(f"开始调整任务计划: {adjustment.model_dump()}")
             
