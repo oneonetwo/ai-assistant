@@ -41,7 +41,7 @@
       <div class="bubble">
         <div class="markdown-body" v-html="renderedContent" />
       </div>
-      <Transition name="fade">
+      <!-- <Transition name="fade">
         <div v-if="showActions && !isSelectable" class="actions">
           <van-button size="mini" @click="$emit('quote', message)">
             <template #icon><svg-icon name="quote" /></template>
@@ -56,7 +56,7 @@
             编辑
           </van-button>
         </div>
-      </Transition>
+      </Transition> -->
     </div>
   </div>
 </template>

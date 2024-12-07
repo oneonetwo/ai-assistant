@@ -87,6 +87,21 @@ MAX_UPLOAD_SIZE=10485760  # 10MB
 ### 启动服务
 ```bash
 uvicorn app.main:app --reload
+
+mysql -u root -p
+DROP DATABASE ai_assistant;
+CREATE DATABASE ai_assistant;
+exit;
+# 1. 删除所有迁移文件（保留 env.py 和 script.py.mako）
+rm -f alembic/versions/*
+
+# 2. 重新生成初始迁移
+alembic revision --autogenerate -m "initial migration"
+
+# 3. 执行迁移
+alembic upgrade head
+
+
 ```
 
 ## API文档

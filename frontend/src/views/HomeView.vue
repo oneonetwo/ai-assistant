@@ -19,7 +19,7 @@ const features = [
   },
   {
     title: '复习助手',
-    description: '系统复习，完全掌握',
+    description: '执行计划，科学复习',
     icon: 'book',
     route: '/revision'
   }

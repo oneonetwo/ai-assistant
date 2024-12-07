@@ -1,14 +1,23 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import type { RevisionTask } from '@/types/revision'
 import MarkdownIt from 'markdown-it'
+import { useTimeSpent } from '@/composables/useTimeSpent'
+
+const router = useRouter()
 
 const props = defineProps<{
   task: RevisionTask
+  mode?: 'normal' | 'quick'
 }>()
 
 const emit = defineEmits<{
-  (e: 'status-change', taskId: number, masteryLevel: RevisionTask['mastery_level']): void
+  (e: 'complete', data: {
+    taskId: number
+    masteryLevel: RevisionTask['mastery_level']
+    timeSpent: number
+  }): void
 }>()
 
 const showContent = ref(false)
@@ -31,19 +40,43 @@ const masteryColor = computed(() => {
   }
 })
 
+const { timeSpent, startTimer, stopTimer } = useTimeSpent()
+
 function handleMasteryChange(masteryLevel: RevisionTask['mastery_level']) {
-  emit('status-change', props.task.id, masteryLevel)
+  stopTimer()
+  emit('complete', {
+    taskId: props.task.id,
+    masteryLevel,
+    timeSpent: timeSpent.value
+  })
+}
+
+watch(showContent, (newValue) => {
+  if (newValue) {
+    startTimer()
+  }
+})
+
+function handleTitleClick(event: Event) {
+  event.stopPropagation()
+  router.push({
+    name: 'note-detail',
+    params: { id: props.task.note.id }
+  })
 }
 </script>
 
 <template>
   <div class="task-execution">
     <div class="task-header">
-      <h3>{{ task.note.title }}</h3>
+      <div class="title-wrapper">
+        <h3 @click="handleTitleClick">{{ task.note.title }}</h3>
+        <van-icon name="arrow" class="title-icon" />
+      </div>
       <van-tag :type="masteryColor" round>
-        {{ task.mastery_level === 'mastered' ? '已掌握' :
+        {{ task.mastery_level === 'mastered' ? '已熟记' :
            task.mastery_level === 'partially_mastered' ? '部分掌握' :
-           task.mastery_level === 'not_mastered' ? '未掌握' : '待评估' }}
+           task.mastery_level === 'not_mastered' ? '记不清' : '待评估' }}
       </van-tag>
     </div>
 
@@ -76,7 +109,7 @@ function handleMasteryChange(masteryLevel: RevisionTask['mastery_level']) {
           :type="task.mastery_level === 'not_mastered' ? 'danger' : 'default'"
           @click="handleMasteryChange('not_mastered')"
         >
-          未掌握
+          记不清
         </van-button>
         <van-button 
           :type="task.mastery_level === 'partially_mastered' ? 'warning' : 'default'"
@@ -88,7 +121,7 @@ function handleMasteryChange(masteryLevel: RevisionTask['mastery_level']) {
           :type="task.mastery_level === 'mastered' ? 'success' : 'default'"
           @click="handleMasteryChange('mastered')"
         >
-          已掌握
+          已熟记，跳过
         </van-button>
       </div>
     </div>
@@ -105,9 +138,27 @@ function handleMasteryChange(masteryLevel: RevisionTask['mastery_level']) {
     align-items: center;
     margin-bottom: 16px;
 
-    h3 {
-      font-size: 16px;
-      font-weight: 500;
+    .title-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      
+      h3 {
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        color: var(--van-primary-color);
+        
+        &:hover {
+          opacity: 0.8;
+          text-decoration: underline;
+        }
+      }
+
+      .title-icon {
+        font-size: 14px;
+        color: var(--van-gray-5);
+      }
     }
   }
 

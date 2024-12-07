@@ -19,7 +19,7 @@ const chatStore = useChatStore()
 const { isLoading } = storeToRefs(chatStore)
 
 const featureTags = [
-  { id: 1, icon: 'image', label: '创建图片' },
+  { id: 1, icon: 'image', label: '直接对话' },
   { id: 2, icon: 'chart', label: '分析数据' },
   { id: 3, icon: 'doc', label: '总结文本' },
   { id: 4, icon: 'bulb', label: '构思' },

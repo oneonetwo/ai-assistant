@@ -2,8 +2,8 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRevisionStore } from '@/stores/revision'
-import { showToast } from 'vant'
-import TaskReviewCard from '@/components/revision/TaskReviewCard.vue'
+import { showToast, showLoadingToast } from 'vant'
+import TaskExecution from '@/components/revision/TaskExecution.vue'
 import type { RevisionTask } from '@/types/revision'
 
 const route = useRoute()
@@ -14,14 +14,24 @@ const currentTask = ref<RevisionTask | null>(null)
 const planId = Number(route.params.planId)
 
 async function loadNextTask() {
+  const loading = showLoadingToast({
+    message: '加载中...',
+    forbidClick: true,
+  })
   try {
     const task = await store.getNextTask({ 
       plan_id: planId,
       mode: 'normal'
     })
     currentTask.value = task
+    if (!task) {
+      showToast('已完成所有任务')
+      router.back()
+    }
   } catch (error) {
     showToast('加载任务失败')
+  } finally {
+    loading.close()
   }
 }
 
@@ -30,6 +40,10 @@ async function handleTaskComplete(data: {
   masteryLevel: RevisionTask['mastery_level']
   timeSpent: number
 }) {
+  const loading = showLoadingToast({
+    message: '更新中...',
+    forbidClick: true,
+  })
   try {
     await store.batchUpdateTasks({
       task_ids: [data.taskId],
@@ -51,9 +65,12 @@ async function handleTaskComplete(data: {
       })
     }
     
+    // 加载下一个任务
     await loadNextTask()
   } catch (error) {
     showToast('更新任务状态失败')
+  } finally {
+    loading.close()
   }
 }
 
@@ -69,7 +86,7 @@ onMounted(loadNextTask)
     />
     
     <div class="review-content">
-      <TaskReviewCard
+      <TaskExecution
         v-if="currentTask"
         :task="currentTask"
         mode="normal"
