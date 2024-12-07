@@ -141,7 +141,7 @@ const routes: Array<RouteRecordRaw> = [
         }
       },
       {
-        path: 'quick-review',
+        path: 'quick-review/:planId',
         name: 'revision-quick-review',
         component: () => import('@/views/revision/QuickReviewView.vue')
       },

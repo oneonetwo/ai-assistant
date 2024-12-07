@@ -85,7 +85,7 @@ class BatchTaskUpdate(BaseModel):
     comments: Optional[str] = None
 
 class TaskAdjustment(BaseModel):
-    task_id: int
-    new_date: datetime
-    priority: Optional[int]
-    comments: Optional[str] 
+    task_id: int = Field(..., description="任务ID")
+    new_date: datetime = Field(..., description="新的计划日期")
+    priority: Optional[int] = Field(None, ge=0, le=3, description="任务优先级(0-3)")
+    comments: Optional[str] = Field(None, description="调整说明") 

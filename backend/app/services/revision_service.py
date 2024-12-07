@@ -190,111 +190,44 @@ class RevisionService:
     @staticmethod
     async def get_next_task(
         db: AsyncSession,
-        plan_id: Optional[int] = None,
+        plan_id: int,
         mode: str = "normal"
     ) -> Optional[RevisionTask]:
+        """获取下一个待复习任务"""
         try:
-            print(f"\n[DEBUG] Starting get_next_task with mode={mode}, plan_id={plan_id}")
+            app_logger.info(f"获取下一个待复习任务: plan_id={plan_id}, mode={mode}")
             
-            # 首先验证计划是否存在
-            if plan_id:
-                plan_query = select(RevisionPlan).filter(RevisionPlan.id == plan_id)
-                plan_result = await db.execute(plan_query)
-                plan = plan_result.scalar_one_or_none()
-                if not plan:
-                    raise HTTPException(
-                        status_code=404,
-                        detail=f"计划 ID {plan_id} 不存在"
-                    )
-                print(f"[DEBUG] Found plan: {plan.id} - {plan.name}")
-
-            # 检查任务状态
-            tasks_query = select(RevisionTask)
-            if plan_id:
-                tasks_query = tasks_query.filter(RevisionTask.plan_id == plan_id)
-            
-            tasks_result = await db.execute(tasks_query)
-            tasks = tasks_result.scalars().all()
-            print(f"\n[DEBUG] Current tasks status:")
-            for task in tasks:
-                print(f"Task {task.id}:")
-                print(f"  - status: {task.status}")
-                print(f"  - mode: {task.revision_mode}")
-                print(f"  - scheduled_date: {task.scheduled_date}")
-                print(f"  - priority: {task.priority}")
-
-            # 查询待处理的任务
-            query = (
+            # 使用 joinedload 预加载关联的 note
+            stmt = (
                 select(RevisionTask)
                 .options(joinedload(RevisionTask.note))
-                .filter(
-                    RevisionTask.status == "pending",
-                    RevisionTask.revision_mode == mode
+                .where(
+                    and_(
+                        RevisionTask.plan_id == plan_id,
+                        RevisionTask.status == "pending",
+                        RevisionTask.revision_mode == mode,
+                        RevisionTask.scheduled_date <= datetime.utcnow()
+                    )
                 )
                 .order_by(
-                    RevisionTask.priority.desc(),
+                    desc(RevisionTask.priority),
                     RevisionTask.scheduled_date
                 )
+                .limit(1)
             )
             
-            if plan_id:
-                query = query.filter(RevisionTask.plan_id == plan_id)
-
-            print(f"\n[DEBUG] Executing query for pending tasks")
-            print(f"[DEBUG] Query SQL: {query.compile(compile_kwargs={'literal_binds': True})}")
-            
-            result = await db.execute(query)
-            task = result.scalars().first()
+            result = await db.execute(stmt)
+            task = result.unique().scalar_one_or_none()
             
             if task:
-                print(f"\n[DEBUG] Found next task:")
-                print(f"  - id: {task.id}")
-                print(f"  - status: {task.status}")
-                print(f"  - mode: {task.revision_mode}")
-                print(f"  - scheduled_date: {task.scheduled_date}")
+                app_logger.info(f"找到下一个任务: {task.id}")
             else:
-                print("\n[DEBUG] No pending task found")
-                # 如果没有找到任务，尝试更新任务模式
-                update_query = (
-                    update(RevisionTask)
-                    .where(
-                        and_(
-                            RevisionTask.status == "pending",
-                            RevisionTask.plan_id == plan_id if plan_id else True,
-                            or_(
-                                RevisionTask.revision_mode.is_(None),
-                                RevisionTask.revision_mode != mode
-                            )
-                        )
-                    )
-                    .values(revision_mode=mode)
-                )
-                await db.execute(update_query)
-                await db.commit()
-                print(f"[DEBUG] Updated tasks to mode: {mode}")
-                
-                # 再次尝试查询
-                result = await db.execute(query)
-                task = result.scalars().first()
-                if task:
-                    print(f"\n[DEBUG] Found task after update:")
-                    print(f"  - id: {task.id}")
-                    print(f"  - status: {task.status}")
-                    print(f"  - mode: {task.revision_mode}")
-                    print(f"  - scheduled_date: {task.scheduled_date}")
-
-            if not task:
-                raise HTTPException(
-                    status_code=404,
-                    detail=f"没有待复习的任务 (plan_id: {plan_id}, mode: {mode})"
-                )
+                app_logger.info(f"没有找到待复习的任务 (plan_id: {plan_id}, mode: {mode})")
                 
             return task
-                
-        except HTTPException:
-            raise
+
         except Exception as e:
-            print(f"[ERROR] Unexpected error: {str(e)}")
+            app_logger.error(f"获取下一个任务失败: {str(e)}")
             raise HTTPException(
                 status_code=500,
                 detail=f"获取下一个任务失败: {str(e)}"
@@ -386,34 +319,39 @@ class RevisionService:
     ) -> RevisionTask:
         """调整任务计划"""
         try:
-            task = await db.get(RevisionTask, adjustment.task_id)
+            app_logger.info(f"开始调整任务计划: {adjustment.model_dump()}")
+            
+            # 使用 joinedload 预加载关联的 note
+            stmt = (
+                select(RevisionTask)
+                .options(joinedload(RevisionTask.note))
+                .where(RevisionTask.id == adjustment.task_id)
+            )
+            result = await db.execute(stmt)
+            task = result.unique().scalar_one_or_none()
+            
             if not task:
+                app_logger.error(f"任务不存在: {adjustment.task_id}")
                 raise HTTPException(
                     status_code=404,
-                    detail="任务不存在"
+                    detail=f"任务 {adjustment.task_id} 不存在"
                 )
-            
+
+            # 更新任务
             task.scheduled_date = adjustment.new_date
             if adjustment.priority is not None:
                 task.priority = adjustment.priority
-                
-            # 记录调整历史
-            history = RevisionHistory(
-                note_id=task.note_id,
-                task_id=task.id,
-                mastery_level=task.mastery_level,
-                revision_mode="adjustment",
-                comments=adjustment.comments
-            )
-            db.add(history)
-            
+            if adjustment.comments:
+                task.comments = adjustment.comments
+
             await db.commit()
-            await db.refresh(task)
+            app_logger.info(f"成功调整任务 {task.id} 的计划")
             return task
-            
+
         except HTTPException:
             raise
         except Exception as e:
+            app_logger.error(f"调整任务计划失败: {str(e)}")
             await db.rollback()
             raise HTTPException(
                 status_code=500,

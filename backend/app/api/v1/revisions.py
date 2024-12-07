@@ -11,6 +11,7 @@ from app.models.revision_schemas import (
     TaskHistoryResponse
 )
 from app.services.revision_service import RevisionService
+from app.core.logging import app_logger
 from typing import List, Optional
 from datetime import date, datetime
 from fastapi.responses import JSONResponse
@@ -123,27 +124,27 @@ async def get_daily_tasks(
     """获取每日任务清单"""
     return await RevisionService.get_daily_tasks(db, date or datetime.now().date())
 
-@router.get("/tasks/next",
-    response_model=RevisionTaskResponse,
+@router.get("/tasks/next", 
+    response_model=Optional[RevisionTaskResponse],
     summary="获取下一个待复习任务",
-    description="""
-    获取下一个待复习的任务，支持以下功能：
-    - 可选择指定计划ID
-    - 支持普通模式和快速复习模式
-    - 按优先级和计划时间排序
-    """)
+    description="获取指定计划下一个待复习任务，如果没有任务则返回null"
+)
 async def get_next_task(
-    plan_id: Optional[int] = Query(None, description="计划ID"),
-    mode: str = Query("normal", description="复习模式: normal/quick"),
+    plan_id: int = Query(..., description="复习计划ID"),
+    mode: str = Query("normal", description="复习模式"),
     db: AsyncSession = Depends(get_db)
 ):
     """获取下一个待复习任务"""
+    app_logger.debug(f"请求获取下一个任务: plan_id={plan_id}, mode={mode}")
+    
     task = await RevisionService.get_next_task(db, plan_id, mode)
-    if not task:
-        raise HTTPException(
-            status_code=404,
-            detail="没有待复习的任务"
-        )
+    
+    # 如果没有任务，直接返回 None
+    if task is None:
+        app_logger.debug("没有找到待复习任务，返回null")
+        return None
+        
+    app_logger.debug(f"找到待复习任务: {task.id}")
     return task
 
 @router.post("/tasks/batch",

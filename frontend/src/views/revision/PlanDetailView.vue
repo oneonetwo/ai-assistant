@@ -215,7 +215,7 @@ async function handleTaskStatusChange(taskId: number, masteryLevel  : RevisionTa
       <van-button 
         type="success" 
         block 
-        @click="router.push({ name: 'revision-quick-review' })"
+        @click="router.push({ name: 'revision-quick-review'  , params: { planId }})"
       >
         快速复习模式
       </van-button>

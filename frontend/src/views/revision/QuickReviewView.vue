@@ -10,6 +10,7 @@ const route = useRoute()
 const router = useRouter()
 const store = useRevisionStore()
 
+const planId = Number(route.params.planId)
 const tasks = ref<RevisionTask[]>([])
 const currentIndex = ref(0)
 const pendingUpdates = ref<Array<{
@@ -31,7 +32,7 @@ async function loadTasks() {
   })
   try {
     const task = await store.getNextTask({ 
-      plan_id: Number(route.params.id), 
+      plan_id: planId, 
       mode: 'quick' 
     })
     if (task) {
