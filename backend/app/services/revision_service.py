@@ -6,7 +6,7 @@ from app.models.revision_schemas import (
     BatchTaskUpdate, TaskAdjustment, TaskHistoryResponse
 )
 from datetime import datetime, timedelta, date
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 from sqlalchemy.sql import func
 from sqlalchemy.orm import joinedload, selectinload
 from fastapi import HTTPException
@@ -93,23 +93,66 @@ class RevisionService:
     async def get_plan_tasks(
         db: AsyncSession,
         plan_id: int,
-        date: Optional[date] = None,
-        status: Optional[str] = None
+        status: Optional[str] = None,
+        date: Optional[date] = None
     ) -> List[RevisionTask]:
         """获取计划的任务列表"""
-        query = (
-            select(RevisionTask)
-            .options(joinedload(RevisionTask.note))
-            .filter(RevisionTask.plan_id == plan_id)
-        )
-        
-        if date:
-            query = query.filter(func.date(RevisionTask.scheduled_date) == date)
-        if status:
-            query = query.filter(RevisionTask.status == status)
-            
-        result = await db.execute(query)
-        return result.unique().scalars().all()
+        try:
+            # 构建基础查询
+            query = (
+                select(RevisionTask)
+                .options(joinedload(RevisionTask.note))  # 预加载笔记信息
+                .where(RevisionTask.plan_id == plan_id)
+                .order_by(RevisionTask.scheduled_date)
+            )
+
+            # 添加过滤条件
+            if status:
+                query = query.where(RevisionTask.status == status)
+            if date:
+                query = query.where(func.date(RevisionTask.scheduled_date) == date)
+
+            result = await db.execute(query)
+            tasks = result.unique().scalars().all()
+
+            # 设置默认值和补充信息
+            for task in tasks:
+                # 设置任务默认值
+                if task.status is None:
+                    task.status = "pending"
+                if task.mastery_level is None:
+                    task.mastery_level = "not_mastered"
+                if task.revision_mode is None:
+                    task.revision_mode = "normal"
+                if task.priority is None:
+                    task.priority = 0
+
+                # 获取复习次数
+                history_count = await db.execute(
+                    select(func.count(RevisionHistory.id))
+                    .where(RevisionHistory.task_id == task.id)
+                )
+                task.revision_count = history_count.scalar() or 0
+
+                # 确保笔记信息完整
+                if task.note:
+                    if task.note.status is None:
+                        task.note.status = "active"
+                    if task.note.priority is None:
+                        task.note.priority = "normal"
+                    if task.note.content is None:
+                        task.note.content = ""
+                    if task.note.title is None:
+                        task.note.title = ""
+
+            return tasks
+
+        except Exception as e:
+            app_logger.error(f"获取计划任务列表失败: {str(e)}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"获取计划任务列表失败: {str(e)}"
+            )
 
     @staticmethod
     async def update_task(
@@ -179,7 +222,7 @@ class RevisionService:
         db: AsyncSession,
         date: date
     ) -> List[RevisionTask]:
-        """获取指定日期的所有任务"""
+        """获取指定期的所有任务"""
         query = (
             select(RevisionTask)
             .filter(func.date(RevisionTask.scheduled_date) == date)
@@ -381,3 +424,167 @@ class RevisionService:
         )
         db.add(new_task)
         return new_task
+
+    @staticmethod
+    async def check_note_revision_plans(
+        db: AsyncSession,
+        handbook_id: int
+    ) -> Dict[str, Any]:
+        """检查手册是否有关联的复习计划"""
+        try:
+            # 修改查询逻辑,使用 handbook_ids 数组字段
+            stmt = (
+                select(RevisionPlan)
+                .where(
+                    # 检查 handbook_ids 数组是否包含指定的 handbook_id
+                    RevisionPlan.handbook_ids.contains([handbook_id])
+                )
+                .options(joinedload(RevisionPlan.tasks))
+            )
+            result = await db.execute(stmt)
+            plans = result.unique().scalars().all()
+            
+            return {
+                "has_plan": bool(plans),
+                "plans": [
+                    {
+                        "id": plan.id,
+                        "name": plan.name,
+                        "start_date": plan.start_date,
+                        "end_date": plan.end_date,
+                        "status": plan.status,
+                        "created_at": plan.created_at,
+                        "updated_at": plan.updated_at,
+                        "task_count": len(plan.tasks) if plan.tasks else 0
+                    }
+                    for plan in plans
+                ]
+            }
+        except Exception as e:
+            app_logger.error(f"检查复习计划失败: {str(e)}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"检查复习计划失败: {str(e)}"
+            )
+
+    @staticmethod
+    async def add_note_to_multiple_plans(
+        db: AsyncSession,
+        note_id: int,
+        plan_ids: List[int],
+        start_date: Optional[datetime] = None,
+        priority: Optional[int] = None
+    ) -> Dict[str, Any]:
+        try:
+            # 首先检查笔记是否存在
+            note_query = select(Note).where(Note.id == note_id)
+            result = await db.execute(note_query)
+            note = result.scalar_one_or_none()
+            
+            if not note:
+                raise HTTPException(
+                    status_code=404,
+                    detail="笔记不存在"
+                )
+            
+            # 查询该笔记在这些计划中已存在的任务
+            existing_tasks_query = (
+                select(RevisionTask)
+                .options(joinedload(RevisionTask.note))  # 预加载笔记信息
+                .where(
+                    and_(
+                        RevisionTask.note_id == note_id,
+                        RevisionTask.plan_id.in_(plan_ids)
+                    )
+                )
+            )
+            result = await db.execute(existing_tasks_query)
+            existing_tasks = result.unique().scalars().all()
+            existing_plan_ids = {task.plan_id for task in existing_tasks}
+
+            # 创建任务
+            created_tasks = []
+            failed_plans = []
+            
+            for plan_id in plan_ids:
+                if plan_id in existing_plan_ids:
+                    failed_plans.append({
+                        "plan_id": plan_id,
+                        "reason": "笔记已存在于该计划中"
+                    })
+                    continue
+                    
+                # 检查计划是否存在
+                plan_query = select(RevisionPlan).where(RevisionPlan.id == plan_id)
+                result = await db.execute(plan_query)
+                plan = result.scalar_one_or_none()
+                
+                if not plan:
+                    failed_plans.append({
+                        "plan_id": plan_id,
+                        "reason": "计划不存在"
+                    })
+                    continue
+                    
+                task = RevisionTask(
+                    plan_id=plan_id,
+                    note_id=note_id,
+                    scheduled_date=start_date or datetime.utcnow(),
+                    status="pending",
+                    priority=priority or 1,
+                    revision_mode="normal",
+                    mastery_level="not_mastered"
+                )
+                db.add(task)
+                created_tasks.append(task)
+                
+            if created_tasks:
+                await db.commit()
+                
+                # 重新查询创建的任务以获取完整信息
+                created_task_ids = [task.id for task in created_tasks]
+                tasks_query = (
+                    select(RevisionTask)
+                    .options(joinedload(RevisionTask.note))
+                    .where(RevisionTask.id.in_(created_task_ids))
+                )
+                result = await db.execute(tasks_query)
+                final_tasks = result.unique().scalars().all()
+                
+                # 设置任务的默认值
+                for task in final_tasks:
+                    if task.status is None:
+                        task.status = "pending"
+                    if task.mastery_level is None:
+                        task.mastery_level = "not_mastered"
+                    if task.revision_mode is None:
+                        task.revision_mode = "normal"
+                    if task.priority is None:
+                        task.priority = 0
+                    
+                    # 确保笔记信息完整
+                    if task.note:
+                        if task.note.status is None:
+                            task.note.status = "active"
+                        if task.note.priority is None:
+                            task.note.priority = "normal"
+                        if task.note.content is None:
+                            task.note.content = ""
+                        if task.note.title is None:
+                            task.note.title = ""
+            
+            return {
+                "success": bool(created_tasks),
+                "tasks": final_tasks if created_tasks else [],
+                "failed_plans": failed_plans
+            }
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            await db.rollback()
+            app_logger.error(f"添加笔记到多个复习计划失败: {str(e)}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"添加笔记到多个复习计划失败: {str(e)}"
+            )

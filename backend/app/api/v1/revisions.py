@@ -8,7 +8,11 @@ from app.models.revision_schemas import (
     RevisionTaskResponse,
     BatchTaskUpdate,
     TaskAdjustment,
-    TaskHistoryResponse
+    TaskHistoryResponse,
+    AddNoteToRevisionPlanRequest,
+    RevisionPlanCheckResponse,
+    AddNoteToRevisionPlansRequest,
+    BatchAddNotesToPlanResponse
 )
 from app.services.revision_service import RevisionService
 from app.core.logging import app_logger
@@ -121,7 +125,7 @@ async def get_daily_tasks(
     date: date = Query(default=None, description="指定日期，默认为今天"),
     db: AsyncSession = Depends(get_db)
 ):
-    """获取每日任务清单"""
+    """获取每日任务清"""
     return await RevisionService.get_daily_tasks(db, date or datetime.now().date())
 
 @router.get("/tasks/next", 
@@ -197,7 +201,7 @@ async def get_daily_summary(
     date: Optional[date] = Query(None, description="指定日期，默认为今天"),
     db: AsyncSession = Depends(get_db)
 ):
-    """获取每日任务统计"""
+    """获每日任务统计"""
     target_date = date or datetime.now().date()
     tasks = await RevisionService.get_daily_tasks(db, target_date)
     
@@ -216,3 +220,86 @@ async def get_daily_summary(
     }
     
     return JSONResponse(content=summary) 
+
+@router.get("/plans/check/{handbook_id}", 
+    response_model=RevisionPlanCheckResponse,
+    summary="检查手册复习计划",
+    description="""
+    检查指定手册是否有关联的复习计划。
+    
+    返回:
+    - has_plan: 是否存在关联的复习计划
+    - plans: 关联的复习计划列表
+    """,
+    responses={
+        200: {
+            "description": "成功返回复习计划信息",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "has_plan": True,
+                        "plans": [
+                            {
+                                "id": 1,
+                                "name": "复习计划1",
+                                "start_date": "2024-01-01T00:00:00",
+                                "end_date": "2024-12-31T00:00:00",
+                                "status": "active",
+                                "task_count": 10
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        500: {
+            "description": "检查复习计划失败",
+            "content": {
+                "application/json": {
+                    "example": {"detail": "检查复习计划失败: 具体错误信息"}
+                }
+            }
+        }
+    }
+)
+async def check_handbook_revision_plans(
+    handbook_id: int = Path(..., description="手册ID"),
+    db: AsyncSession = Depends(get_db)
+):
+    """检查手册是否有复习计划"""
+    return await RevisionService.check_note_revision_plans(db, handbook_id)
+
+@router.post("/plans/{plan_id}/notes",
+    response_model=RevisionTaskResponse,
+    summary="添加笔记到复习计划",
+    description="将现有笔记添加到指定的复习计划中")
+async def add_note_to_plan(
+    plan_id: int,
+    request: AddNoteToRevisionPlanRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """添加笔记到复习计划"""
+    return await RevisionService.add_note_to_revision_plan(
+        db=db,
+        note_id=request.note_id,
+        plan_id=plan_id,
+        start_date=request.start_date,
+        priority=request.priority
+    )
+
+@router.post("/plans/notes/batch",
+    response_model=BatchAddNotesToPlanResponse,
+    summary="批量添加笔记到多个复习计划",
+    description="将笔记添加到多个指定的复习计划中")
+async def add_note_to_multiple_plans(
+    request: AddNoteToRevisionPlansRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """批量添加笔记到多个复习计划"""
+    return await RevisionService.add_note_to_multiple_plans(
+        db=db,
+        note_id=request.note_id,
+        plan_ids=request.plan_ids,
+        start_date=request.start_date,
+        priority=request.priority
+    ) 

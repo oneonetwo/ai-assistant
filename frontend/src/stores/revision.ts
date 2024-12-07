@@ -212,6 +212,65 @@ export const useRevisionStore = defineStore('revision', () => {
     }
   }
 
+  // 检查手册的复习计划
+  async function checkHandbookPlans(handbookId: number) {
+    try {
+      isLoading.value = true
+      return await RevisionAPI.checkHandbookPlans(handbookId)
+    } catch (err) {
+      error.value = '获取手册复习计划失败'
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  // 添加笔记到复习计划
+  async function addNoteToPlan(planId: number, data: {
+    note_id: number
+    start_date: string
+    priority: number
+  }) {
+    try {
+      isLoading.value = true
+      await RevisionAPI.addNoteToPlan(planId, data)
+      showToast('添加成功')
+    } catch (err) {
+      error.value = '添加到复习计划失败'
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  /**
+   * 批量添加笔记到多个复习计划
+   */
+  async function addNoteToPlansBatch(data: {
+    note_id: number
+    plan_ids: number[]
+    start_date?: string
+    priority?: number
+  }) {
+    try {
+      isLoading.value = true
+      const result = await RevisionAPI.addNoteToPlansBatch(data)
+      
+      // 显示操作结果
+      // const successCount = result.details.filter(d => d.status === 'success').length
+      // const skippedCount = result.details.filter(d => d.status === 'skipped').length
+      
+      showToast(`添加成功`)
+      
+      return result
+    } catch (err) {
+      error.value = '批量添加到复习计划失败'
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   return {
     // 状态
     plans,
@@ -240,6 +299,9 @@ export const useRevisionStore = defineStore('revision', () => {
     batchUpdateTasks,
     getTaskHistory,
     adjustTaskSchedule,
-    fetchDailySummary
+    fetchDailySummary,
+    checkHandbookPlans,
+    addNoteToPlan,
+    addNoteToPlansBatch
   }
 }) 

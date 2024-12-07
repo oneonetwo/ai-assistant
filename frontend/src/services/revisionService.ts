@@ -8,6 +8,16 @@ interface GetPlanTasksParams {
   status?: 'pending' | 'completed' | 'skipped'
 }
 
+interface AddNoteToPlansBatchResult {
+  success: boolean
+  message: string
+  details: {
+    plan_id: number
+    status: 'success' | 'skipped' | 'failed'
+    message?: string
+  }[]
+}
+
 export class RevisionAPI {
   // 创建复习计划
   static async createPlan(data: {
@@ -108,6 +118,37 @@ export class RevisionAPI {
     const response = await request.get(`${API_BASE_URL}/tasks/daily/summary`, {
       params: { date }
     })
+    return response
+  }
+
+  // 检查手册是否有复习计划
+  static async checkHandbookPlans(handbookId: number): Promise<RevisionPlan[]> {
+    const response = await request.get(`${API_BASE_URL}/plans/check/${handbookId}`)
+    return response
+  }
+
+  // 将笔记添加到复习计划
+  static async addNoteToPlan(planId: number, data: {
+    note_id: number
+    start_date: string
+    priority: number
+  }): Promise<void> {
+    await request.post(`${API_BASE_URL}/plans/${planId}/notes`, {
+      ...data,
+      plan_id: planId
+    })
+  }
+
+  /**
+   * 批量添加笔记到多个复习计划
+   */
+  static async addNoteToPlansBatch(data: {
+    note_id: number
+    plan_ids: number[]
+    start_date?: string
+    priority?: number
+  }): Promise<AddNoteToPlansBatchResult> {
+    const response = await request.post(`${API_BASE_URL}/plans/notes/batch`, data)
     return response
   }
 } 

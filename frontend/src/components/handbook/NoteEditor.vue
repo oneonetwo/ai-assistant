@@ -1,16 +1,19 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useHandbookStore } from '@/stores/handbook'
 import { useNoteEditorStore } from '@/stores/noteEditor'
+import { useRevisionStore } from '@/stores/revision'
 import { showToast } from 'vant'
 import type { Note, NotePriority, NoteStatus } from '@/types/handbook'
 import TagSelector from './TagSelector.vue'
+import MultiSelector from '@/components/common/MultiSelector.vue'
 
 const route = useRoute()
 const router = useRouter()
 const store = useHandbookStore()
 const noteEditorStore = useNoteEditorStore()
+const revisionStore = useRevisionStore()
 
 const noteId = route.params.id as string
 const handbookId = route.query.handbook as string
@@ -38,11 +41,25 @@ const newTagName = ref('')
 const fileList = ref<any[]>([])
 const isUploading = ref(false)
 
+const hasRevisionPlans = ref(false)
+
+const selectedPlanIds = ref<number[]>([])
+const planOptions = ref<{ text: string; value: number }[]>([])
+
 onMounted(async () => {
   await store.fetchTags()
   if (!isNew) {
     await loadNote()
   } else {
+    // ���查是否有复习计划
+    const result = await revisionStore.checkHandbookPlans(Number(handbookId))
+    const plans = result.plans
+    hasRevisionPlans.value = plans.length > 0
+    // 转换计划数据为 Selector 需要的格式
+    planOptions.value = plans.map(plan => ({
+      text: plan.name,
+      value: plan.id
+    }))
     // 新建笔记时默认设置为待复习
     status.value = '待复习'
     canShare.value = true
@@ -132,8 +149,20 @@ async function handleSave() {
       }))
     }
 
+    let newNoteId: number
     if (isNew) {
-      await store.createNote(data)
+      const result = await store.createNote(data)
+      newNoteId = result.id
+      
+      // 如果选择了复习计划,批量添加
+      if (selectedPlanIds.value.length > 0) {
+        await revisionStore.addNoteToPlansBatch({
+          note_id: newNoteId,
+          plan_ids: selectedPlanIds.value,
+          start_date: new Date().toISOString(),
+          priority: 3
+        })
+      }
     } else {
       await store.updateNote(Number(noteId), data)
     }
@@ -141,9 +170,12 @@ async function handleSave() {
     showToast('保存成功')
     router.back()
   } catch (error) {
+    console.error(error)
     showToast('保存失败')
   }
 }
+
+
 </script>
 
 <template>
@@ -184,7 +216,15 @@ async function handleSave() {
         rows="6"
         required
       />
-
+      <div class="tag-section" v-if="hasRevisionPlans && isNew">
+        <div class="selector-wrapper">
+          <MultiSelector
+            v-model="selectedPlanIds"
+            :options="planOptions"
+            placeholder="请选择复习计划"
+          />
+        </div>
+      </div>
       <!-- 标签 -->
       <div class="tag-section">
         <div class="section-title">标签</div>
@@ -219,6 +259,14 @@ async function handleSave() {
           </template>
         </van-field>
       </van-cell-group>
+      <!-- 分享设置 -->
+      <van-cell-group>
+        <van-cell title="是否能进行分享">
+          <template #right-icon>
+            <van-switch v-model="canShare" />
+          </template>
+        </van-cell>
+      </van-cell-group>
 
       <!-- 附件 -->
       <div class="attachments">
@@ -245,15 +293,7 @@ async function handleSave() {
           </van-cell>
         </div>
       </div>
-
-      <!-- 分享设置 -->
-      <van-cell-group>
-        <van-cell title="是否能进行分享">
-          <template #right-icon>
-            <van-switch v-model="canShare" />
-          </template>
-        </van-cell>
-      </van-cell-group>
+      <div class="tag-section"></div>
     </div>
   </div>
 </template>
@@ -344,6 +384,12 @@ async function handleSave() {
         color: #52c41a;
       }
     }
+  }
+
+  .selector-wrapper {
+    position: relative;
+    width: 100%;
+    z-index: 10;
   }
 }
 </style> 

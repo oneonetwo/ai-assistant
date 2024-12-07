@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from datetime import datetime
 from sqlalchemy.orm import joinedload
 from enum import Enum
@@ -37,11 +37,12 @@ class RevisionTaskUpdate(BaseModel):
     completed_at: Optional[datetime] = None
 
 class NoteBasicInfo(BaseModel):
+    """笔记基本信息"""
     id: int
     title: str
-    content: Optional[str] = None
-    status: Optional[str] = None
-    priority: Optional[str] = None
+    content: str = ""
+    status: str = "active"
+    priority: str = "normal"
     
     class Config:
         from_attributes = True
@@ -52,13 +53,13 @@ class RevisionTaskResponse(BaseModel):
     plan_id: int
     note_id: int
     scheduled_date: datetime
-    status: str
-    mastery_level: Optional[str]
-    revision_mode: Optional[str]
-    priority: Optional[int]
-    completed_at: Optional[datetime]
-    revision_count: Optional[int] = 0
-    note: Optional[NoteBasicInfo] = None
+    status: str = "pending"
+    mastery_level: str = "not_mastered"
+    revision_mode: str = "normal"
+    priority: int = 0
+    completed_at: Optional[datetime] = None
+    revision_count: int = 0
+    note: NoteBasicInfo
     
     class Config:
         from_attributes = True
@@ -89,3 +90,26 @@ class TaskAdjustment(BaseModel):
     new_date: datetime = Field(..., description="新的计划日期")
     priority: Optional[int] = Field(None, ge=0, le=3, description="任务优先级(0-3)")
     comments: Optional[str] = Field(None, description="调整说明") 
+
+class AddNoteToRevisionPlanRequest(BaseModel):
+    note_id: int
+    plan_id: int
+    start_date: Optional[datetime] = None
+    priority: Optional[int] = Field(None, ge=0, le=3)
+
+class RevisionPlanCheckResponse(BaseModel):
+    has_plan: bool
+    plans: List[RevisionPlanResponse] = []
+
+class AddNoteToRevisionPlansRequest(BaseModel):
+    """添加笔记到多个复习计划的请求模型"""
+    note_id: int
+    plan_ids: List[int]
+    start_date: Optional[datetime] = None
+    priority: Optional[int] = Field(None, ge=0, le=3)
+
+class BatchAddNotesToPlanResponse(BaseModel):
+    """批量添加笔记到计划的响应模型"""
+    success: bool
+    tasks: List[RevisionTaskResponse]
+    failed_plans: List[Dict[str, Any]] = []  # 记录添加失败的计划及原因
