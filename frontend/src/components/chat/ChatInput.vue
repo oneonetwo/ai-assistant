@@ -117,6 +117,11 @@ async function handleSend() {
           onProgress: (progress) => {
             uploadProgress.value = progress
           },
+          onEnd: () => {
+          // 重置输入
+
+            handleOnEnd()
+          },
           signal: uploadController.value.signal
         }
       )
@@ -127,7 +132,11 @@ async function handleSend() {
     } else {
       // 普通文本消息
       await chatStore.sendMessage(messageText.value, {
-        quote: props.quotedMessage || undefined
+        quote: props.quotedMessage || undefined,
+        onEnd: () => {
+          // 重置输入
+          handleOnEnd()
+        } 
       })
     }
     
@@ -145,7 +154,10 @@ async function handleSend() {
     uploadController.value = null
   }
 }
-
+function handleOnEnd() {
+  // 更新会话列表
+  chatStore.updateConversationList()
+}
 // 移除引用
 function removeQuote() {
   emit('quote-remove')

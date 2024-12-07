@@ -91,6 +91,7 @@ export const useChatStore = defineStore('chat', () => {
     quote?: Message
     retry?: boolean
     messageId?: string
+    onEnd?: () => void
   } = {}) {
     console.log('sendMessage', content, options)
     console.log('currentConversation.value', currentConversation.value)
@@ -152,6 +153,7 @@ export const useChatStore = defineStore('chat', () => {
           assistantMessage.status = 'success'
           // 更新会话时间
           conversation.lastTime = new Date().toISOString()
+          options.onEnd?.()
         },
         onError: (error: Error) => {
           console.log('onError>>>>>>>>>>>', error)
@@ -281,7 +283,7 @@ export const useChatStore = defineStore('chat', () => {
       // 乐观更新
       conversation.name = name
       
-      // 调用重命名API
+      // 调��重命名API
       await ConversationAPI.updateConversation(id, name)
       
       showToast({
@@ -390,6 +392,7 @@ export const useChatStore = defineStore('chat', () => {
     content: string,
     file: File,
     options: {
+      onEnd?: () => void
       onProgress?: (progress: number) => void
       signal?: AbortSignal
       systemPrompt?: string
@@ -471,6 +474,7 @@ export const useChatStore = defineStore('chat', () => {
             onEnd: () => {
               assistantMessage.status = 'success'
               conversation.lastTime = new Date().toISOString()
+              options.onEnd?.()
             },
             onError: (error) => {
               assistantMessage.status = 'error'
@@ -546,6 +550,26 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
+  // 添加更新会话列表的方法
+  async function updateConversationList() {
+    try {
+      const data = await ConversationAPI.getConversations()
+      conversations.value = data.map((conv: any) => ({
+        id: conv.session_id,
+        name: conv.name || '新会话',
+        messages: conv.messages || [],
+        lastTime: conv.created_at,
+        model: conv.model || 'gpt-3.5-turbo'
+      }))
+    } catch (error) {
+      console.error('更新会话列表失败:', error)
+      showToast({
+        type: 'fail',
+        message: '更新会话列表失败'
+      })
+    }
+  }
+
   return {
     conversations,
     currentConversationId,
@@ -564,6 +588,7 @@ export const useChatStore = defineStore('chat', () => {
     createNewChat,
     sendMessageWithFile,
     updateFileProgress,
-    cancelFileUpload
+    cancelFileUpload,
+    updateConversationList
   }
 })
