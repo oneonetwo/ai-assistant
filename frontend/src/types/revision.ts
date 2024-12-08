@@ -21,14 +21,24 @@ export interface Note {
 }
 
 export interface RevisionTask {
-  id: number
-  note_id: number
+  task_id: number
   scheduled_date: string
-  mastery_level: 'not_mastered' | 'partially_mastered' | 'mastered'
-  revision_count: number
-  created_at: string
-  completed_at: string | null
-  note: Note
+  priority: number
+  status: 'completed' | 'pending'
+  note_id: number
+  note_title: string
+  note_content: string
+}
+
+export interface RevisionSummary {
+  date: string
+  total_tasks: number
+  message: string
+  tasks: RevisionTask[]
+  has_tasks: boolean
+  pending_tasks: number
+  upcoming_tasks: number
+  completed_tasks: number
 }
 
 export type RevisionStatus = 'not_started' | 'in_progress' | 'completed' 

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, onUnmounted } from 'vue'
-import { NotificationAPI } from '@/services/notificationService'
+import { NotificationAPI, NotificationService } from '@/services/notificationService'
 import type { NotificationSettings, NotificationSummary } from '@/types/notification'
 
 export const useNotificationStore = defineStore('notification', () => {
@@ -56,7 +56,7 @@ export const useNotificationStore = defineStore('notification', () => {
     // 每分钟检查一次
     checkInterval = window.setInterval(async () => {
       if (!settings.value) return
-      await NotificationAPI.checkAndNotify(settings.value)
+      await NotificationService.checkAndNotify(settings.value)
     }, 60000)
   }
 
