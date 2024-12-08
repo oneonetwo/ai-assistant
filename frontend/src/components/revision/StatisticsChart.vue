@@ -1,94 +1,132 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, onUnmounted } from 'vue'
-import type { NoteStatistics } from '@/types/history'
-import * as echarts from 'echarts/core'
-import { LineChart } from 'echarts/charts'
-import {
-  TitleComponent,
-  TooltipComponent,
-  GridComponent
-} from 'echarts/components'
-import { CanvasRenderer } from 'echarts/renderers'
+import { computed } from 'vue';
+import type { NoteStatistics } from '@/stores/types';
+import { use } from "echarts/core";
+import { CanvasRenderer } from "echarts/renderers";
+import { LineChart, PieChart, BarChart } from "echarts/charts";
+import { GridComponent, TooltipComponent, LegendComponent } from "echarts/components";
+import VChart from "vue-echarts";
 
-echarts.use([
-  TitleComponent,
-  TooltipComponent,
-  GridComponent,
+use([
+  CanvasRenderer,
   LineChart,
-  CanvasRenderer
-])
+  PieChart,
+  BarChart,
+  GridComponent,
+  TooltipComponent,
+  LegendComponent
+]);
 
 const props = defineProps<{
-  statistics: NoteStatistics
-}>()
+  statistics: NoteStatistics;
+}>();
 
-const chartRef = ref<HTMLElement>()
-let chart: echarts.ECharts | null = null
-
-onMounted(() => {
-  if (chartRef.value) {
-    chart = echarts.init(chartRef.value)
-    updateChart()
-  }
-})
-
-watch(() => props.statistics, updateChart, { deep: true })
-
-function updateChart() {
-  if (!chart) return
-
-  const dates = props.statistics.revision_dates.map(date => 
-    new Date(date).toLocaleDateString()
-  )
-
-  const option = {
-    title: {
-      text: '复习趋势'
+// 复习趋势数据
+const trendOption = computed(() => ({
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'cross'
+    }
+  },
+  legend: {
+    data: ['复习次数', '复习时长(分钟)', '质量评分']
+  },
+  xAxis: {
+    type: 'category',
+    data: props.statistics.revision_trends.map(item => item.date)
+  },
+  yAxis: [
+    {
+      type: 'value',
+      name: '次数/分钟',
     },
-    tooltip: {
-      trigger: 'axis'
+    {
+      type: 'value',
+      name: '评分',
+      max: 100,
+      min: 0
+    }
+  ],
+  series: [
+    {
+      name: '复习次数',
+      type: 'bar',
+      data: props.statistics.revision_trends.map(item => item.count)
     },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '3%',
-      containLabel: true
+    {
+      name: '复习时长(分钟)',
+      type: 'line',
+      data: props.statistics.revision_trends.map(item => item.duration)
     },
-    xAxis: {
-      type: 'category',
-      data: dates
-    },
-    yAxis: {
-      type: 'value'
-    },
-    series: [
-      {
-        name: '复习次数',
-        type: 'line',
-        data: dates.map(() => 1),
-        smooth: true
+    {
+      name: '质量评分',
+      type: 'line',
+      yAxisIndex: 1,
+      data: props.statistics.revision_trends.map(item => item.quality)
+    }
+  ]
+}));
+
+// 掌握程度分布
+const masteryOption = computed(() => ({
+  tooltip: {
+    trigger: 'item'
+  },
+  legend: {
+    orient: 'vertical',
+    left: 'left'
+  },
+  series: [
+    {
+      type: 'pie',
+      radius: '50%',
+      data: [
+        { value: props.statistics.mastery_levels.low, name: '待加强' },
+        { value: props.statistics.mastery_levels.medium, name: '良好' },
+        { value: props.statistics.mastery_levels.high, name: '熟练' }
+      ],
+      emphasis: {
+        itemStyle: {
+          shadowBlur: 10,
+          shadowOffsetX: 0,
+          shadowColor: 'rgba(0, 0, 0, 0.5)'
+        }
       }
-    ]
-  }
-
-  chart.setOption(option)
-}
-
-onUnmounted(() => {
-  if (chart) {
-    chart.dispose()
-    chart = null
-  }
-})
+    }
+  ]
+}));
 </script>
 
 <template>
-  <div ref="chartRef" class="statistics-chart"></div>
+  <div class="statistics-charts">
+    <div class="chart-container">
+      <h3>复习趋势</h3>
+      <v-chart class="chart" :option="trendOption" autoresize />
+    </div>
+    
+    <div class="chart-container">
+      <h3>掌握程度分布</h3>
+      <v-chart class="chart" :option="masteryOption" autoresize />
+    </div>
+  </div>
 </template>
 
 <style lang="scss" scoped>
-.statistics-chart {
-  width: 100%;
-  height: 300px;
+.statistics-charts {
+  .chart-container {
+    margin-bottom: 20px;
+    
+    h3 {
+      margin-bottom: 12px;
+      font-size: 16px;
+      color: var(--van-text-color);
+    }
+    
+    .chart {
+      height: 300px;
+      width: 100%;
+    }
+  }
 }
 </style> 

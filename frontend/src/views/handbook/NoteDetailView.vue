@@ -109,6 +109,7 @@ function navigateToHistory() {
     >
       <template #right>
         <van-button
+          class="history-btn"
           plain
           size="small"
           icon="chart-trending-o"
@@ -321,6 +322,30 @@ function navigateToHistory() {
         background: var(--van-background-2);
         border-radius: 8px;
       }
+    }
+  }
+
+  :deep(.history-btn) {
+    // 适配暗色主题
+    --van-button-plain-background: transparent;
+    --van-button-default-border-color: var(--van-gray-5);
+    --van-button-default-color: var(--van-text-color);
+    
+    // 按钮样式优化
+    padding: 0 12px;
+    border-radius: 16px;
+    font-size: 13px;
+    
+    // 悬停效果
+    &:active {
+      opacity: 0.8;
+      background: var(--van-gray-2);
+    }
+    
+    // 图标样式
+    .van-button__icon {
+      margin-right: 4px;
+      font-size: 16px;
     }
   }
 }
