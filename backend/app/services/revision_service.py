@@ -3,14 +3,15 @@ from sqlalchemy import select, and_, or_, desc, func, update
 from app.db.models import RevisionPlan, RevisionTask, Note, RevisionHistory
 from app.models.revision_schemas import (
     RevisionPlanCreate, RevisionTaskUpdate, 
-    BatchTaskUpdate, TaskAdjustment, TaskHistoryResponse
+    BatchTaskUpdate, TaskAdjustment, TaskHistoryResponse, RevisionTaskResponse
 )
 from datetime import datetime, timedelta, date
 from typing import List, Optional, Dict, Any
 from sqlalchemy.sql import func
 from sqlalchemy.orm import joinedload, selectinload
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from app.core.logging import app_logger
+from app.services.history_service import HistoryService  # 确保导入
 
 class RevisionService:
     @staticmethod
@@ -338,46 +339,76 @@ class RevisionService:
     @staticmethod
     async def batch_update_tasks(
         db: AsyncSession,
-        updates: BatchTaskUpdate
-    ) -> List[RevisionTask]:
+        update_data: BatchTaskUpdate
+    ) -> List[RevisionTaskResponse]:
         """批量更新任务状态"""
         try:
-            app_logger.info(f"开始批量更新任务: {updates.model_dump()}")
-            tasks = []
+            app_logger.info(f"开始批量更新任务: {update_data.model_dump()}")
+            updated_tasks = []
             
-            # 使用 joinedload 预加载关联的 note
-            stmt = (
-                select(RevisionTask)
-                .options(joinedload(RevisionTask.note))
-                .where(RevisionTask.id.in_(updates.task_ids))
-            )
-            result = await db.execute(stmt)
-            db_tasks = result.unique().scalars().all()
+            for task_id in update_data.task_ids:
+                app_logger.debug(f"更新任务 {task_id} 的状态")
+                # 使用 joinedload 预加载关联的 note
+                query = (
+                    select(RevisionTask)
+                    .options(joinedload(RevisionTask.note))
+                    .where(RevisionTask.id == task_id)
+                )
+                result = await db.execute(query)
+                task = result.unique().scalar_one_or_none()
+                
+                if task:
+                    # 更新任务状态
+                    if update_data.status:
+                        task.status = update_data.status
+                    if update_data.mastery_level:
+                        task.mastery_level = update_data.mastery_level
+                    if update_data.revision_mode:
+                        task.revision_mode = update_data.revision_mode
+                    if update_data.time_spent is not None:
+                        task.time_spent = update_data.time_spent
+                    
+                    # 记录复习历史
+                    if update_data.status == "completed":
+                        app_logger.debug(f"为任务 {task_id} 记录复习历史")
+                        await HistoryService.record_revision(
+                            db=db,
+                            task_id=task_id,
+                            mastery_level=update_data.mastery_level,
+                            revision_mode=update_data.revision_mode or "normal",
+                            time_spent=update_data.time_spent or 0,
+                            comments=update_data.comments
+                        )
+                    
+                    # 刷新任务对象以获取最新状态
+                    await db.refresh(task)
+                    
+                    # 转换为响应模型，包含所有必需字段
+                    task_response = RevisionTaskResponse(
+                        id=task.id,
+                        note_id=task.note_id,
+                        note=task.note,
+                        plan_id=task.plan_id,  # 添加计划ID
+                        status=task.status,
+                        mastery_level=task.mastery_level,
+                        revision_mode=task.revision_mode,
+                        time_spent=task.time_spent,
+                        scheduled_date=task.scheduled_date,  # 添加计划日期
+                        created_at=task.created_at,
+                        updated_at=task.updated_at
+                    )
+                    updated_tasks.append(task_response)
             
-            for task in db_tasks:
-                app_logger.debug(f"更新任务 {task.id} 的状态")
-                task.status = updates.status
-                task.mastery_level = updates.mastery_level
-                task.revision_mode = updates.revision_mode
-                task.time_spent = updates.time_spent
-                task.comments = updates.comments
-                task.completed_at = datetime.utcnow() if updates.status == "completed" else None
-                tasks.append(task)
-
-                # 如果任务完成且未完全掌握，创建后续任务
-                if updates.status == "completed" and updates.mastery_level != "mastered":
-                    app_logger.debug(f"为任务 {task.id} 创建后续复习任务")
-                    await RevisionService._create_followup_task(db, task)
-
             await db.commit()
-            app_logger.info(f"成功更新 {len(tasks)} 个任务")
-            return tasks
-
+            app_logger.info(f"成功更新 {len(updated_tasks)} 个任务")
+            
+            return updated_tasks
+            
         except Exception as e:
             app_logger.error(f"批量更新任务失败: {str(e)}")
             await db.rollback()
             raise HTTPException(
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"批量更新任务失败: {str(e)}"
             )
 

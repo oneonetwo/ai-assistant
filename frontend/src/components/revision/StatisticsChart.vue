@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, onUnmounted } from 'vue'
 import type { NoteStatistics } from '@/types/history'
 import * as echarts from 'echarts/core'
 import { LineChart } from 'echarts/charts'

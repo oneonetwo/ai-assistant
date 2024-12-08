@@ -14,31 +14,55 @@ class HistoryService:
         db: AsyncSession,
         task_id: int,
         mastery_level: str,
+        revision_mode: str = "normal",
+        time_spent: int = 0,
         comments: str = None
     ) -> RevisionHistory:
         """记录一次复习历史"""
-        # 获取任务信息
-        task = await db.get(RevisionTask, task_id)
-        if not task:
-            raise ValueError("Task not found")
+        try:
+            app_logger.info(f"开始记录复习历史 - 任务ID: {task_id}")
             
-        # 创建历史记录
-        history = RevisionHistory(
-            note_id=task.note_id,
-            task_id=task_id,
-            mastery_level=mastery_level,
-            comments=comments
-        )
-        
-        # 更新笔记状态
-        note = await db.get(Note, task.note_id)
-        note.total_revisions += 1
-        note.last_revision_date = datetime.utcnow()
-        note.current_mastery_level = mastery_level
-        
-        db.add(history)
-        await db.commit()
-        return history
+            # 获取任务信息
+            task = await db.get(RevisionTask, task_id)
+            app_logger.debug(f"获取到任务信息: {task}")
+            
+            if not task:
+                app_logger.error(f"未找到任务: {task_id}")
+                raise ValueError("Task not found")
+            
+            # 创建历史记录
+            history = RevisionHistory(
+                note_id=task.note_id,
+                task_id=task_id,
+                mastery_level=mastery_level,
+                revision_mode=revision_mode,
+                time_spent=time_spent,
+                comments=comments,
+                revision_date=datetime.utcnow()
+            )
+            
+            # 更新笔记状态
+            note = await db.get(Note, task.note_id)
+            if note:
+                app_logger.debug(f"更新笔记状态 - 笔记ID: {note.id}")
+                note.total_revisions += 1
+                note.last_revision_date = datetime.utcnow()
+                note.current_mastery_level = mastery_level
+            
+            db.add(history)
+            await db.commit()
+            await db.refresh(history)
+            
+            app_logger.info(f"成功记录复习历史 - 历史ID: {history.id}")
+            return history
+            
+        except Exception as e:
+            app_logger.error(f"记录复习历史失败: {str(e)}", exc_info=True)
+            await db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"记录复习历史失败: {str(e)}"
+            )
     
     @staticmethod
     async def get_note_statistics(
@@ -87,8 +111,11 @@ class HistoryService:
                 RevisionHistoryEntry(
                     id=entry.id,
                     note_id=entry.note_id,
+                    task_id=entry.task_id,
                     revision_date=entry.revision_date,
                     mastery_level=entry.mastery_level,
+                    revision_mode=entry.revision_mode,
+                    time_spent=entry.time_spent,
                     comments=entry.comments
                 )
                 for entry in history
