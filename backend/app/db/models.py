@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, BigInteger, JSON, Boolean
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, BigInteger, JSON, Boolean, Time
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 from sqlalchemy.orm import relationship
@@ -191,7 +191,7 @@ class RevisionSettings(Base):
     
     id = Column(Integer, primary_key=True)
     reminder_enabled = Column(Boolean, default=True)
-    reminder_time = Column(String(5), default="08:00")  # 格式: "HH:MM"
+    reminder_time = Column(String, default="09:00")  # 存储为 HH:MM 格式
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
 

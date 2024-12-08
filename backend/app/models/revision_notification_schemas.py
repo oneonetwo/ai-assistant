@@ -9,7 +9,7 @@ class RevisionSettingsUpdate(BaseModel):
 class RevisionSettingsResponse(BaseModel):
     id: int
     reminder_enabled: bool
-    reminder_time: str
+    reminder_time: str = Field(..., pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")
     created_at: datetime
     updated_at: datetime
     

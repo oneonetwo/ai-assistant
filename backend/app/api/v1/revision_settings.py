@@ -32,7 +32,7 @@ async def get_daily_summary(
     return await NotificationService.get_daily_summary(db, datetime.now())
 
 @router.get("/settings", response_model=RevisionSettingsResponse,
-    summary="获取提醒设置",
+    summary="获取复习提醒设置",
     description="获取用户的复习提醒设置"
 )
 async def get_notification_settings(
@@ -45,10 +45,10 @@ async def get_notification_settings(
     - 是否启用提醒
     - 提醒时间
     """
-    return await NotificationService.get_settings()
+    return await NotificationService.get_settings(db)
 
 @router.patch("/settings", response_model=RevisionSettingsResponse,
-    summary="更新提醒设置",
+    summary="更新复习提醒设置",
     description="更新用户的复习提醒设置"
 )
 async def update_notification_settings(
@@ -56,14 +56,14 @@ async def update_notification_settings(
     db: AsyncSession = Depends(get_db)
 ):
     """
-    更新提醒设置
+    更新复习提醒设置
     
     - **settings**: 设置更新参数
         - reminder_enabled: 是否启用提醒
         - reminder_time: 提醒时间 (HH:MM)
     """
     return await NotificationService.update_settings(
-        db,
+        db=db,
         reminder_enabled=settings.reminder_enabled,
         reminder_time=settings.reminder_time
     )

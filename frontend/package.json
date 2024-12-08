@@ -30,6 +30,8 @@
     "@vitejs/plugin-vue": "^5.1.4",
     "@vue/tsconfig": "^0.6.0",
     "autoprefixer": "^10.4.20",
+    "dayjs": "^1.11.13",
+    "echarts": "^5.5.1",
     "node-sass": "^9.0.0",
     "pinia": "^2.2.6",
     "postcss": "^8.4.49",

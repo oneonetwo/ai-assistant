@@ -4,6 +4,7 @@ from app.db.models import RevisionSettings, RevisionTask, Note
 from datetime import datetime, timedelta
 from app.core.logging import app_logger
 import asyncio
+from fastapi import HTTPException
 
 class NotificationService:
     @staticmethod
@@ -23,16 +24,27 @@ class NotificationService:
         }
     
     @staticmethod
-    async def get_settings() -> RevisionSettings:
-        """获取提醒设置"""
-        async with AsyncSession() as db:
+    async def get_settings(db: AsyncSession):
+        """获取复习提醒设置"""
+        try:
             result = await db.execute(select(RevisionSettings))
             settings = result.scalar_one_or_none()
+            
             if not settings:
-                settings = RevisionSettings()
+                # 如果没有设置，创建默认设置
+                settings = RevisionSettings(
+                    reminder_enabled=True,
+                    reminder_time="09:00"
+                )
                 db.add(settings)
                 await db.commit()
+                await db.refresh(settings)
+                
             return settings
+            
+        except Exception as e:
+            app_logger.error(f"获取复习提醒设置失败: {str(e)}")
+            raise
     
     @staticmethod
     async def update_settings(
@@ -41,15 +53,27 @@ class NotificationService:
         reminder_time: str = None
     ) -> RevisionSettings:
         """更新提醒设置"""
-        settings = await NotificationService.get_settings()
-        
-        if reminder_enabled is not None:
-            settings.reminder_enabled = reminder_enabled
-        if reminder_time is not None:
-            settings.reminder_time = reminder_time
+        try:
+            # 获取当前设置
+            settings = await NotificationService.get_settings(db)
             
-        await db.commit()
-        return settings
+            # 更新设置
+            if reminder_enabled is not None:
+                settings.reminder_enabled = reminder_enabled
+            if reminder_time is not None:
+                settings.reminder_time = reminder_time
+            
+            await db.commit()
+            await db.refresh(settings)
+            return settings
+            
+        except Exception as e:
+            app_logger.error(f"更新复习提醒设置失败: {str(e)}")
+            await db.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail=f"更新复习提醒设置失败: {str(e)}"
+            )
     
     @staticmethod
     async def send_notification(message: str):

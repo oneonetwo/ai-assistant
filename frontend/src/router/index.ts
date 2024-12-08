@@ -149,6 +149,46 @@ const routes: Array<RouteRecordRaw> = [
         path: 'plans/:planId/review',
         name: 'revision-task-review',
         component: () => import('@/views/revision/TaskReviewView.vue')
+      },
+      {
+        path: 'settings',
+        name: 'revision-settings',
+        component: () => import('@/views/revision/RevisionSettingsView.vue'),
+        meta: {
+          title: '复习设置'
+        }
+      },
+      {
+        path: 'settings/notification',
+        name: 'notification-settings',
+        component: () => import('@/views/revision/NotificationSettingsView.vue'),
+        meta: {
+          title: '提醒设置'
+        }
+      },
+      {
+        path: 'daily-summary',
+        name: 'daily-summary',
+        component: () => import('@/views/revision/DailySummaryView.vue'),
+        meta: {
+          title: '每日摘要'
+        }
+      },
+      {
+        path: 'history',
+        name: 'revision-history',
+        component: () => import('@/views/revision/RevisionHistoryView.vue'),
+        meta: {
+          title: '复习历史'
+        }
+      },
+      {
+        path: 'statistics',
+        name: 'learning-statistics',
+        component: () => import('@/views/revision/LearningStatsView.vue'),
+        meta: {
+          title: '学习统计'
+        }
       }
     ]
   },
