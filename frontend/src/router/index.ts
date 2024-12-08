@@ -141,14 +141,20 @@ const routes: Array<RouteRecordRaw> = [
         }
       },
       {
-        path: 'quick-review/:planId',
+        path: 'quick-review',
         name: 'revision-quick-review',
-        component: () => import('@/views/revision/QuickReviewView.vue')
+        component: () => import('@/views/revision/QuickReviewView.vue'),
+        meta: {
+          title: '快速复习'
+        }
       },
       {
-        path: 'plans/:planId/review',
+        path: 'task-review',
         name: 'revision-task-review',
-        component: () => import('@/views/revision/TaskReviewView.vue')
+        component: () => import('@/views/revision/TaskReviewView.vue'),
+        meta: {
+          title: '任务复习'
+        }
       },
       {
         path: 'settings',

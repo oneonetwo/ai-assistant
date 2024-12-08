@@ -18,6 +18,11 @@ interface AddNoteToPlansBatchResult {
   }[]
 }
 
+interface GetDailyTasksParams {
+  date?: string
+  status?: 'pending' | 'completed' | 'skipped'
+}
+
 export class RevisionAPI {
   // 创建复习计划
   static async createPlan(data: {
@@ -69,8 +74,10 @@ export class RevisionAPI {
   }
 
   // 获取每日任务
-  static async getDailyTasks(): Promise<RevisionTask[]> {
-    const response = await request.get(`${API_BASE_URL}/daily-tasks`)
+  static async getDailyTasks(params: GetDailyTasksParams = {}): Promise<RevisionTask[]> {
+    const response = await request.get(`${API_BASE_URL}/daily-tasks`, {
+      params
+    })
     return response
   }
 

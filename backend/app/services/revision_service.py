@@ -57,23 +57,12 @@ class RevisionService:
             for days in revision_points:
                 scheduled_date = plan.start_date + timedelta(days=days)
                 if scheduled_date <= plan.end_date:
-                    # 创建普通模式任务
-                    normal_task = RevisionTask(
+                    task = RevisionTask(
                         plan_id=plan.id,
                         note_id=note.id,
-                        scheduled_date=scheduled_date,
-                        revision_mode="normal"
+                        scheduled_date=scheduled_date
                     )
-                    db.add(normal_task)
-                    
-                    # 同时创建快速模式任务
-                    quick_task = RevisionTask(
-                        plan_id=plan.id,
-                        note_id=note.id,
-                        scheduled_date=scheduled_date,
-                        revision_mode="quick"
-                    )
-                    db.add(quick_task)
+                    db.add(task)
         
         await db.commit() 
 
@@ -231,17 +220,45 @@ class RevisionService:
 
     @staticmethod
     async def get_daily_tasks(
-        db: AsyncSession,
-        date: date
+        db: AsyncSession, 
+        date: date,
+        status: Optional[str] = None
     ) -> List[RevisionTask]:
-        """取指定期的所有任务"""
-        query = (
-            select(RevisionTask)
-            .filter(func.date(RevisionTask.scheduled_date) == date)
-            .order_by(RevisionTask.scheduled_date)
-        )
-        result = await db.execute(query)
-        return result.scalars().all()
+        """获取指定日期的复习任务
+        
+        Args:
+            db: 数据库会话
+            date: 指定日期
+            status: 任务状态筛选
+        """
+        try:
+            # 构建基础查询
+            query = select(RevisionTask).filter(
+                func.date(RevisionTask.scheduled_date) == date
+            )
+            
+            # 添加状态筛选
+            if status:
+                query = query.filter(RevisionTask.status == status)
+            
+            # 预加载笔记关系
+            query = query.options(
+                selectinload(RevisionTask.note)
+            )
+            
+            # 执行查询
+            result = await db.execute(query)
+            tasks = result.scalars().all()
+            
+            return list(tasks)
+            
+        except Exception as e:
+            app_logger.error(f"获取每日任务失败: {str(e)}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"获取每日任务失败: {str(e)}"
+            )
+
     @staticmethod
     async def get_next_task(
         db: AsyncSession,

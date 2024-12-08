@@ -16,65 +16,64 @@ class NotificationService:
             today_start = datetime.combine(date.date(), datetime.min.time())
             today_end = datetime.combine(date.date(), datetime.max.time())
             
-            app_logger.info(f"查询日期范围: {today_start} - {today_end}")
-            
-            # 修改查询条件，使用 date() 函数进行日期比较
+            # 查询今天的任务，并预加载笔记信息
             base_query = select(RevisionTask).filter(
                 func.date(RevisionTask.scheduled_date) == date.date()
             ).options(
                 joinedload(RevisionTask.note)  # 预加载关联的笔记信息
             )
             
-            # 先获取任务列表
+            # 获取任务列表
             tasks_result = await db.execute(base_query)
             tasks = tasks_result.unique().scalars().all()
-            
-            # 记录查询到的原始任务数据
-            app_logger.info(f"查询到的任务数量: {len(tasks)}")
-            for task in tasks:
-                app_logger.info(f"任务ID: {task.id}, 计划日期: {task.scheduled_date}, 状态: {task.status}")
             
             # 统计任务数量
             task_count = len(tasks)
             
-            # 构建任务详情列表
+            # 构建任务详情列表，包含笔记信息
             task_details = []
             for task in tasks:
-                note_info = {
-                    "task_id": task.id,
-                    "scheduled_date": task.scheduled_date,
-                    "priority": task.priority,
-                    "status": task.status
-                }
-                
-                # 安全地获取笔记信息
                 if task.note:
-                    note_info.update({
-                        "note_id": task.note.id,
-                        "note_title": task.note.title or "无标题",
-                        "note_content": task.note.content[:100] if task.note.content else ""  # 只取前100个字符
-                    })
-                else:
-                    note_info.update({
-                        "note_id": None,
-                        "note_title": "未关联笔记",
-                        "note_content": ""
-                    })
+                    # 截取内容的前200个字符
+                    content_preview = task.note.content[:200] + "..." if task.note.content and len(task.note.content) > 200 else task.note.content
                     
-                task_details.append(note_info)
+                    task_detail = {
+                        "task_id": task.id,
+                        "scheduled_date": task.scheduled_date.isoformat() if task.scheduled_date else None,
+                        "priority": task.priority,
+                        "status": task.status,
+                        "note": {
+                            "id": task.note.id,
+                            "title": task.note.title or "无标题",
+                            "content": content_preview,
+                            "status": "待复习",  # 可以根据实际状态设置
+                            "priority": task.priority or "medium"
+                        }
+                    }
+                else:
+                    task_detail = {
+                        "task_id": task.id,
+                        "scheduled_date": task.scheduled_date.isoformat() if task.scheduled_date else None,
+                        "priority": task.priority,
+                        "status": task.status,
+                        "note": {
+                            "id": None,
+                            "title": "未关联笔记",
+                            "content": "",
+                            "status": "未知",
+                            "priority": "low"
+                        }
+                    }
+                
+                task_details.append(task_detail)
             
-            response_data = {
+            return {
                 "date": date.date().isoformat(),
                 "total_tasks": task_count,
                 "message": f"今天有 {task_count} 条笔记需要复习",
                 "tasks": task_details,
                 "has_tasks": task_count > 0
             }
-            
-            # 记录返回的数据结构
-            app_logger.info(f"返回的数据: {response_data}")
-            
-            return response_data
             
         except Exception as e:
             app_logger.error(f"获取每日复习任务摘要失败: {str(e)}")
@@ -114,7 +113,7 @@ class NotificationService:
     ) -> RevisionSettings:
         """更新提醒设置"""
         try:
-            # 获取当前设��
+            # 获取当前设置
             settings = await NotificationService.get_settings(db)
             
             # 更新设置

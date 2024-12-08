@@ -10,7 +10,9 @@ const route = useRoute()
 const router = useRouter()
 const store = useRevisionStore()
 
-const planId = Number(route.params.planId)
+const planId = Number(route.query.planId)
+const date = route.query.date as string
+
 const tasks = ref<RevisionTask[]>([])
 const currentIndex = ref(0)
 const pendingUpdates = ref<Array<{
@@ -89,12 +91,22 @@ async function loadTasks() {
   })
   
   try {
-    // 获取当天的所有任务
-    const today = new Date().toISOString().split('T')[0]
-    const planTasks = await store.fetchPlanTasks(planId, {
-      date: today,
-      status: 'pending' // 只获取待复习的任务
-    })
+    // 获取计划所有待复习任务 时间不设限
+    let planTasks: RevisionTask[]
+    if (planId) {
+      // 获取计划的待复习任务  日期不设限
+      planTasks = await store.fetchPlanTasks(planId, {
+        status: 'pending'
+      })
+    } else if (date) {
+      // 获取指定日期的待复习任务 date获取当天不需要传递
+      const response = await store.fetchDailyTasks({
+        status: 'pending'
+      })
+      planTasks = response.filter(task => task.status === 'pending')
+    } else {
+      throw new Error('缺少必要参数')
+    }
     
     if (planTasks.length > 0) {
       tasks.value = planTasks

@@ -19,6 +19,7 @@ from app.core.logging import app_logger
 from typing import List, Optional
 from datetime import date, datetime
 from fastapi.responses import JSONResponse
+from app.db.models import Note
 
 router = APIRouter(prefix="/revisions", tags=["revisions"])
 
@@ -125,13 +126,97 @@ async def update_task(
             detail=f"更新任务失败: {str(e)}"
         )
 
-@router.get("/daily-tasks", response_model=List[RevisionTaskResponse])
+@router.get(
+    "/daily-tasks", 
+    response_model=List[RevisionTaskResponse],
+    summary="获取每日复习任务列表",
+    description="""
+    获取指定日期的复习任务列表，支持以下功能：
+    - 按日期查询任务（默认为今天）
+    - 按状态筛选任务（pending/completed/skipped）
+    - 返回包含完整笔记信息的任务列表
+    
+    示例请求：
+    - GET /api/v1/revisions/daily-tasks
+    - GET /api/v1/revisions/daily-tasks?date=2024-03-14
+    - GET /api/v1/revisions/daily-tasks?status=pending
+    - GET /api/v1/revisions/daily-tasks?date=2024-03-14&status=pending
+    """,
+    response_description="返回指定日期的复习任务列表，每个任务包含关联的笔记详细信息",
+    responses={
+        200: {
+            "description": "成功获取任务列表",
+            "content": {
+                "application/json": {
+                    "example": [{
+                        "id": 1,
+                        "scheduled_date": "2024-03-14T10:00:00",
+                        "status": "pending",
+                        "note": {
+                            "id": 2,
+                            "title": "新概念英语一册内容及应用场景",
+                            "content": "标题: 新概念英语一册内容及应用场景...",
+                            "status": "待复习",
+                            "priority": "low"
+                        }
+                    }]
+                }
+            }
+        },
+        500: {
+            "description": "服务器内部错误",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": "获取每日任务失败: 具体错误信息"
+                    }
+                }
+            }
+        }
+    }
+)
 async def get_daily_tasks(
-    date: date = Query(default=None, description="指定日期，默认为今天"),
+    date: date = Query(
+        default=None, 
+        description="指定日期，默认为今天",
+        example="2024-03-14"
+    ),
+    status: str = Query(
+        None, 
+        description="按状态筛选 (pending/completed/skipped)",
+        example="pending"
+    ),
     db: AsyncSession = Depends(get_db)
 ):
-    """获取每日任务清"""
-    return await RevisionService.get_daily_tasks(db, date or datetime.now().date())
+    """获取每日任务列表
+    
+    Args:
+        date: 指定日期，默认为今天
+        status: 任务状态筛选 (pending/completed/skipped)
+        db: 数据库会话
+    """
+    try:
+        tasks = await RevisionService.get_daily_tasks(
+            db, 
+            date or datetime.now().date(),
+            status=status
+        )
+        
+        # 预加载笔记数据
+        for task in tasks:
+            if task.note_id:
+                note = await db.get(Note, task.note_id)
+                if note:
+                    task.note = note
+        
+        return tasks
+        
+    except Exception as e:
+        app_logger.error(f"获取每日任务失败: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"获取每日任务失败: {str(e)}"
+        )
 
 @router.get("/tasks/next", 
     response_model=Optional[RevisionTaskResponse],
@@ -148,7 +233,7 @@ async def get_next_task(
     
     task = await RevisionService.get_next_task(db, plan_id, mode)
     
-    # 如果没有任务，直接返回 None
+    # 如果没有任务，直��返回 None
     if task is None:
         app_logger.debug("没有找到待复习任务，返回null")
         return None

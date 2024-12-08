@@ -13,6 +13,11 @@ interface GetPlanTasksParams {
   status?: 'pending' | 'completed' | 'skipped'
 }
 
+interface GetDailyTasksParams {
+  date?: string
+  status?: 'pending' | 'completed' | 'skipped'
+}
+
 export const useRevisionStore = defineStore('revision', () => {
   // 状态
   const plans = ref<RevisionPlan[]>([])
@@ -83,11 +88,12 @@ export const useRevisionStore = defineStore('revision', () => {
     }
   }
 
-  async function fetchDailyTasks() {
+  async function fetchDailyTasks(params: GetDailyTasksParams = {}) {
     try {
       isLoading.value = true
-      const tasks = await RevisionAPI.getDailyTasks()
+      const tasks = await RevisionAPI.getDailyTasks(params)
       dailyTasks.value = tasks
+      return tasks
     } catch (err) {
       error.value = '获取每日任务失败'
       throw err
@@ -192,7 +198,13 @@ export const useRevisionStore = defineStore('revision', () => {
     comments?: string
   }) {
     try {
-      return await RevisionAPI.adjustTaskSchedule(data)
+      const updatedTask = await RevisionAPI.adjustTaskSchedule(data)
+      // 更新本地状态
+      const index = dailyTasks.value.findIndex(task => task.id === data.task_id)
+      if (index !== -1) {
+        dailyTasks.value[index] = updatedTask
+      }
+      return updatedTask
     } catch (err) {
       error.value = '调整任务计划失败'
       throw err

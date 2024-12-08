@@ -5,9 +5,12 @@ import { showToast } from 'vant'
 import { useRouter } from 'vue-router'
 import TaskSummaryCard from '@/components/revision/TaskSummaryCard.vue'
 import dayjs from 'dayjs'
+import TaskExecution from '@/components/revision/TaskExecution.vue'
 
 const store = useNotificationStore()
 const router = useRouter()
+const showTaskExecution = ref(false)
+const currentTask = ref<RevisionTask | null>(null)
 
 // 计算今日日期
 const today = computed(() => {
@@ -31,7 +34,7 @@ function formatTime(dateStr: string) {
   return dayjs(dateStr).format('HH:mm')
 }
 
-// 计算任务统计数据
+// 计算任务统��数据
 const taskStats = computed(() => {
   if (!store.summary?.tasks) return { pending: 0, upcoming: 0, completed: 0 }
   
@@ -61,8 +64,42 @@ onMounted(async () => {
   }
 })
 
-function startRevision() {
-  router.push({ name: 'revision-tasks' })
+// 处理任务点击
+function handleTaskClick(task: RevisionTask) {
+  currentTask.value = task
+  showTaskExecution.value = true
+}
+
+// 处理任务状态更新
+async function handleTaskStatusChange(taskId: number, masteryLevel: RevisionTask['mastery_level']) {
+  try {
+    await store.updateTaskStatus(taskId, masteryLevel)
+    // 更新本地任务状态
+    if (store.summary?.tasks) {
+      const taskIndex = store.summary.tasks.findIndex(t => t.task_id === taskId)
+      if (taskIndex !== -1) {
+        store.summary.tasks[taskIndex].status = masteryLevel === 'mastered' ? 'completed' : 'pending'
+      }
+    }
+  } catch (error) {
+    showToast('更新任务状态失败')
+  }
+}
+
+// 开始复习当天任务
+function startDailyRevision() {
+  router.push({ 
+    name: 'revision-task-review',
+    query: { date: store.summary?.date }
+  })
+}
+
+// 快速复习模式
+function startQuickRevision() {
+  router.push({ 
+    name: 'revision-quick-review',
+    query: { date: store.summary?.date }
+  })
 }
 </script>
 
@@ -119,11 +156,11 @@ function startRevision() {
               <van-cell
                 v-for="task in tasks"
                 :key="task.task_id"
-                :title="task.note_title"
+                :title="task.note.title"
                 :label="formatTime(task.scheduled_date)"
                 is-link
                 :class="{ 'completed': task.status === 'completed' }"
-                @click="router.push(`/revision/tasks/${task.task_id}`)"
+                @click="handleTaskClick(task)"
               >
                 <template #right-icon>
                   <van-tag 
@@ -139,15 +176,35 @@ function startRevision() {
         </template>
       </div>
       
+      <!-- Task Execution Popup -->
+      <van-popup
+        v-model:show="showTaskExecution"
+        :style="{ width: '90%', height: '70%' }"
+        round
+      >
+        <TaskExecution
+          v-if="currentTask"
+          :task="currentTask"
+          @status-change="handleTaskStatusChange"
+        />
+      </van-popup>
+      
       <!-- 底部按钮 -->
-      <div class="summary-actions">
+      <div class="review-actions">
         <van-button 
+          type="primary" 
           block 
-          type="primary"
-          size="large"
-          @click="startRevision"
+          @click="startDailyRevision"
         >
-          开始复习
+          开始逐条复习
+        </van-button>
+        
+        <van-button 
+          type="success" 
+          block 
+          @click="startQuickRevision"
+        >
+          快速复习模式
         </van-button>
       </div>
     </div>
@@ -190,6 +247,8 @@ function startRevision() {
     }
     
     .task-list {
+      margin-bottom: 80px; // 为底部按钮留出空间
+      
       .priority-group {
         margin-bottom: 20px;
         
@@ -207,11 +266,20 @@ function startRevision() {
         }
       }
     }
-    
-    .summary-actions {
-      margin-top: 24px;
-      padding: 16px 0;
-    }
   }
+}
+
+.review-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  background: var(--van-background);
+  border-top: 1px solid var(--van-border-color);
+  
+  display: flex;
+  gap: 16px;
+  z-index: 99;
 }
 </style> 
