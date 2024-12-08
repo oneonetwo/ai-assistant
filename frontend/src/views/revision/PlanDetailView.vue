@@ -103,6 +103,10 @@ async function handleTaskStatusChange(taskId: number, masteryLevel  : RevisionTa
     showToast('更新任务状态失败')
   }
 }
+
+function navigateToNoteHistory(noteId: number) {
+  router.push(`/handbooks/notes/${noteId}/history`)
+}
 </script>
 
 <template>
@@ -170,6 +174,12 @@ async function handleTaskStatusChange(taskId: number, masteryLevel  : RevisionTa
                   {{ task.status === 'mastered' ? '已掌握' :
                      task.status === 'partially_mastered' ? '部分掌握' : '未掌握' }}
                 </van-tag>
+              </template>
+              <template #right-icon>
+                <van-icon 
+                  name="chart-trending-o"
+                  @click.stop="navigateToNoteHistory(task.note.id)"
+                />
               </template>
             </van-cell>
           </van-cell-group>

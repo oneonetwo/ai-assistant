@@ -91,6 +91,11 @@ const getPriorityText = (priority: string) => {
   }
   return textMap[priority] || priority
 }
+
+// 跳转到复习历史
+function navigateToHistory() {
+  router.push(`/handbooks/notes/${noteId}/history`)
+}
 </script>
 
 <template>
@@ -100,7 +105,19 @@ const getPriorityText = (priority: string) => {
       left-arrow
       :title="note.title"
       @click-left="router.back()"
-    />
+      @click-right="navigateToHistory"
+    >
+      <template #right>
+        <van-button
+          plain
+          size="small"
+          icon="chart-trending-o"
+          @click="navigateToHistory"
+        >
+          复习历史
+        </van-button>
+      </template>
+    </van-nav-bar>
 
     <div class="detail-content">
       <!-- <h1 class="title">{{ note.title }}</h1> -->

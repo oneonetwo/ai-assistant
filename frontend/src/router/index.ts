@@ -90,6 +90,15 @@ const routes: Array<RouteRecordRaw> = [
         }
       },
       {
+        path: 'notes/:noteId/history',
+        name: 'note-history',
+        component: () => import('@/views/revision/RevisionHistoryView.vue'),
+        meta: {
+          title: '复习历史',
+          requiresAuth: true
+        }
+      },
+      {
         path: 'tags',
         name: 'tags',
         component: () => import('@/views/handbook/TagManagerView.vue'),
@@ -203,7 +212,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'settings',
     component: () => import('@/views/SettingsView.vue'),
     meta: {
-      title: '设置'
+      title: '��置'
     }
   },
   {
@@ -221,7 +230,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       title: '页面不存在'
     }
-  }
+  },
 ]
 
 // 创建路由实例
