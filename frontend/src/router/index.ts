@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import { useChatStore } from '@/stores/chat'
-
+import { statisticsRoutes } from './routes/statistics'
 // 定义路由配置
 const routes: Array<RouteRecordRaw> = [
   {
@@ -207,6 +207,8 @@ const routes: Array<RouteRecordRaw> = [
       }
     ]
   },
+  // 统计相关路由
+  ...statisticsRoutes,
   {
     path: '/settings',
     name: 'settings',

@@ -17,6 +17,9 @@ importers:
       axios:
         specifier: ^1.7.7
         version: 1.7.7
+      echarts-wordcloud:
+        specifier: ^2.1.0
+        version: 2.1.0(echarts@5.5.1)
       highlight.js:
         specifier: ^11.10.0
         version: 11.10.0
@@ -1027,6 +1030,11 @@ packages:
   dotenv@16.4.5:
     resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
     engines: {node: '>=12'}
+
+  echarts-wordcloud@2.1.0:
+    resolution: {integrity: sha512-Kt1JmbcROgb+3IMI48KZECK2AP5lG6bSsOEs+AsuwaWJxQom31RTNd6NFYI01E/YaI1PFZeueaupjlmzSQasjQ==}
+    peerDependencies:
+      echarts: ^5.0.1
 
   echarts@5.5.1:
     resolution: {integrity: sha512-Fce8upazaAXUVUVsjgV6mBnGuqgO+JNDlcgF79Dksy4+wgGpQB2lmYoO4TSweFg/mZITdpGHomw/cNBJZj1icA==}
@@ -3518,6 +3526,10 @@ snapshots:
     optional: true
 
   dotenv@16.4.5: {}
+
+  echarts-wordcloud@2.1.0(echarts@5.5.1):
+    dependencies:
+      echarts: 5.5.1
 
   echarts@5.5.1:
     dependencies:

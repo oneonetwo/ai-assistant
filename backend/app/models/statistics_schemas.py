@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union
 from datetime import datetime
 
 class StudyTimeStats(BaseModel):
@@ -27,12 +27,12 @@ class StudyTimeStats(BaseModel):
 
 class MasteryStats(BaseModel):
     """知识点掌握情况统计"""
-    total_points: int = Field(..., description="知识点总数")
-    mastered: int = Field(..., description="已掌握数量")
-    learning: int = Field(..., description="正在学习数量")
-    struggling: int = Field(..., description="需要加强数量")
-    mastery_rate: float = Field(..., description="掌握率")
-    category_distribution: Dict[str, int] = Field(..., description="分类分布")
+    total_points: int
+    mastered: int
+    learning: int
+    struggling: int
+    mastery_rate: float
+    category_distribution: Dict[str, int]
 
     class Config:
         json_schema_extra = {
@@ -76,10 +76,10 @@ class RevisionStats(BaseModel):
 
 class TagStats(BaseModel):
     """标签分布统计"""
-    total_tags: int = Field(..., description="标签总数")
-    most_used: List[Dict[str, Any]] = Field(..., description="使用最多的标签")
-    category_tags: Dict[str, List[str]] = Field(..., description="分类标签统计")
-    recent_tags: List[Dict[str, Any]] = Field(..., description="最近使用的标签")
+    total_tags: int
+    most_used: List[Dict[str, Any]]
+    category_tags: Dict[str, List[str]]
+    recent_tags: List[Dict[str, Any]]
 
     class Config:
         json_schema_extra = {
