@@ -36,13 +36,32 @@ const uploadController = ref<AbortController | null>(null)
 
 // 文件类型映射
 const FILE_TYPES = {
-  IMAGE: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+  IMAGE: [
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+    'image/svg+xml',
+    'image/bmp'
+  ],
   DOCUMENT: [
     'text/plain',
     'application/pdf',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'application/epub+zip',
-    'text/markdown'
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'application/msword',
+    'application/vnd.ms-excel',
+    'application/vnd.ms-powerpoint',
+    'text/markdown',
+    'application/json'
+  ],
+  AUDIO: [
+    'audio/mpeg',
+    'audio/wav',
+    'audio/ogg',
+    'audio/x-m4a',
+    'audio/aac'
   ]
 } as const
 
@@ -50,6 +69,7 @@ const FILE_TYPES = {
 function getFileType(file: File) {
   if (FILE_TYPES.IMAGE.includes(file.type)) return 'image'
   if (FILE_TYPES.DOCUMENT.includes(file.type)) return 'document'
+  if (FILE_TYPES.AUDIO.includes(file.type)) return 'audio'
   return null
 }
 
@@ -82,6 +102,9 @@ const getFileIcon = (fileType: string) => {
   if (fileType === 'application/pdf') return 'pdf'
   if (fileType === 'text/plain') return 'txt'
   if (fileType.includes('word')) return 'doc'
+  if (fileType.includes('sheet') || fileType.includes('excel')) return 'excel'
+  if (fileType.includes('presentation') || fileType.includes('powerpoint')) return 'ppt'
+  if (fileType.startsWith('audio/')) return 'audio'
   return 'file'
 }
 
@@ -196,8 +219,8 @@ function getFilePreview(file: File) {
     <div class="toolbar">
       
       <van-uploader
-      accept=".txt,.pdf,.docx,.epub,.md,image/*"
-      :max-size="2000 * 1024"
+      accept=".txt,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.epub,.md,.json,image/*,.mp3,.wav,.ogg,.m4a,.aac"
+      :max-size="30 * 1024 * 1024"
       :max-count="1"
       :before-read="beforeUpload"
       :after-read="handleFileUpload"
