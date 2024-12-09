@@ -96,7 +96,7 @@ export class ChatClient {
     const { onStart = () => {}, onChunk = () => {}, onEnd = () => {}, onError = () => {} } = callbacks
 
     try {
-      // 首先发送 POST 请求初始化流
+      // 首先发送 POST ��求初始化流
       await request.post(`${this.baseUrl}/${this.sessionId}/stream`, {
         message
       })
@@ -362,5 +362,29 @@ export class ChatAPI {
     } catch (error) {
       callbacks.onError?.(error as Error)
     }
+  }
+
+  /**
+   * 发送带音频的消息并获取AI分析
+   */
+  static async audioChat(
+    sessionId: string,
+    message: string,
+    audioUrl: string,
+    fileName: string,
+    fileType: string,
+    options: {
+      systemPrompt?: string
+    } = {}
+  ) {
+    const response = await request.post(`${API_BASE_URL}/chat/${sessionId}/audio`, {
+      message,
+      file: audioUrl,
+      file_name: fileName,
+      file_type: fileType,
+      system_prompt: options.systemPrompt || '你是一个专业的音频分析助手'
+    })
+    
+    return response
   }
 } 

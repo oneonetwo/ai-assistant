@@ -704,3 +704,93 @@ async def get_message_analysis_stream(session_id: str):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         ) 
+    
+
+class AudioChatRequest(BaseModel):
+    message: str
+    file: str
+    file_name: str
+    file_type: str
+    system_prompt: Optional[str] = None
+
+class AudioChatResponse(BaseModel):
+    session_id: str
+    response: str
+    file_id: str
+
+@router.post("/{session_id}/audio", 
+    response_model=AudioChatResponse,
+    summary="Process audio chat",
+    description="Process audio file chat request and return analysis")
+async def audio_chat(
+    session_id: str,
+    request: AudioChatRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    try:
+        # Validate session_id format
+        try:
+            uuid.UUID(session_id)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid session ID format"
+            )
+            
+        # Create file record
+        file_id = str(uuid.uuid4())
+        file_record = File(
+            file_id=file_id,
+            original_name=request.file_name,
+            file_path=request.file,
+            file_type="audio",
+            mime_type=request.file_type,
+            file_size=0,
+            user_session_id=session_id
+        )
+        db.add(file_record)
+        await db.commit()
+        
+        # Get conversation
+        conversation = await get_conversation(db, session_id)
+        if not conversation:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Conversation not found"
+            )
+
+        # Save user message
+        user_msg = MessageCreate(
+            role="user",
+            content=request.message,
+            file_id=file_id
+        )
+        saved_user_msg = await add_message(db, conversation.id, user_msg)
+
+        # Analyze audio
+        response = await ai_client.analyze_audio(
+            audio_url=request.file,
+            query=request.message,
+            system_prompt=request.system_prompt
+        )
+
+        # Save AI response
+        ai_msg = MessageCreate(
+            role="assistant",
+            content=response,
+            parent_message_id=saved_user_msg.id
+        )
+        await add_message(db, conversation.id, ai_msg)
+
+        return AudioChatResponse(
+            session_id=session_id,
+            response=response,
+            file_id=file_id
+        )
+
+    except Exception as e:
+        app_logger.error(f"Audio chat processing failed: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )

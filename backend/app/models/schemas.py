@@ -130,7 +130,7 @@ class ImageChatRequest(BaseModel):
     extract_text: Optional[bool] = False
 
 class ImageChatResponse(BaseModel):
-    """图片聊天响应模型"""
+    """图片聊天响��模型"""
     analysis: str
     extracted_text: Optional[str] = None
 
@@ -189,3 +189,15 @@ class HandbookResponse(HandbookBase):
     
     class Config:
         from_attributes = True
+
+class AudioChatRequest(BaseModel):
+    message: str
+    file: str
+    file_name: str
+    file_type: str
+    system_prompt: Optional[str] = None
+
+class AudioChatResponse(BaseModel):
+    session_id: str
+    response: str
+    file_id: str

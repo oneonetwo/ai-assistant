@@ -283,7 +283,7 @@ export const useChatStore = defineStore('chat', () => {
       // 乐观更新
       conversation.name = name
       
-      // 调��重命名API
+      // 调用重命名API
       await ConversationAPI.updateConversation(id, name)
       
       showToast({
@@ -570,6 +570,101 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
+  /**
+   * 发送音频消息
+   */
+  async function sendAudioMessage(
+    content: string,
+    file: File,
+    options: {
+      onEnd?: () => void
+      onProgress?: (progress: number) => void
+      signal?: AbortSignal
+      systemPrompt?: string
+    } = {}
+  ) {
+    if (!currentConversationId.value) {
+      throw new Error('未选择会话')
+    }
+
+
+    const conversation = currentConversation.value
+    if (!conversation) return
+
+    const messageId = generateUUID()
+
+    try {
+      // 创建用户消息
+      const userMessage: Message = {
+        id: messageId,
+        role: 'user',
+        content,
+        timestamp: Date.now(),
+        status: 'sending',
+        file: {
+          file_type: file.type,
+          original_name: file.name,
+          file_path: '',
+          uploading: true,
+          progress: 0
+        }
+      }
+      
+      conversation.messages.push(userMessage)
+
+      // 上传文件
+      const fileUrl = await uploadToOSS(file, {
+        onProgress: (progress) => {
+          updateFileProgress(messageId, progress)
+          options.onProgress?.(progress)
+        },
+        signal: options.signal
+      })
+
+      // 更新文件 URL
+      userMessage.file!.file_path = fileUrl
+      userMessage.status = 'success'
+
+      // 创建助手消息占位
+      const assistantMessage: Message = {
+        id: generateUUID(),
+        parent_message_id: userMessage.id,
+        role: 'assistant',
+        content: '',
+        timestamp: Date.now(),
+        status: 'sending'
+      }
+      
+      conversation.messages.push(assistantMessage)
+
+      // 调用音频聊天 API
+      const response = await ChatAPI.audioChat(
+        currentConversationId.value,
+        content,
+        fileUrl,
+        file.name,
+        file.type,
+        {
+          systemPrompt: options.systemPrompt
+        }
+      )
+
+      // 更新助手消息
+      assistantMessage.content = response
+      assistantMessage.status = 'success'
+      conversation.lastTime = new Date().toISOString()
+      options.onEnd?.()
+
+    } catch (error: any) {
+      console.error('发送音频消息失败:', error)
+      showToast({
+        type: 'fail',
+        message: error.message || '发送音频消息失败'
+      })
+      throw error
+    }
+  }
+
   return {
     conversations,
     currentConversationId,
@@ -589,6 +684,7 @@ export const useChatStore = defineStore('chat', () => {
     sendMessageWithFile,
     updateFileProgress,
     cancelFileUpload,
-    updateConversationList
+    updateConversationList,
+    sendAudioMessage
   }
 })

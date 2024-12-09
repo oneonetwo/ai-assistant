@@ -19,7 +19,7 @@ const defaultRetryConfig: RetryConfig = {
 
 export const request = axios.create({
   baseURL: '/api',
-  timeout: 10000,
+  timeout: 1000 * 60 * 10,
   headers: {
     'Content-Type': 'application/json'
   }

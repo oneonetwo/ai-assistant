@@ -31,6 +31,7 @@ class AIClient:
         )
         self.model = "qwen-max"
         self.vision_model = "qwen-vl-plus"
+        self.audio_model = "qwen-audio-turbo"
         
         # 重试配置
         self.max_retries = 3
@@ -67,10 +68,6 @@ class AIClient:
             # 可以在这里添加任何必要的会话初始化逻辑
             self.initialized_sessions.add(session_id)
 
-    @retry(
-        stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=1, min=4, max=10)
-    )
     async def _make_api_call(
         self,
         messages: List[Dict[str, Any]],
@@ -576,6 +573,70 @@ class AIClient:
         except Exception as e:
             app_logger.error(f"检查会话状态失败: {str(e)}")
             return False
+
+    async def analyze_audio(
+        self,
+        audio_url: str,
+        query: str,
+        system_prompt: Optional[str] = None,
+        timeout: int = 180
+    ) -> str:
+        """Analyze audio content using Qwen Audio model with timeout control"""
+        try:
+            # 按照测试文件的格式构建消息
+            messages = [
+                {
+                    "role": "user",
+                    "content": [
+                        {"audio": audio_url},
+                        {"text": query}
+                    ]
+                }
+            ]
+
+            async def _make_audio_call():
+                import dashscope
+                response = await asyncio.to_thread(
+                    dashscope.MultiModalConversation.call,
+                    api_key=self.api_key,
+                    model=self.audio_model,
+                    messages=messages
+                )
+                return response
+
+            try:
+                app_logger.info("Starting audio analysis...")
+                response = await asyncio.wait_for(_make_audio_call(), timeout=timeout)
+                
+                if hasattr(response, 'status_code') and response.status_code == 200:
+                    if hasattr(response, 'output') and hasattr(response.output, 'choices'):
+                        content = response.output.choices[0].message.content
+                        # 处理返回的内容
+                        if isinstance(content, list):
+                            # 如果是列表，提取text字段
+                            for item in content:
+                                if isinstance(item, dict) and 'text' in item:
+                                    return item['text']
+                        elif isinstance(content, dict) and 'text' in content:
+                            # 如果是字典，直接提取text字段
+                            return content['text']
+                        else:
+                            # 如果是字符串，直接返回
+                            return str(content)
+                    else:
+                        raise APIError("Invalid response structure: missing output or choices")
+                else:
+                    error_msg = getattr(response, 'message', 'Unknown error')
+                    app_logger.error(f"Audio analysis failed: {error_msg}")
+                    raise APIError(f"Audio analysis failed: {error_msg}")
+                    
+            except asyncio.TimeoutError:
+                app_logger.error(f"Audio analysis timeout after {timeout} seconds")
+                raise APIError(f"Audio analysis timeout after {timeout} seconds")
+
+        except Exception as e:
+            app_logger.error(f"Audio analysis failed: {str(e)}")
+            raise APIError(f"Audio analysis failed: {str(e)}")
 
 # 创建全局AI客户端实例
 ai_client = AIClient() 

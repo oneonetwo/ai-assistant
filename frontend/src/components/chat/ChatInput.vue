@@ -88,34 +88,31 @@ const handleFileUpload = async (file: { file: File }) => {
   // 根据文件类型设置默认提示文本
   messageText.value = fileType === 'image' 
     ? '请帮我分析这张图片：\n' + (messageText.value || '')
+    : fileType === 'audio'
+    ? '请帮我分析这段音频：\n' + (messageText.value || '')
     : '请帮我分析这个文件：\n' + (messageText.value || '')
 }
 
 // 移除文件
 const removeFile = () => {
   uploadedFile.value = null
+  uploadProgress.value = 0
+  if (uploadController.value) {
+    uploadController.value.abort()
+    uploadController.value = null
+  }
 }
 
 // 获取文件图标
 const getFileIcon = (fileType: string) => {
   if (fileType.startsWith('image/')) return 'image'
+  if (fileType.startsWith('audio/')) return 'audio'
   if (fileType === 'application/pdf') return 'pdf'
   if (fileType === 'text/plain') return 'txt'
   if (fileType.includes('word')) return 'doc'
   if (fileType.includes('sheet') || fileType.includes('excel')) return 'excel'
   if (fileType.includes('presentation') || fileType.includes('powerpoint')) return 'ppt'
-  if (fileType.startsWith('audio/')) return 'audio'
   return 'file'
-}
-
-// 处理标签点击
-function handleTagClick(tag: typeof featureTags[0]) {
-  messageText.value = `${tag.label}：\n`
-}
-
-// 处理语音输入
-function handleVoiceInput(text: string) {
-  messageText.value = text
 }
 
 // 处理发送消息
@@ -127,27 +124,41 @@ async function handleSend() {
       uploadController.value = new AbortController()
       const fileType = getFileType(uploadedFile.value)
       const isImage = fileType === 'image'
+      const isAudio = fileType === 'audio'
 
-      // 使用统一的 sendMessageWithFile 方法
-      await chatStore.sendMessageWithFile(
-        messageText.value,
-        uploadedFile.value,
-        {
-          // 图片特有的选项
-          systemPrompt: isImage ? '请分析这张图片' : undefined,
-          extractText: isImage ? true : undefined,
-          // 通用选项
-          onProgress: (progress) => {
-            uploadProgress.value = progress
-          },
-          onEnd: () => {
-          // 重置输入
-
-            handleOnEnd()
-          },
-          signal: uploadController.value.signal
-        }
-      )
+      if (isAudio) {
+        // 使用音频专用的发送方法
+        await chatStore.sendAudioMessage(
+          messageText.value,
+          uploadedFile.value,
+          {
+            onProgress: (progress) => {
+              uploadProgress.value = progress
+            },
+            onEnd: () => {
+              handleOnEnd()
+            },
+            signal: uploadController.value.signal
+          }
+        )
+      } else {
+        // 使用通用的文件发送方法
+        await chatStore.sendMessageWithFile(
+          messageText.value,
+          uploadedFile.value,
+          {
+            systemPrompt: isImage ? '请分析这张图片' : undefined,
+            extractText: isImage ? true : undefined,
+            onProgress: (progress) => {
+              uploadProgress.value = progress
+            },
+            onEnd: () => {
+              handleOnEnd()
+            },
+            signal: uploadController.value.signal
+          }
+        )
+      }
       
       // 重置文件上传状态
       uploadedFile.value = null
@@ -157,49 +168,24 @@ async function handleSend() {
       await chatStore.sendMessage(messageText.value, {
         quote: props.quotedMessage || undefined,
         onEnd: () => {
-          // 重置输入
           handleOnEnd()
-        } 
+        }
       })
     }
-    
-    // 重置输入
-    messageText.value = ''
-    emit('quote-remove')
   } catch (error) {
     if (error.name === 'AbortError') {
       showToast('已取消上传')
     } else {
-      console.error('发送消息失败:', error)
       showToast('发送失败')
+      console.error('发送失败:', error)
     }
-  } finally {
-    uploadController.value = null
   }
 }
+
+// 处理发送完成
 function handleOnEnd() {
-  // 更新会话列表
-  chatStore.updateConversationList()
-}
-// 移除引用
-function removeQuote() {
+  messageText.value = ''
   emit('quote-remove')
-}
-
-watch(() => chatStore.isLoading, (newVal) => {
-  // 处理消息保存
-  async function handleSave(content: string) {
-    try {
-      await chatStore.saveMessage(content)
-    } catch (error) {
-      showToast('保存失败')
-    }
-  }
-})
-
-// 取消上传
-const cancelUpload = () => {
-  uploadController.value?.abort()
   uploadController.value = null
   uploadProgress.value = 0
   uploadedFile.value = null
