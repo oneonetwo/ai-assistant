@@ -56,8 +56,10 @@ class TagResponse(BaseModel):
         }
 
 class AttachmentCreate(BaseModel):
-    url: str
-    file_name: Optional[str] = None
+    original_name: str
+    file_type: str = ""
+    file_size: int
+    file_path: str
 
 class FileResponse(BaseModel):
     file_id: str
@@ -73,6 +75,13 @@ class NoteAttachmentResponse(BaseModel):
     file_id: str
     created_at: datetime
     file: Optional[FileResponse] = None
+
+    class Config:
+        from_attributes = True
+
+class NoteAttachmentSimpleResponse(BaseModel):
+    """简化的笔记附件响应模型"""
+    file_id: str
 
     class Config:
         from_attributes = True
@@ -111,7 +120,7 @@ class NoteResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     tags: List[TagResponse] = []
-    attachments: List[NoteAttachmentResponse] = []
+    attachments: List[NoteAttachmentSimpleResponse] = []
 
     class Config:
         from_attributes = True

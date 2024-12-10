@@ -86,4 +86,12 @@ export class NoteAPI {
       target_tag_id: targetTagId
     })
   }
+
+  /**
+   * 批量获取文件信息
+   */
+  static async batchGetFiles(query: BatchFileQuery): Promise<FileInfo[]> {
+    const response = await request.post(`${API_BASE_URL}/files/batch`, query)
+    return response
+  }
 } 

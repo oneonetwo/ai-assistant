@@ -8,6 +8,8 @@ from app.core.config import settings
 from app.core.logging import app_logger
 from app.db.models import File
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, or_
+from typing import List, Optional
 
 class FileService:
     async def save_file(
@@ -86,6 +88,43 @@ class FileService:
             )
             
         return settings.UPLOAD_DIR / file_record.file_path
+
+    async def get_files_by_batch(
+        self,
+        db: AsyncSession,
+        ids: Optional[List[int]] = None,
+        file_ids: Optional[List[str]] = None
+    ) -> List[File]:
+        """批量查询文件"""
+        try:
+            if not ids and not file_ids:
+                raise ValueError("必须提供ids或file_ids中的至少一个参数")
+
+            query = select(File)
+            
+            # 构建查询条件
+            conditions = []
+            if ids:
+                conditions.append(File.id.in_(ids))
+            if file_ids:
+                conditions.append(File.file_id.in_(file_ids))
+            
+            # 组合条件
+            if conditions:
+                query = query.where(or_(*conditions))
+            
+            # 执行查询
+            result = await db.execute(query)
+            files = result.scalars().all()
+            
+            return files
+
+        except Exception as e:
+            app_logger.error(f"批量查询文件失败: {str(e)}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"批量查询文件失败: {str(e)}"
+            )
 
 # 创建全局文件服务实例
 file_service = FileService() 

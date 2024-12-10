@@ -1,12 +1,14 @@
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from app.db.models import Tag, Note, NoteTag, Message
-from app.models.handbook_schemas import TagResponse, NoteCreate, NoteUpdate
+from sqlalchemy import select, desc
+from app.db.models import Tag, Note, NoteTag, Message, File, NoteAttachment
+from app.models.handbook_schemas import TagResponse, NoteCreate, NoteUpdate, AttachmentCreate
 from app.core.logging import app_logger
 from fastapi import HTTPException, status
 from sqlalchemy.orm import joinedload
 from app.models.schemas import MessageResponse
+import uuid
+from datetime import datetime
 
 class NoteService:
     async def get_tags(self, db: AsyncSession) -> List[TagResponse]:
@@ -37,32 +39,56 @@ class NoteService:
                 detail=f"获取标签列表失败: {str(e)}"
             )
 
-    async def create_note(self, db: AsyncSession, note: NoteCreate) -> Note:
-        """创建新笔记"""
+    async def create_note(self, db: AsyncSession, note_data: NoteCreate) -> Note:
+        """创建笔记并处理附件"""
         try:
-            # 创建笔记实例
-            db_note = Note(
-                title=note.title,
-                content=note.content,
-                message_ids=note.message_ids,
-                priority=note.priority,
-                status=note.status,
-                is_shared=note.is_shared,
-                handbook_id=note.handbook_id
+            # 创建笔记基本信息
+            note = Note(
+                title=note_data.title,
+                content=note_data.content,
+                handbook_id=note_data.handbook_id,
+                priority=note_data.priority,
+                status=note_data.status,
+                is_shared=note_data.is_shared,
+                message_ids=note_data.message_ids or []
             )
             
-            db.add(db_note)
+            db.add(note)
+            await db.flush()  # 获取note.id
+            
+            # 处理附件
+            if note_data.attachments:
+                for attachment in note_data.attachments:
+                    # 创建文件记录
+                    file = File(
+                        file_id=str(uuid.uuid4()),
+                        original_name=attachment.original_name,
+                        file_path=attachment.file_path,
+                        file_type=attachment.file_type or "unknown",
+                        mime_type=attachment.file_type or "application/octet-stream",
+                        file_size=attachment.file_size,
+                        created_at=datetime.utcnow()
+                    )
+                    db.add(file)
+                    await db.flush()  # 获取file.file_id
+                    
+                    # 创建笔记-附件关联
+                    note_attachment = NoteAttachment(
+                        note_id=note.id,
+                        file_id=file.file_id
+                    )
+                    db.add(note_attachment)
+            
+            # 处理标签
+            if note_data.tags:
+                for tag_name in note_data.tags:
+                    tag = await self._get_or_create_tag(db, tag_name)
+                    note.tags.append(tag)
+            
             await db.commit()
-            await db.refresh(db_note)
+            await db.refresh(note)
             
-            # 显式加载关联数据
-            stmt = select(Note).options(
-                joinedload(Note.tags),
-                joinedload(Note.attachments)
-            ).where(Note.id == db_note.id)
-            
-            result = await db.execute(stmt)
-            return result.unique().scalar_one()
+            return note
             
         except Exception as e:
             await db.rollback()
@@ -130,49 +156,37 @@ class NoteService:
             )
 
     async def get_notes(
-        self, 
-        db: AsyncSession, 
+        self,
+        db: AsyncSession,
         handbook_id: Optional[int] = None,
-        skip: int = 0,
-        limit: int = 10
+        tag_id: Optional[int] = None
     ) -> List[Note]:
-        """获取笔记列表
-        
-        Args:
-            db: 数据库会话
-            handbook_id: 可选的手册ID过滤
-            skip: 跳过的记录数
-            limit: 返回的最大记录数
-        """
         try:
             # 构建基础查询
-            query = (
-                select(Note)
-                .options(
-                    joinedload(Note.tags),
-                    joinedload(Note.attachments)
-                )
-                .order_by(Note.created_at.desc())
+            query = select(Note).options(
+                joinedload(Note.tags),
+                joinedload(Note.attachments)
             )
+
+            # 添加过滤条件
+            if handbook_id:
+                query = query.filter(Note.handbook_id == handbook_id)
+            if tag_id:
+                query = query.join(NoteTag).filter(NoteTag.tag_id == tag_id)
             
-            # 如果指定了手册ID，添加过滤条件
-            if handbook_id is not None:
-                query = query.where(Note.handbook_id == handbook_id)
-            
-            # 添加分页
-            query = query.offset(skip).limit(limit)
-            
+            # 添加按时间倒序排序
+            query = query.order_by(desc(Note.updated_at))
+
             # 执行查询
             result = await db.execute(query)
             notes = result.unique().scalars().all()
-            
-            return list(notes)
-            
+            return notes
+
         except Exception as e:
             app_logger.error(f"获取笔记列表失败: {str(e)}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"获取笔记列表失败: {str(e)}"
+                detail=str(e)
             )
 
     async def create_tag(self, db: AsyncSession, tag_name: str) -> Tag:

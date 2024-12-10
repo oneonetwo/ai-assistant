@@ -130,7 +130,7 @@ class ImageChatRequest(BaseModel):
     extract_text: Optional[bool] = False
 
 class ImageChatResponse(BaseModel):
-    """图片聊天响��模型"""
+    """图片聊天响应模型"""
     analysis: str
     extracted_text: Optional[str] = None
 
@@ -201,3 +201,29 @@ class AudioChatResponse(BaseModel):
     session_id: str
     response: str
     file_id: str
+
+class BatchFileQuery(BaseModel):
+    """批量查询文件请求模型"""
+    ids: Optional[List[int]] = None
+    file_ids: Optional[List[str]] = None
+
+    @field_validator('ids', 'file_ids')
+    def validate_query_params(cls, v):
+        if v is not None and len(v) > 100:  # 限制单次查询数量
+            raise ValueError("一次最多查询100个文件")
+        return v
+
+class FileDetailResponse(BaseModel):
+    """文件详细信息响应模型"""
+    id: int
+    file_id: str
+    original_name: str
+    file_path: str
+    file_type: str
+    mime_type: Optional[str] = None
+    file_size: Optional[int] = None
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True

@@ -29,13 +29,17 @@ async def get_tags(db: AsyncSession = Depends(get_db)):
 @router.get("", response_model=List[NoteResponse])
 async def get_notes(
     handbook_id: Optional[int] = None,
-    skip: int = 0,
-    limit: int = 10,
+    tag_id: Optional[int] = None,
     db: AsyncSession = Depends(get_db)
 ):
     """获取笔记列表"""
     try:
-        return await note_service.get_notes(db, handbook_id, skip, limit)
+        notes = await note_service.get_notes(
+            db=db,
+            handbook_id=handbook_id,
+            tag_id=tag_id
+        )
+        return notes
     except Exception as e:
         app_logger.error(f"获取笔记列表失败: {str(e)}")
         raise HTTPException(

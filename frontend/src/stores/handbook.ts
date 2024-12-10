@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { HandbookAPI } from '@/services/handbookService'
 import { NoteAPI } from '@/services/noteService'
-import type { Category, Handbook, Note, Tag, CreateNoteData, UpdateNoteData } from '@/types/handbook'
+import type { Category, Handbook, Note, Tag, CreateNoteData, UpdateNoteData, FileInfo } from '@/types/handbook'
 
 interface Handbook {
   id: number
@@ -283,6 +283,19 @@ export const useHandbookStore = defineStore('handbook', () => {
     }
   }
 
+  async function fetchFileDetails(fileIds: string[]) {
+    try {
+      isLoading.value = true
+      const response = await NoteAPI.batchGetFiles({ file_ids: fileIds })
+      return response
+    } catch (err) {
+      error.value = '获取文件信息失败'
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   // 清除状态
   function reset() {
     handbooks.value = []
@@ -332,6 +345,7 @@ export const useHandbookStore = defineStore('handbook', () => {
     mergeTags,
 
     // 工具方法
-    reset
+    reset,
+    fetchFileDetails,
   }
 }) 
