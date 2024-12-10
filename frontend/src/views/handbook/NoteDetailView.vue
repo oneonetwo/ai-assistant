@@ -328,7 +328,7 @@ function previewImage(imagePath: string, index: number) {
       </div>
 
       <!-- 消息列表 -->
-      <div class="messages-section">
+      <div class="messages-section" v-if="note.messages?.length">
         <van-cell
           title="相关对话"
           is-link

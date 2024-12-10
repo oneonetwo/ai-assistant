@@ -59,13 +59,18 @@ class NoteService:
             # 处理附件
             if note_data.attachments:
                 for attachment in note_data.attachments:
+                    # 简化文件类型，只保留主要类型
+                    file_type = attachment.file_type.split('/')[-1]
+                    if file_type.startswith('vnd.'):
+                        file_type = file_type.split('.')[-1]  # 提取最后一个部分
+                    
                     # 创建文件记录
                     file = File(
                         file_id=str(uuid.uuid4()),
                         original_name=attachment.original_name,
                         file_path=attachment.file_path,
-                        file_type=attachment.file_type or "unknown",
-                        mime_type=attachment.file_type or "application/octet-stream",
+                        file_type=file_type,  # 使用简化后的文件类型
+                        mime_type=attachment.file_type,  # 保持完整的MIME类型
                         file_size=attachment.file_size,
                         created_at=datetime.utcnow()
                     )
@@ -82,8 +87,19 @@ class NoteService:
             # 处理标签
             if note_data.tags:
                 for tag_name in note_data.tags:
-                    tag = await self._get_or_create_tag(db, tag_name)
-                    note.tags.append(tag)
+                    # 查找或创建标签
+                    stmt = select(Tag).where(Tag.name == tag_name)
+                    result = await db.execute(stmt)
+                    tag = result.scalar_one_or_none()
+                    
+                    if not tag:
+                        tag = Tag(name=tag_name)
+                        db.add(tag)
+                        await db.flush()
+                    
+                    # 创建笔记-标签关联
+                    note_tag = NoteTag(note_id=note.id, tag_id=tag.id)
+                    db.add(note_tag)
             
             await db.commit()
             await db.refresh(note)
@@ -279,5 +295,5 @@ class NoteService:
                 detail=f"获取笔记详情失败: {str(e)}"
             )
 
-# 创建服务实例
+# 创建��务实例
 note_service = NoteService()
