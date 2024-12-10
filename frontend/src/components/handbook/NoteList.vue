@@ -79,6 +79,13 @@ async function handleDelete(note: Note) {
     // 用户取消或删除失败
   }
 }
+
+// Add color cycling function
+let colorIndex = 0
+function getNextColor(): number {
+  colorIndex = (colorIndex % 5) + 1
+  return colorIndex
+}
 </script>
 
 <template>
@@ -96,7 +103,8 @@ async function handleDelete(note: Note) {
           v-for="tag in store.tags"
           :key="tag.id"
           :type="selectedTags.includes(tag.name) ? 'primary' : 'default'"
-          class="filter-tag"
+          :class="['custom-tag', `color-${getNextColor()}`]"
+          :plain="!selectedTags.includes(tag.name)"
           @click="selectedTags.includes(tag.name) 
             ? selectedTags = selectedTags.filter(t => t !== tag.name)
             : selectedTags.push(tag.name)"
@@ -145,7 +153,12 @@ async function handleDelete(note: Note) {
                 <van-tag :type="note.status === '已完成' ? 'success' : 'primary'">
                   {{ note.status }}
                 </van-tag>
-                <van-tag v-for="tag in note.tags" :key="tag.id" plain>
+                <van-tag 
+                  v-for="tag in note.tags" 
+                  :key="tag.id" 
+                  :class="['custom-tag', `color-${getNextColor()}`]"
+                  plain
+                >
                   {{ tag.name }}
                 </van-tag>
               </div>
@@ -226,6 +239,83 @@ async function handleDelete(note: Note) {
       
       &:not(:last-child) {
         border-bottom: 8px solid var(--van-gray-3);
+      }
+    }
+  }
+
+  .custom-tag {
+    border-radius: 16px !important;
+    padding: 2px 8px !important;
+    margin: 4px !important;
+    border: none !important;
+    font-size: 12px !important;
+    
+    &.color-1 {
+      background-color: #00B4DB !important;
+      color: #ffffff !important;
+    }
+    
+    &.color-2 {
+      background-color: #9BE36D !important;
+      color: #2C5E1A !important;
+    }
+    
+    &.color-3 {
+      background-color: #A78BFA !important;
+      color: #ffffff !important;
+    }
+    
+    &.color-4 {
+      background-color: #FF8C82 !important;
+      color: #ffffff !important;
+    }
+    
+    &.color-5 {
+      background-color: #14B8A6 !important;
+      color: #ffffff !important;
+    }
+
+    &.van-tag--plain {
+      background-color: transparent !important;
+      
+      &.color-1 {
+        border: 0.5px solid #00B4DB !important;
+        color: #00B4DB !important;
+        :root[data-theme="dark"] & {
+          color: #ffffff !important;
+        }
+      }
+      
+      &.color-2 {
+        border: 0.5px solid #9BE36D !important;
+        color: #2C5E1A !important;
+        :root[data-theme="dark"] & {
+          color: #ffffff !important;
+        }
+      }
+      
+      &.color-3 {
+        border: 0.5px solid #A78BFA !important;
+        color: #A78BFA !important;
+        :root[data-theme="dark"] & {
+          color: #ffffff !important;
+        }
+      }
+      
+      &.color-4 {
+        border: 0.5px solid #FF8C82 !important;
+        color: #FF8C82 !important;
+        :root[data-theme="dark"] & {
+          color: #ffffff !important;
+        }
+      }
+      
+      &.color-5 {
+        border: 0.5px solid #14B8A6 !important;
+        color: #14B8A6 !important;
+        :root[data-theme="dark"] & {
+          color: #ffffff !important;
+        }
       }
     }
   }

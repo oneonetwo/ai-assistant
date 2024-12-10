@@ -197,6 +197,13 @@ function previewImage(imagePath: string, index: number) {
     closeable: true,
   })
 }
+
+// Add color cycling function
+let colorIndex = 0
+function getNextColor(): number {
+  colorIndex = (colorIndex % 5) + 1
+  return colorIndex
+}
 </script>
 
 <template>
@@ -230,8 +237,8 @@ function previewImage(imagePath: string, index: number) {
           <van-tag 
             v-for="tag in note.tags" 
             :key="tag.id"
-            type="primary"
-            class="tag"
+            :class="['custom-tag', `color-${getNextColor()}`]"
+            plain
           >
             {{ tag.name }}
           </van-tag>
@@ -379,12 +386,6 @@ function previewImage(imagePath: string, index: number) {
         flex-wrap: wrap;
         gap: 8px;
         margin-bottom: var(--van-padding-sm);
-
-        :deep(.van-tag) {
-          font-size: 13px;
-          padding: 4px 12px;
-          border-radius: 4px;
-        }
       }
 
       .status-priority {
@@ -693,6 +694,83 @@ function previewImage(imagePath: string, index: number) {
             inset 0 2px 4px rgba(0, 0, 0, 0.2),
             0 1px 2px rgba(0, 0, 0, 0.1);
         }
+      }
+    }
+  }
+}
+
+.custom-tag {
+  border-radius: 16px !important;
+  padding: 2px 8px !important;
+  margin: 4px !important;
+  border: none !important;
+  font-size: 12px !important;
+  
+  &.color-1 {
+    background-color: #00B4DB !important;
+    color: #ffffff !important;
+  }
+  
+  &.color-2 {
+    background-color: #9BE36D !important;
+    color: #2C5E1A !important;
+  }
+  
+  &.color-3 {
+    background-color: #A78BFA !important;
+    color: #ffffff !important;
+  }
+  
+  &.color-4 {
+    background-color: #FF8C82 !important;
+    color: #ffffff !important;
+  }
+  
+  &.color-5 {
+    background-color: #14B8A6 !important;
+    color: #ffffff !important;
+  }
+
+  &.van-tag--plain {
+    background-color: transparent !important;
+    
+    &.color-1 {
+      border: 0.5px solid #00B4DB !important;
+      color: #00B4DB !important;
+      :root[data-theme="dark"] & {
+        color: #ffffff !important;
+      }
+    }
+    
+    &.color-2 {
+      border: 0.5px solid #9BE36D !important;
+      color: #2C5E1A !important;
+      :root[data-theme="dark"] & {
+        color: #ffffff !important;
+      }
+    }
+    
+    &.color-3 {
+      border: 0.5px solid #A78BFA !important;
+      color: #A78BFA !important;
+      :root[data-theme="dark"] & {
+        color: #ffffff !important;
+      }
+    }
+    
+    &.color-4 {
+      border: 0.5px solid #FF8C82 !important;
+      color: #FF8C82 !important;
+      :root[data-theme="dark"] & {
+        color: #ffffff !important;
+      }
+    }
+    
+    &.color-5 {
+      border: 0.5px solid #14B8A6 !important;
+      color: #14B8A6 !important;
+      :root[data-theme="dark"] & {
+        color: #ffffff !important;
       }
     }
   }
