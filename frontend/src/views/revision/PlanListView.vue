@@ -122,6 +122,20 @@ function calculateDuration(start: string, end: string): number {
     flex: 1;
     overflow-y: auto;
     padding: 16px;
+
+    :deep(.van-cell-group) {
+      background: transparent;
+    }
+
+    :deep(.van-cell) {
+      margin-bottom: 12px;
+      border-radius: 8px;
+      background: var(--van-background);
+      
+      &::after {
+        display: none;
+      }
+    }
   }
 
   .plan-info {
@@ -151,9 +165,46 @@ function calculateDuration(start: string, end: string): number {
   .filter-section {
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: 1; :deep {
+      .van-tabs__wrap {
+        height: 44px;
+      }
+
+      .van-tab {
+        color: var(--van-text-color-2);
+        font-size: 14px;
+        
+        &--active {
+          color: var(--van-primary-color);
+          font-weight: 500;
+        }
+      }
+
+      .van-tabs__line {
+        background-color: var(--van-primary-color);
+      }
+    }
     background: var(--van-background);
     border-bottom: 1px solid var(--van-border-color);
+  }
+}
+
+// 深色主题适配
+:root[data-theme="dark"] {
+  .plan-list {
+    :deep {
+      .van-cell {
+        background: var(--van-background-2);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        border: 1px solid var(--van-gray-8);
+        
+        &:hover {
+          border-color: var(--van-primary-color);
+          transform: translateY(-1px);
+          transition: all 0.3s ease;
+        }
+      }
+    }
   }
 }
 </style> 

@@ -15,11 +15,6 @@ function navigateToDailyTasks() {
 
 <template>
   <div class="revision-view">
-    <van-nav-bar
-      title="复习"
-      right-text="设置"
-      @click-right="$router.push('/revision/settings')"
-    />
     <AppHeader title="复习计划管理" />
     <router-view v-slot="{ Component }">
       <component :is="Component" />
