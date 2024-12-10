@@ -8,6 +8,7 @@ import { showToast } from 'vant'
 import type { Note, NotePriority, NoteStatus } from '@/types/handbook'
 import TagSelector from './TagSelector.vue'
 import MultiSelector from '@/components/common/MultiSelector.vue'
+import { uploadToOSS } from '@/utils/oss'
 
 const route = useRoute()
 const router = useRouter()
@@ -37,9 +38,42 @@ const status = ref<NoteStatus>('待复习')
 const canShare = ref(true)
 const newTagName = ref('')
 
+// 文件类型映射
+const FILE_TYPES = {
+  IMAGE: [
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+    'image/svg+xml',
+    'image/bmp'
+  ],
+  DOCUMENT: [
+    'text/plain',
+    'application/pdf',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'application/msword',
+    'application/vnd.ms-excel',
+    'application/vnd.ms-powerpoint',
+    'text/markdown',
+    'application/json',
+    'text/x-markdown'
+  ],
+  AUDIO: [
+    'audio/mpeg',
+    'audio/wav',
+    'audio/ogg',
+    'audio/x-m4a',
+    'audio/aac'
+  ]
+} as const
+
 // 文件上传
 const fileList = ref<any[]>([])
 const isUploading = ref(false)
+const uploadProgress = ref(0)
 
 const hasRevisionPlans = ref(false)
 
@@ -48,10 +82,11 @@ const planOptions = ref<{ text: string; value: number }[]>([])
 
 onMounted(async () => {
   await store.fetchTags()
+  console.log('isNew', isNew)
   if (!isNew) {
     await loadNote()
   } else {
-    // ���查是否有复习计划
+    // 查询是否有复习计划
     const result = await revisionStore.checkHandbookPlans(Number(handbookId))
     const plans = result.plans
     hasRevisionPlans.value = plans.length > 0
@@ -76,15 +111,15 @@ async function loadNote() {
     priority.value = note.priority
     status.value = note.status
     canShare.value = note.is_shared
-    // 加载附件列表
+    // 统一附件列表格式
     fileList.value = note.attachments.map(attachment => ({
-      url: attachment.file_path,
-      name: attachment.original_name,
-      isImage: attachment.mime_type.startsWith('image/')
+      original_name: attachment.original_name,
+      file_type: attachment.file_type,
+      file_size: attachment.file_size,
+      file_path: attachment.file_path
     }))
   } catch (error) {
     showToast('加载笔记失败')
-    // router.back()
   }
 }
 
@@ -102,18 +137,36 @@ async function handleAddTag() {
 async function handleUpload(file: File) {
   try {
     isUploading.value = true
-    // TODO: 实现文件上传逻辑
-    fileList.value.push({
-      url: URL.createObjectURL(file),
-      name: file.name,
-      isImage: file.type.startsWith('image/')
+    console.log('file', file)
+    // 创建临时预览URL
+    const tempUrl = URL.createObjectURL(file)
+    
+    // 添加到文件列表，先用临时URL
+    const fileInfo = {
+      original_name: file.name,
+      file_type: file.type,
+      file_size: file.size,
+      file_path: tempUrl
+    }
+    // 上传到OSS
+    const ossUrl = await uploadToOSS(file, {
+      onProgress: (progress) => {
+        uploadProgress.value = progress
+      }
     })
+    // 上传成功后更新文件路径
+    fileInfo.file_path = ossUrl
+    console.log('fileInfo', fileInfo)
+    fileList.value.push(fileInfo)
+    console.log('fileList', fileList.value)
+
     return true
   } catch (error) {
     showToast('文件上传失败')
     return false
   } finally {
     isUploading.value = false
+    uploadProgress.value = 0
   }
 }
 
@@ -143,9 +196,12 @@ async function handleSave() {
       status: status.value,
       is_shared: canShare.value,
       message_ids: messageIds.value,
+      // 统一附件数据结构
       attachments: fileList.value.map(file => ({
-        url: file.url,
-        file_name: file.name
+        original_name: file.original_name,
+        file_type: file.file_type,
+        file_size: file.file_size,
+        file_path: file.file_path
       }))
     }
 
@@ -272,16 +328,29 @@ async function handleSave() {
       <div class="attachments">
         <div class="section-title">附件</div>
         <van-uploader
-          v-model="fileList"
+          :file-list="fileList"
           :max-count="5"
           :before-read="handleUpload"
           :loading="isUploading"
-        />
+          accept=".txt,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.epub,.md,.markdown,text/markdown,text/x-markdown,image/*,.mp3,.wav,.ogg,.m4a,.aac"
+        >
+          <template #preview-cover="{ file }">
+            <div class="preview-info" v-if="file.file_path">
+              <span class="file-name">{{ file.original_name }}</span>
+              <span class="file-size">{{ (file.file_size / 1024).toFixed(1) }}KB</span>
+              <van-progress 
+                v-if="isUploading" 
+                :percentage="uploadProgress" 
+                :show-pivot="false"
+              />
+            </div>
+          </template>
+        </van-uploader>
         <div class="attachment-list">
           <van-cell
             v-for="file in fileList"
-            :key="file.url"
-            :title="file.name"
+            :key="file.file_path"
+            :title="file.original_name"
           >
             <template #right-icon>
               <van-button 
@@ -390,6 +459,28 @@ async function handleSave() {
     position: relative;
     width: 100%;
     z-index: 10;
+  }
+}
+
+.preview-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 4px 8px;
+  color: white;
+  font-size: 12px;
+
+  .file-name {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .file-size {
+    color: #ccc;
   }
 }
 </style> 
