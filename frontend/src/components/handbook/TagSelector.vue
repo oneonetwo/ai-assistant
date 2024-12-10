@@ -59,6 +59,13 @@ function handleRemoveTag(tagName: string) {
   const newTags = props.modelValue.filter(t => t !== tagName)
   emit('update:modelValue', newTags)
 }
+
+// Replace random color with cycling color
+let colorIndex = 0
+function getNextColor(): number {
+  colorIndex = (colorIndex % 5) + 1
+  return colorIndex
+}
 </script>
 
 <template>
@@ -69,7 +76,7 @@ function handleRemoveTag(tagName: string) {
         v-for="tagName in modelValue"
         :key="tagName"
         closeable
-        type="primary"
+        :class="['custom-tag', `color-${getNextColor()}`]"
         @close="handleRemoveTag(tagName)"
       >
         {{ tagName }}
@@ -102,7 +109,7 @@ function handleRemoveTag(tagName: string) {
         v-for="tag in tagSuggestions"
         :key="tag.id"
         plain
-        class="suggestion-tag"
+        :class="['suggestion-tag', 'custom-tag', `color-${getNextColor()}`]"
         @click="handleAddTag(tag.name)"
       >
         {{ tag.name }}
@@ -138,6 +145,82 @@ function handleRemoveTag(tagName: string) {
       
       &:hover {
         opacity: 0.8;
+      }
+    }
+  }
+
+  .custom-tag {
+    border-radius: 16px !important;
+    padding: 4px 10px !important;
+    margin: 4px !important;
+    border: none !important;
+    
+    &.color-1 {
+      background-color: #00B4DB !important;
+      color: #ffffff !important;
+    }
+    
+    &.color-2 {
+      background-color: #9BE36D !important;
+      color: #2C5E1A !important;
+    }
+    
+    &.color-3 {
+      background-color: #A78BFA !important;
+      color: #ffffff !important;
+    }
+    
+    &.color-4 {
+      background-color: #FF8C82 !important;
+      color: #ffffff !important;
+    }
+    
+    &.color-5 {
+      background-color: #14B8A6 !important;
+      color: #ffffff !important;
+    }
+
+    &.van-tag--plain {
+      background-color: transparent !important;
+      
+      &.color-1 {
+        border: 1px solid #00B4DB !important;
+        color: #00B4DB !important;
+        :root[data-theme="dark"] & {
+          color: #ffffff !important;
+        }
+      }
+      
+      &.color-2 {
+        border: 1px solid #9BE36D !important;
+        color: #2C5E1A !important;
+        :root[data-theme="dark"] & {
+          color: #ffffff !important;
+        }
+      }
+      
+      &.color-3 {
+        border: 1px solid #A78BFA !important;
+        color: #A78BFA !important;
+        :root[data-theme="dark"] & {
+          color: #ffffff !important;
+        }
+      }
+      
+      &.color-4 {
+        border: 1px solid #FF8C82 !important;
+        color: #FF8C82 !important;
+        :root[data-theme="dark"] & {
+          color: #ffffff !important;
+        }
+      }
+      
+      &.color-5 {
+        border: 1px solid #14B8A6 !important;
+        color: #14B8A6 !important;
+        :root[data-theme="dark"] & {
+          color: #ffffff !important;
+        }
       }
     }
   }
