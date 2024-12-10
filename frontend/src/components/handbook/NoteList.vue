@@ -230,4 +230,82 @@ async function handleDelete(note: Note) {
     }
   }
 }
+.list {
+    background: var(--van-background-2);
+    border-radius: var(--van-radius-md);
+    padding: var(--van-padding-xs);
+
+    :deep {
+      .van-cell-group {
+        background: transparent;
+      }
+
+      .van-swipe-cell {
+        margin-bottom: var(--van-padding-xs);
+        border-bottom: 1px solid var(--van-border-color);
+
+        &:last-child {
+          margin-bottom: 0;
+          border-bottom: none;
+        }
+      }
+
+      .van-cell {
+        background: var(--van-background);
+        border-radius: var(--van-radius-sm);
+        margin: 0 var(--van-padding-xs);
+        margin-bottom: var(--van-padding-xs);
+        
+        &::after {
+          display: none;
+        }
+
+        .van-cell__title {
+          color: var(--van-text-color);
+          font-weight: 500;
+        }
+      }
+    }
+
+    .note-content {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.5;
+      max-height: 3em;
+      color: var(--van-text-color-2);
+      font-size: var(--van-font-size-sm);
+      margin: var(--van-padding-xs) 0;
+    }
+
+    .note-meta {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin-top: var(--van-padding-xs);
+
+      :deep(.van-tag) {
+        margin-right: var(--van-padding-xs);
+      }
+    }
+
+    .edit-button {
+      margin-right: var(--van-padding-xs);
+      border-radius: var(--van-radius-sm);
+      background: transparent;
+      border: 1px solid var(--van-border-color);
+      color: var(--van-text-color);
+      
+      &:active {
+        background: var(--van-active-color);
+      }
+    }
+
+    .delete-button {
+      height: 100%;
+      min-width: 65px;
+    }
+  }
 </style>
