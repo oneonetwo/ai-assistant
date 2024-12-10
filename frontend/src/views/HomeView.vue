@@ -1,7 +1,19 @@
 <template>
   <div class="home-view">
-    <div class="settings-button" @click="router.push('/settings')">
-      <van-icon name="setting-o" class="settings-icon" size="32"/>
+    <div class="header-buttons">
+      <!-- Theme toggle button -->
+      <div class="theme-button" @click="themeStore.toggleTheme">
+        <van-icon 
+          :name="themeStore.isDark ? 'bulb-o' : 'bulb-o'" 
+          class="theme-icon" 
+          size="32"
+        />
+      </div>
+      
+      <!-- Settings button -->
+      <div class="settings-button" @click="router.push('/settings')">
+        <van-icon name="setting-o" class="settings-icon" size="32"/>
+      </div>
     </div>
 
     <div class="content">
@@ -21,7 +33,7 @@
         <!-- 知识库模块 -->
         <div class="module-card" @click="router.push('/handbooks')">
           <div class="card-content">
-            <van-icon name="book" class="module-icon"/>
+            <van-icon name="notes" class="module-icon"/>
             <h2>知识管理</h2>
             <p>构建和管理你的个人知识库</p>
           </div>
@@ -31,7 +43,7 @@
         <!-- 复习计划模块 -->
         <div class="module-card" @click="router.push('/revision')">
           <div class="card-content">
-            <van-icon name="calendar" class="module-icon"/>
+            <van-icon name="label" class="module-icon"/>
             <h2>学习计划</h2>
             <p>制定个性化学习计划，追踪学习进度</p>
           </div>
@@ -45,8 +57,10 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { Icon } from 'vant'
+import { useThemeStore } from '@/stores/theme'
 
 const router = useRouter()
+const themeStore = useThemeStore()
 </script>
 
 <style scoped>
@@ -160,11 +174,17 @@ p {
   line-height: 1.5;
 }
 
-.settings-button {
+.header-buttons {
   position: absolute;
   top: 1rem;
   right: 1rem;
   z-index: 2;
+  display: flex;
+  gap: 1rem;
+}
+
+.theme-button,
+.settings-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -181,6 +201,15 @@ p {
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
+.theme-button:hover {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(66, 184, 131, 0.4);
+  box-shadow: 
+    0 0 15px rgba(66, 184, 131, 0.3),
+    0 0 5px rgba(66, 184, 131, 0.2);
+}
+
 .settings-button:hover {
   transform: rotate(90deg);
   background: rgba(255, 255, 255, 0.2);
@@ -190,19 +219,11 @@ p {
     0 0 5px rgba(66, 184, 131, 0.2);
 }
 
+.theme-icon,
 .settings-icon {
   font-size: 24px;
   color: #333;
   transition: color 0.3s ease;
-}
-
-@keyframes glow {
-  from {
-    text-shadow: 0 0 20px rgba(66, 184, 131, 0.2);
-  }
-  to {
-    text-shadow: 0 0 30px rgba(66, 184, 131, 0.4);
-  }
 }
 
 /* Dark theme styles */
@@ -225,14 +246,17 @@ p {
     color: #aaa;
   }
 
+  .theme-button,
   .settings-button {
     background: rgba(0, 0, 0, 0.2);
   }
 
+  .theme-button:hover,
   .settings-button:hover {
     background: rgba(0, 0, 0, 0.3);
   }
 
+  .theme-icon,
   .settings-icon {
     color: #fff;
   }
@@ -252,6 +276,18 @@ p {
 
   .module-card {
     padding: 1.5rem;
+  }
+
+  .header-buttons {
+    top: 0.5rem;
+    right: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .theme-button,
+  .settings-button {
+    width: 40px;
+    height: 40px;
   }
 }
 </style>

@@ -35,15 +35,9 @@ defineProps<{
       
       <template #right>
         <van-space :size="8">
-          <van-button
-            class="nav-button"
-            @click="router.push('/settings')"
-          >
-            <template #icon>
-              <svg-icon name="setting" class="nav-icon" />
-            </template>
-            设置
-          </van-button>
+          <!-- <div class="settings-button" @click="router.push('/settings')">
+            <van-icon name="setting-o" class="settings-icon" size="24"/>
+          </div> -->
           <van-button 
             class="nav-button theme-button"
             @click="themeStore.toggleTheme"
@@ -108,6 +102,38 @@ defineProps<{
       margin-right: 4px;
       vertical-align: -0.125em;
     }
+  }
+  
+  .settings-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .settings-button:hover {
+    transform: rotate(90deg);
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(66, 184, 131, 0.4);
+    box-shadow: 
+      0 0 15px rgba(66, 184, 131, 0.3),
+      0 0 5px rgba(66, 184, 131, 0.2);
+  }
+
+  .settings-icon {
+    font-size: 24px;
+    color: #333;
+    transition: color 0.3s ease;
   }
   
   // 移动端样式
