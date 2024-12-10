@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import QRCode from 'qrcode'
 import { useClipboard } from '@vueuse/core'
+import { watch } from 'vue';
 
 const props = defineProps<{
   show: boolean
@@ -48,7 +49,7 @@ function handleDownload() {
 
 <template>
   <van-dialog
-    v-model:show="show"
+    :show="show"
     title="分享对话"
     class="share-dialog"
   >

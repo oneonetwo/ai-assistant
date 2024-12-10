@@ -40,12 +40,28 @@
           <div class="card-overlay"></div>
         </div>
 
-        <!-- 复习计划模块 -->
-        <div class="module-card" @click="router.push('/revision')">
+        <!-- 学习计划模块 - 更新为包含子模块 -->
+        <div class="module-card learning-module"  @click="router.push('/revision')">
           <div class="card-content">
             <van-icon name="label" class="module-icon"/>
             <h2>学习计划</h2>
             <p>制定个性化学习计划，追踪学习进度</p>
+            
+            <!-- 子模块网格 -->
+            <div class="sub-modules">
+              <div class="sub-module" @click.stop="router.push('/statistics')">
+                <van-icon name="chart-trending-o" class="sub-icon"/>
+                <span>学习统计</span>
+              </div>
+              <div class="sub-module" @click.stop="router.push('/revision/daily-summary')">
+                <van-icon name="description" class="sub-icon"/>
+                <span>每日摘要</span>
+              </div>
+              <div class="sub-module" @click.stop="router.push('/revision/settings/notification')">
+                <van-icon name="clock-o" class="sub-icon"/>
+                <span>提醒设置</span>
+              </div>
+            </div>
           </div>
           <div class="card-overlay"></div>
         </div>
@@ -288,6 +304,92 @@ p {
   .settings-button {
     width: 40px;
     height: 40px;
+  }
+}
+
+.learning-module {
+  /* 移除原有的点击事件样式 */
+  cursor: default;
+}
+
+.learning-module:hover {
+  transform: translateY(-5px);
+}
+
+.sub-modules {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sub-module {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sub-module:hover {
+  background: rgba(66, 184, 131, 0.1);
+  transform: translateY(-2px);
+}
+
+.sub-icon {
+  font-size: 24px;
+  margin-bottom: 0.5rem;
+  color: var(--van-primary-color);
+}
+
+.sub-module span {
+  font-size: 0.85rem;
+  color: inherit;
+}
+
+/* Dark theme additions */
+:root[data-theme="dark"] {
+  .sub-modules {
+    border-top-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .sub-module {
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .sub-module:hover {
+    background: rgba(66, 184, 131, 0.15);
+  }
+
+  .sub-module span {
+    color: #fff;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sub-modules {
+    gap: 0.25rem;
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+  }
+
+  .sub-module {
+    padding: 0.5rem;
+  }
+
+  .sub-icon {
+    font-size: 20px;
+    margin-bottom: 0.25rem;
+  }
+
+  .sub-module span {
+    font-size: 0.75rem;
   }
 }
 </style>

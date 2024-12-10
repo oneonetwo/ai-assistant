@@ -26,7 +26,7 @@ defineProps<{
             @click="router.push('/')"
           >
             <template #icon>
-              <svg-icon name="home" class="nav-icon" />
+              <van-icon name="home-o" class="nav-icon" />
             </template>
             首页
           </van-button>
@@ -35,21 +35,13 @@ defineProps<{
       
       <template #right>
         <van-space :size="8">
-          <!-- <div class="settings-button" @click="router.push('/settings')">
-            <van-icon name="setting-o" class="settings-icon" size="24"/>
-          </div> -->
-          <van-button 
-            class="nav-button theme-button"
-            @click="themeStore.toggleTheme"
-          >
-            <template #icon>
-              <svg-icon 
-                :name="themeStore.isDark ? 'sun' : 'moon'" 
-                class="nav-icon"
-              />
-            </template>
-            {{ themeStore.isDark ? '浅色' : '深色' }}
-          </van-button>
+          <div class="theme-button" @click="themeStore.toggleTheme">
+            <van-icon 
+              :name="themeStore.isDark ? 'bulb-o' : 'bulb-o'" 
+              class="theme-icon" 
+              size="24"
+            />
+          </div>
         </van-space>
       </template>
     </van-nav-bar>
@@ -64,23 +56,23 @@ defineProps<{
   
   :deep {
     .van-nav-bar {
-    background: transparent;
-    height: 56px;
-    line-height: 56px;
-    
-    &__content {
+      background: transparent;
       height: 56px;
+      line-height: 56px;
+      
+      &__content {
+        height: 56px;
+      }
+      
+      &__title {
+        font-size: 18px;
+        font-weight: 600;
+      }
+      
+      &__left, &__right {
+        font-size: 16px;
+      }
     }
-    
-    &__title {
-      font-size: 18px;
-      font-weight: 600;
-    }
-    
-    &__left, &__right {
-      font-size: 16px;
-    }
-  }
   }
   
   .nav-button {
@@ -103,8 +95,8 @@ defineProps<{
       vertical-align: -0.125em;
     }
   }
-  
-  .settings-button {
+
+  .theme-button {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -121,8 +113,8 @@ defineProps<{
       0 2px 4px -1px rgba(0, 0, 0, 0.06);
   }
 
-  .settings-button:hover {
-    transform: rotate(90deg);
+  .theme-button:hover {
+    transform: scale(1.1);
     background: rgba(255, 255, 255, 0.2);
     border-color: rgba(66, 184, 131, 0.4);
     box-shadow: 
@@ -130,7 +122,7 @@ defineProps<{
       0 0 5px rgba(66, 184, 131, 0.2);
   }
 
-  .settings-icon {
+  .theme-icon {
     font-size: 24px;
     color: #333;
     transition: color 0.3s ease;
@@ -138,15 +130,15 @@ defineProps<{
   
   // 移动端样式
   @media (max-width: 768px) {
-    :deep{
-        .van-nav-bar {
-      height: 46px;
-      line-height: 46px;
-      
-      &__content {
+    :deep {
+      .van-nav-bar {
         height: 46px;
+        line-height: 46px;
+        
+        &__content {
+          height: 46px;
+        }
       }
-    }
     }
     
     .nav-button {
@@ -167,13 +159,17 @@ defineProps<{
 }
     
 // 深色模式
-:deep {
-    .dark {
-  .nav-button {
-    &:hover {
-      background: rgba(var(--van-primary-color-rgb), 0.15);
+/* Dark theme styles */
+:root[data-theme="dark"] {
+    .nav-button {
+      &:hover {
+        background: rgba(var(--van-primary-color-rgb), 0.15);
+      }
     }
-    }
+    .theme-icon {
+        font-size: 24px;
+        color: #fff;
+        transition: color 0.3s ease;
+      }
   }
-}
 </style> 

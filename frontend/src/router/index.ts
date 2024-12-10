@@ -23,7 +23,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'chat',
         component: () => import('@/views/ChatView.vue'),
         meta: {
-          title: 'AI 对话'
+          title: 'AI 智能对话'
         }
       },
       {
@@ -54,7 +54,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'handbooks',
         component: () => import('@/views/handbook/HandbookListView.vue'),
         meta: {
-          title: '知识手册'
+          title: '知识管理'
         }
       },
       {
@@ -189,22 +189,6 @@ const routes: Array<RouteRecordRaw> = [
           title: '每日摘要'
         }
       },
-      {
-        path: 'history',
-        name: 'revision-history',
-        component: () => import('@/views/revision/RevisionHistoryView.vue'),
-        meta: {
-          title: '复习历史'
-        }
-      },
-      {
-        path: 'statistics',
-        name: 'learning-statistics',
-        component: () => import('@/views/revision/LearningStatsView.vue'),
-        meta: {
-          title: '学习统计'
-        }
-      }
     ]
   },
   // 统计相关路由
@@ -214,7 +198,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'settings',
     component: () => import('@/views/SettingsView.vue'),
     meta: {
-      title: '��置'
+      title: '设置'
     }
   },
   {
