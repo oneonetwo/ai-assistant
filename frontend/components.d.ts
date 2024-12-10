@@ -55,6 +55,7 @@ declare module 'vue' {
     ThemeSwitch: typeof import('./src/components/common/ThemeSwitch.vue')['default']
     TimePickerField: typeof import('./src/components/revision/TimePickerField.vue')['default']
     UploadProgress: typeof import('./src/components/chat/UploadProgress.vue')['default']
+    VanBadge: typeof import('vant/es')['Badge']
     VanButton: typeof import('vant/es')['Button']
     VanCard: typeof import('vant/es')['Card']
     VanCell: typeof import('vant/es')['Cell']
