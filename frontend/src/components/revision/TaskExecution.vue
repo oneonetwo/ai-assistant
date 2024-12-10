@@ -125,10 +125,27 @@ function handleTitleClick(event: Event) {
     </div>
   </div>
 </template>
-
 <style lang="scss" scoped>
 .task-execution {
   padding: 16px;
+  background-color: var(--van-background);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.03) 0px, transparent 1px) 0 0;
+    background-size: 20px 100%;
+    pointer-events: none;
+  }
 
   .task-header {
     display: flex;
@@ -140,13 +157,13 @@ function handleTitleClick(event: Event) {
       display: flex;
       align-items: center;
       gap: 4px;
-      
+
       h3 {
         font-size: 16px;
         font-weight: 500;
         cursor: pointer;
         color: var(--van-primary-color);
-        
+
         &:hover {
           opacity: 0.8;
           text-decoration: underline;
@@ -164,17 +181,76 @@ function handleTitleClick(event: Event) {
     display: flex;
     gap: 8px;
     margin-bottom: 16px;
+
+    .van-tag {
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: 6px;
+      margin-right: 8px;
+      transition: all 0.3s ease;
+
+      &--primary {
+        background: var(--van-primary-color);
+        color: white;
+        border: none;
+      }
+
+      &--success {
+        background: rgba(var(--van-success-color), 0.1);
+        color: var(--van-success-color);
+        border: 1px solid var(--van-success-color);
+      }
+
+      &--warning {
+        background: rgba(var(--van-warning-color), 0.1);
+        color: var(--van-warning-color);
+        border: 1px solid var(--van-warning-color);
+      }
+
+      &--danger {
+        background: rgba(var(--van-danger-color), 0.1);
+        color: var(--van-danger-color);
+        border: 1px solid var(--van-danger-color);
+      }
+    }
   }
 
   .task-actions {
     margin-bottom: 16px;
+
+    .van-button {
+      height: 40px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 8px;
+      margin: 0 8px;
+      transition: all 0.3s ease;
+
+      &--view {
+        background: var(--van-primary-color);
+        border-color: var(--van-primary-color);
+        color: white;
+
+        &:active {
+          opacity: 0.8;
+        }
+      }
+    }
   }
 
   .task-content {
     margin-bottom: 16px;
     padding: 16px;
-    background: var(--van-background-2);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(230, 230, 250, 0.8)); // 更加鲜明的渐变效果
     border-radius: 8px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(210, 210, 240, 0.9)); // 悬停时的渐变变化
+    }
   }
 
   .mastery-controls {
@@ -182,6 +258,240 @@ function handleTitleClick(event: Event) {
     display: flex;
     gap: var(--van-padding-xs);
     justify-content: center;
+
+    .van-button {
+      &--not-mastered {
+        background: rgba(var(--van-danger-color), 0.1);
+        border-color: var(--van-danger-color);
+        color: var(--van-danger-color);
+
+        &:active {
+          background: rgba(var(--van-danger-color), 0.2);
+        }
+      }
+
+      &--learning {
+        background: rgba(var(--van-warning-color), 0.1);
+        border-color: var(--van-warning-color);
+        color: var(--van-warning-color);
+
+        &:active {
+          background: rgba(var(--van-warning-color), 0.2);
+        }
+      }
+
+      &--mastered {
+        background: rgba(var(--van-success-color), 0.1);
+        border-color: var(--van-success-color);
+        color: var(--van-success-color);
+
+        &:active {
+          background: rgba(var(--van-success-color), 0.2);
+        }
+      }
+    }
   }
 }
-</style> 
+
+// 深色主题
+:root[data-theme="dark"] {
+  .task-execution {
+    background: rgba(70, 80, 95, 0.6);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+
+    &::before {
+      background: linear-gradient(to right, rgba(255, 255, 255, 0.03) 0px, transparent 1px) 0 0;
+    }
+
+    .task-content {
+      background: linear-gradient(135deg, rgba(60, 60, 60, 0.8), rgba(40, 40, 60, 0.8)); // 深色主题下的渐变效果
+      backdrop-filter: blur(4px);
+    }
+  }
+}
+
+// 浅色主题
+:root[data-theme="light"] {
+  .task-execution {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    &::before {
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.03) 0px, transparent 1px) 0 0;
+    }
+
+    .task-content {
+      background: linear-gradient(135deg, rgba(250, 250, 250, 0.8), rgba(230, 230, 250, 0.8)); // 浅色主题下的渐变效果
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+
+      &:hover {
+        background: linear-gradient(135deg, rgba(252, 252, 252, 0.9), rgba(210, 210, 240, 0.9)); // 悬停时的渐变变化
+      }
+    }
+  }
+}
+
+.task-meta {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+
+  .van-tag {
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 16px;
+    margin-right: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    backdrop-filter: blur(4px);
+    border: none;
+
+    &--plain {
+      background: rgba(var(--van-primary-color), 0.08);
+      color: var(--van-primary-color);
+
+      &:hover {
+        background: rgba(var(--van-primary-color), 0.12);
+      }
+    }
+
+    // 复习次数标签
+    &--primary {
+      background: linear-gradient(135deg, rgba(var(--van-primary-color), 0.1), rgba(var(--van-primary-color), 0.2));
+      color: var(--van-primary-color);
+    }
+
+    // 优先级标签
+    &--danger {
+      background: linear-gradient(135deg, rgba(var(--van-danger-color), 0.1), rgba(var(--van-danger-color), 0.2));
+      color: var(--van-danger-color);
+    }
+
+    &--warning {
+      background: linear-gradient(135deg, rgba(var(--van-warning-color), 0.1), rgba(var(--van-warning-color), 0.2));
+      color: var(--van-warning-color);
+    }
+
+    // 掌握程度标签
+    &--success {
+      background: linear-gradient(135deg, rgba(var(--van-success-color), 0.1), rgba(var(--van-success-color), 0.2));
+      color: var(--van-success-color);
+    }
+  }
+}
+
+.task-actions {
+  margin-bottom: 16px;
+
+  .van-button {
+    height: 44px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 22px;
+    margin: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(4px);
+    border: none;
+    background: linear-gradient(135deg, rgba(var(--van-primary-color), 0.1), rgba(var(--van-primary-color), 0.2));
+    color: var(--van-primary-color);
+    
+    &:active {
+      transform: scale(0.98);
+    }
+
+    &:hover {
+      background: linear-gradient(135deg, rgba(var(--van-primary-color), 0.15), rgba(var(--van-primary-color), 0.25));
+    }
+  }
+}
+
+.mastery-controls {
+  margin-top: var(--van-padding-md);
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+
+  .van-button {
+    flex: 1;
+    max-width: 120px;
+    height: 44px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 22px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(4px);
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    // 不熟悉按钮
+    &[type="danger"] {
+      background: linear-gradient(135deg, rgba(var(--van-danger-color), 0.1), rgba(var(--van-danger-color), 0.2));
+      color: var(--van-danger-color);
+
+      &:hover {
+        background: linear-gradient(135deg, rgba(var(--van-danger-color), 0.15), rgba(var(--van-danger-color), 0.25));
+      }
+    }
+
+    // 学习中按钮
+    &[type="warning"] {
+      background: linear-gradient(135deg, rgba(var(--van-warning-color), 0.1), rgba(var(--van-warning-color), 0.2));
+      color: var(--van-warning-color);
+
+      &:hover {
+        background: linear-gradient(135deg, rgba(var(--van-warning-color), 0.15), rgba(var(--van-warning-color), 0.25));
+      }
+    }
+
+    // 已掌握按钮
+    &[type="success"] {
+      background: linear-gradient(135deg, rgba(var(--van-success-color), 0.1), rgba(var(--van-success-color), 0.2));
+      color: var(--van-success-color);
+
+      &:hover {
+        background: linear-gradient(135deg, rgba(var(--van-success-color), 0.15), rgba(var(--van-success-color), 0.25));
+      }
+    }
+  }
+}
+
+// 深色主题调整
+:root[data-theme="dark"] {
+  .task-execution {
+    .van-tag {
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .van-button {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+  }
+}
+
+// 浅色主题调整
+:root[data-theme="light"] {
+  .task-execution {
+    .van-tag {
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    }
+
+    .van-button {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+  }
+}
+</style>
