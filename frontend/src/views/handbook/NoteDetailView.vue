@@ -358,44 +358,49 @@ function previewImage(imagePath: string, index: number) {
     flex: 1;
     overflow-y: auto;
     padding: var(--van-padding-md);
-
-    .title {
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: var(--van-padding-md);
-    }
+    max-width: 800px; // 限制内容最大宽度
+    margin: 0 auto; // 居中显示
+    
+    // 添加页面纸张效果
+    background: var(--van-background-2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-top: var(--van-padding-md);
+    margin-bottom: var(--van-padding-md);
+    padding: var(--van-padding-xl);
 
     .meta-info {
-      margin-bottom: var(--van-padding-lg);
+      margin-bottom: var(--van-padding-xl);
+      padding-bottom: var(--van-padding-md);
+      border-bottom: 1px solid var(--van-border-color);
 
       .tags {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-        margin-bottom: var(--van-padding-xs);
+        margin-bottom: var(--van-padding-sm);
+
+        :deep(.van-tag) {
+          font-size: 13px;
+          padding: 4px 12px;
+          border-radius: 4px;
+        }
       }
 
       .status-priority {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 12px;
         
         :deep(.van-tag) {
-          padding: 2px 12px;
-          font-size: 12px;
+          padding: 4px 16px;
+          font-size: 13px;
+          border-radius: 16px;
           
-          &.status-tag {
-            min-width: 60px;
-            text-align: center;
-          }
-          
-          &.priority-tag {
-            min-width: 70px;
-            text-align: center;
-          }
-          
+          &.status-tag,
+          &.priority-tag,
           &.share-tag {
-            min-width: 60px;
+            min-width: 80px;
             text-align: center;
           }
         }
@@ -403,60 +408,112 @@ function previewImage(imagePath: string, index: number) {
     }
 
     .content {
-      margin-bottom: var(--van-padding-lg);
-      line-height: 1.6;
+      margin-bottom: var(--van-padding-xl);
+      line-height: 1.8;
+      font-size: 16px;
+      color: var(--van-text-color);
+      
+      // 添加 Markdown 内容样式
+      :deep(h1, h2, h3, h4, h5, h6) {
+        margin-top: 2em;
+        margin-bottom: 1em;
+        font-weight: 600;
+        line-height: 1.25;
+      }
+
+      :deep(h1) {
+        font-size: 2em;
+        border-bottom: 1px solid var(--van-border-color);
+        padding-bottom: 0.3em;
+      }
+
+      :deep(h2) {
+        font-size: 1.5em;
+        border-bottom: 1px solid var(--van-border-color);
+        padding-bottom: 0.3em;
+      }
+
+      :deep(p) {
+        margin: 1em 0;
+        line-height: 1.8;
+      }
+
+      :deep(ul, ol) {
+        padding-left: 2em;
+        margin: 1em 0;
+      }
+
+      :deep(li) {
+        margin: 0.5em 0;
+      }
+
+      :deep(blockquote) {
+        margin: 1em 0;
+        padding: 0.5em 1em;
+        color: var(--van-text-color-2);
+        border-left: 4px solid var(--van-primary-color);
+        background: var(--van-background);
+        border-radius: 4px;
+      }
+
+      :deep(code) {
+        background: var(--van-background);
+        padding: 0.2em 0.4em;
+        border-radius: 3px;
+        font-size: 0.9em;
+        border: 1px solid var(--van-border-color);
+      }
+
+      :deep(pre code) {
+        display: block;
+        overflow-x: auto;
+        padding: 1em;
+        border: none;
+        border-radius: 8px;
+      }
     }
 
     .attachments {
-      margin-bottom: var(--van-padding-lg);
+      margin: var(--van-padding-xl) 0;
+      padding: var(--van-padding-lg);
+      background: var(--van-background);
+      border-radius: 12px;
+      border: 1px solid var(--van-border-color);
 
       .section-title {
-        font-weight: 500;
-        margin-bottom: var(--van-padding-xs);
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: var(--van-padding-md);
+        color: var(--van-text-color);
       }
 
       .attachment-list {
         display: grid;
         gap: 16px;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 
         .attachment-item {
           border-radius: 8px;
           overflow: hidden;
+          transition: transform 0.2s;
+
+          &:hover {
+            transform: translateY(-2px);
+          }
         }
 
         .image-preview {
           position: relative;
           cursor: zoom-in;
-          overflow: hidden;
           border-radius: 8px;
-          border: 1px solid var(--van-border-color);
-          transition: transform 0.2s;
-
-          &:hover {
-            transform: scale(1.02);
-
-            .image-name {
-              transform: translateY(0);
-            }
-
-            &::after {
-              content: '';
-              position: absolute;
-              top: 0;
-              left: 0;
-              right: 0;
-              bottom: 0;
-              background: rgba(0, 0, 0, 0.1);
-              pointer-events: none;
-            }
-          }
+          overflow: hidden;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
           img {
             width: 100%;
             height: 200px;
             object-fit: cover;
-            vertical-align: middle;
+            transition: transform 0.3s;
           }
 
           .image-name {
@@ -464,69 +521,21 @@ function previewImage(imagePath: string, index: number) {
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 8px;
-            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.7);
             color: white;
-            font-size: 12px;
+            font-size: 13px;
             transform: translateY(100%);
-            transition: transform 0.2s;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            transition: transform 0.3s;
           }
-        }
 
-        .audio-player {
-          background: var(--van-background-2);
-          border-radius: 8px;
-          border: 1px solid var(--van-border-color);
-          padding: 12px;
-
-          .file-info {
-            display: flex;
-            gap: 12px;
-
-            .file-icon {
-              flex-shrink: 0;
-              width: 24px;
-              height: 24px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              
-              :deep(svg) {
-                width: 24px;
-                height: 24px;
-              }
+          &:hover {
+            img {
+              transform: scale(1.05);
             }
 
-            .file-details {
-              flex: 1;
-              min-width: 0; // 防止子元素溢出
-
-              .file-name {
-                font-size: 14px;
-                margin-bottom: 8px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-              }
-
-              .file-controls {
-                display: flex;
-                gap: 8px;
-
-                :deep(.van-button) {
-                  flex-shrink: 0;
-                  height: 28px;
-                  padding: 0 12px;
-                  border-radius: 14px;
-                  
-                  &:active {
-                    opacity: 0.8;
-                  }
-                }
-              }
+            .image-name {
+              transform: translateY(0);
             }
           }
         }
@@ -534,70 +543,157 @@ function previewImage(imagePath: string, index: number) {
         .file-info {
           display: flex;
           align-items: center;
-          gap: 8px;
-          padding: 12px;
-          background: var(--van-background-2);
+          gap: 12px;
+          padding: 16px;
+          background: var(--van-background);
           border-radius: 8px;
           border: 1px solid var(--van-border-color);
+          transition: all 0.3s;
+
+          &:hover {
+            background: var(--van-background-2);
+          }
 
           .file-name {
             flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            font-size: 14px;
+            @include text-ellipsis;
+          }
+
+          :deep(.van-button) {
+            padding: 0 16px;
+            height: 32px;
+            border-radius: 16px;
           }
         }
       }
     }
 
     .messages-section {
-      .message-list {
-        margin-top: var(--van-padding-xs);
-        padding: var(--van-padding-sm);
-        background: var(--van-background-2);
+      margin-top: var(--van-padding-xl);
+      
+      :deep(.van-cell) {
+        padding: var(--van-padding-md);
         border-radius: 8px;
+        margin-bottom: var(--van-padding-xs);
+        background: var(--van-background);
+        
+        &::after {
+          display: none;
+        }
+      }
+
+      .message-list {
+        margin-top: var(--van-padding-md);
+        padding: var(--van-padding-md);
+        background: var(--van-background);
+        border-radius: 8px;
+        border: 1px solid var(--van-border-color);
       }
     }
   }
 
-  :deep(.history-btn) {
-    // 适配暗色主题
-    --van-button-plain-background: transparent;
-    --van-button-default-border-color: var(--van-gray-5);
-    --van-button-default-color: var(--van-text-color);
-    
-    // 按钮样式优化
-    padding: 0 12px;
-    border-radius: 16px;
-    font-size: 13px;
-    
-    // 悬停效果
-    &:active {
-      opacity: 0.8;
-      background: var(--van-gray-2);
-    }
-    
-    // 图标���式
-    .van-button__icon {
-      margin-right: 4px;
-      font-size: 16px;
+  :deep{
+    .history-btn {
+      height: 32px;
+      padding: 0 16px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 500;
+      
+      // 添加金属质感效果
+      background: linear-gradient(
+        180deg, 
+        var(--van-background-2) 0%,
+        var(--van-background) 100%
+      );
+      border: 1px solid rgba(var(--van-primary-color), 0.3);
+      box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        0 1px 3px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(4px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 
+          inset 0 1px 0 rgba(255, 255, 255, 0.15),
+          0 4px 8px rgba(0, 0, 0, 0.1);
+        border-color: var(--van-primary-color);
+        
+        .van-button__text {
+          background: linear-gradient(
+            90deg,
+            var(--van-primary-color) 0%,
+            var(--van-text-color) 100%
+          );
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+      }
+      
+      &:active {
+        transform: translateY(0);
+        box-shadow: 
+          inset 0 2px 4px rgba(0, 0, 0, 0.1),
+          0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+      
+      .van-button__icon {
+        font-size: 18px;
+        margin-right: 4px;
+        color: var(--van-primary-color);
+      }
+      
+      .van-button__text {
+        transition: all 0.3s ease;
+      }
     }
   }
+}
 
-  // 自定义 vant 图片预览样式
-  :deep(.van-image-preview) {
-    .van-image-preview__index {
-      padding: 8px 16px;
-      border-radius: 16px;
-      background: rgba(0, 0, 0, 0.7);
-      font-size: 14px;
+// 暗色主题适配
+:root[data-theme='dark'] {
+  .note-detail {
+    .detail-content {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
-
-    .van-image-preview__close-icon {
-      top: 16px;
-      right: 16px;
-      color: #fff;
-      font-size: 22px;
+    
+    :deep{
+      .history-btn {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.08) 0%,
+          rgba(255, 255, 255, 0.04) 100%
+        );
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 
+          inset 0 1px 0 rgba(255, 255, 255, 0.05),
+          0 1px 3px rgba(0, 0, 0, 0.2);
+        
+        &:hover {
+          background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.1) 0%,
+            rgba(255, 255, 255, 0.06) 100%
+          );
+          border-color: var(--van-primary-color);
+          box-shadow: 
+            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+            0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        &:active {
+          background: linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0.05) 0%,
+            rgba(0, 0, 0, 0.1) 100%
+          );
+          box-shadow: 
+            inset 0 2px 4px rgba(0, 0, 0, 0.2),
+            0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+      }
     }
   }
 }
