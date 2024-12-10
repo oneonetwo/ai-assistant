@@ -1,184 +1,257 @@
-<script setup lang="ts">
-import { useRouter } from 'vue-router'
-import SvgIcon from '@/components/common/SvgIcon.vue'
-import { useWindowSize } from '@vueuse/core'
-import { computed } from 'vue';
-
-const router = useRouter()
-
-const { width } = useWindowSize()
-const isMobile = computed(() => width.value <= 768)
-
-const features = [
-  {
-    title: '知识手册',
-    description: '笔记管理，知识整理，标签系统',
-    icon: 'book',
-    route: '/handbooks'
-  },
-  {
-    title: 'AI 助手',
-    description: '智能对话，解答问题，代码生成',
-    icon: 'chat',
-    route: '/chat'
-  },
-  {
-    title: '复习助手',
-    description: '执行计划，科学复习',
-    icon: 'book',
-    route: '/revision'
-  }
-]
-</script>
-
 <template>
   <div class="home-view">
-    <header class="header" :class="{ 'header--mobile': isMobile }">
-      <h1>AI 智囊</h1>
-      <p>你的 知识管理工具 & 智能助手 & 复习助手</p>
-    </header>
+    <div class="settings-button" @click="router.push('/settings')">
+      <van-icon name="setting-o" class="settings-icon" size="32"/>
+    </div>
 
-    <main class="features" :class="{ 'features--mobile': isMobile }">
-      <div
-        v-for="feature in features"
-        :key="feature.title"
-        class="feature-card"
-        :class="{ 'feature-card--mobile': isMobile }"
-        @click="router.push(feature.route)"
-      >
-        <div class="icon">
-          <svg-icon :name="feature.icon" />
+    <div class="content">
+      <h1 class="title">AI 智囊</h1>
+      
+      <div class="module-grid">
+        <!-- 对话模块 -->
+        <div class="module-card" @click="router.push('/chat')">
+          <div class="card-content">
+            <van-icon name="chat" class="module-icon"/>
+            <h2>AI智能对话</h2>
+            <p>与 AI 助手进行自然对话，获取帮助与建议</p>
+          </div>
+          <div class="card-overlay"></div>
         </div>
-        <div class="content">
-          <h2>{{ feature.title }}</h2>
-          <p>{{ feature.description }}</p>
+
+        <!-- 知识库模块 -->
+        <div class="module-card" @click="router.push('/handbooks')">
+          <div class="card-content">
+            <van-icon name="book" class="module-icon"/>
+            <h2>知识管理</h2>
+            <p>构建和管理你的个人知识库</p>
+          </div>
+          <div class="card-overlay"></div>
+        </div>
+
+        <!-- 复习计划模块 -->
+        <div class="module-card" @click="router.push('/revision')">
+          <div class="card-content">
+            <van-icon name="calendar" class="module-icon"/>
+            <h2>学习计划</h2>
+            <p>制定个性化学习计划，追踪学习进度</p>
+          </div>
+          <div class="card-overlay"></div>
         </div>
       </div>
-    </main>
-
-    <footer class="footer">
-      <van-button
-        icon="setting-o"
-        :size="isMobile ? 'normal' : 'large'"
-        @click="router.push('/settings')"
-      >
-        设置
-      </van-button>
-    </footer>
+    </div>
   </div>
 </template>
 
-<style lang="scss" scoped>
+<script setup lang="ts">
+import { useRouter } from 'vue-router'
+import { Icon } from 'vant'
+
+const router = useRouter()
+</script>
+
+<style scoped>
 .home-view {
-  min-height: 100vh;
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+}
+
+.content {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  padding: var(--van-padding-md);
-  max-width: 1200px;
-  margin: 0 auto;
-  box-sizing: border-box;
-  
-  .header {
-    text-align: center;
-    margin: 48px 0;
-    
-    h1 {
-      font-size: clamp(24px, 5vw, 32px);
-      font-weight: 600;
-      margin-bottom: 12px;
-    }
-    
-    p {
-      color: var(--van-text-color-2);
-      font-size: clamp(14px, 3vw, 16px);
-    }
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #333;
+  text-align: center;
+}
 
-    &--mobile {
-      margin: 24px 0;
-    }
+.title {
+  font-size: 3rem;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #42b883, #35495e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 30px rgba(66, 184, 131, 0.2);
+  animation: glow 3s ease-in-out infinite alternate;
+}
+
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  padding: 0 2rem;
+}
+
+.module-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 2rem;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    inset 0 0 20px rgba(255, 255, 255, 0.05);
+}
+
+.module-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04),
+    inset 0 0 25px rgba(255, 255, 255, 0.1);
+  border-color: rgba(66, 184, 131, 0.4);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.module-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, rgba(66, 184, 131, 0.1), rgba(53, 73, 94, 0.1));
+  z-index: -1;
+  transition: opacity 0.4s ease;
+  opacity: 0;
+}
+
+.module-card:hover::before {
+  opacity: 1;
+}
+
+.card-content {
+  position: relative;
+  z-index: 1;
+}
+
+.module-icon {
+  font-size: 48px;
+  margin-bottom: 1rem;
+  color: var(--van-primary-color);
+  transition: transform 0.3s ease;
+}
+
+.module-card:hover .module-icon {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 8px rgba(66, 184, 131, 0.3));
+}
+
+h2 {
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+p {
+  color: #666;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+  line-height: 1.5;
+}
+
+.settings-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.settings-button:hover {
+  transform: rotate(90deg);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(66, 184, 131, 0.4);
+  box-shadow: 
+    0 0 15px rgba(66, 184, 131, 0.3),
+    0 0 5px rgba(66, 184, 131, 0.2);
+}
+
+.settings-icon {
+  font-size: 24px;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 20px rgba(66, 184, 131, 0.2);
   }
-  
-  .features {
-    flex: 1;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: clamp(16px, 3vw, 24px);
-    width: 100%;
-    padding: clamp(16px, 3vw, 24px);
-    
-    &--mobile {
-      grid-template-columns: 1fr;
-      padding: 16px 0;
-    }
-    
-    .feature-card {
-      background: var(--van-background-2);
-      border-radius: var(--van-radius-lg);
-      padding: clamp(16px, 3vw, 24px);
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      
-      &:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      }
-      
-      &--mobile {
-        padding: 16px;
-      }
-      
-      .icon {
-        flex-shrink: 0;
-        width: clamp(40px, 6vw, 48px);
-        height: clamp(40px, 6vw, 48px);
-        
-        .svg-icon {
-          width: 100%;
-          height: 100%;
-          color: var(--van-primary-color);
-        }
-      }
-      
-      .content {
-        flex: 1;
-        
-        h2 {
-          font-size: clamp(18px, 4vw, 20px);
-          font-weight: 600;
-          margin-bottom: 8px;
-        }
-        
-        p {
-          color: var(--van-text-color-2);
-          line-height: 1.5;
-          font-size: clamp(14px, 3vw, 16px);
-        }
-      }
-    }
-  }
-  
-  .footer {
-    text-align: center;
-    padding: clamp(16px, 3vw, 24px) 0;
+  to {
+    text-shadow: 0 0 30px rgba(66, 184, 131, 0.4);
   }
 }
 
-// 媒体查询优化
+/* Dark theme styles */
+:root[data-theme="dark"] {
+  .module-card {
+    background: rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .module-card:hover {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: rgba(66, 184, 131, 0.4);
+  }
+
+  h2 {
+    color: #fff;
+  }
+
+  p {
+    color: #aaa;
+  }
+
+  .settings-button {
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .settings-button:hover {
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  .settings-icon {
+    color: #fff;
+  }
+}
+
+/* Responsive styles */
 @media (max-width: 768px) {
-  .home-view {
-    padding: var(--van-padding-sm);
+  .title {
+    font-size: 2rem;
   }
-}
+  
+  .module-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0 1rem;
+  }
 
-// 深色模式优化
-@media (prefers-color-scheme: dark) {
-  .feature-card {
-    &:hover {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
+  .module-card {
+    padding: 1.5rem;
   }
 }
-</style> 
+</style>
