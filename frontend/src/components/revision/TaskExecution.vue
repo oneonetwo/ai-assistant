@@ -494,4 +494,10 @@ function handleTitleClick(event: Event) {
     }
   }
 }
+
+:deep {
+  .van-button {
+    border: none;
+  }
+}
 </style>

@@ -188,13 +188,7 @@ async def get_daily_tasks(
     ),
     db: AsyncSession = Depends(get_db)
 ):
-    """获取每日任务列表
-    
-    Args:
-        date: 指定日期，默认为今天
-        status: 任务状态筛选 (pending/completed/skipped)
-        db: 数据库会话
-    """
+    """获取每日任务列表"""
     try:
         tasks = await RevisionService.get_daily_tasks(
             db, 
@@ -208,6 +202,10 @@ async def get_daily_tasks(
                 note = await db.get(Note, task.note_id)
                 if note:
                     task.note = note
+            
+            # 确保 mastery_level 有默认值
+            if task.mastery_level is None:
+                task.mastery_level = "not_mastered"  # 或者其他默认值
         
         return tasks
         
@@ -233,7 +231,7 @@ async def get_next_task(
     
     task = await RevisionService.get_next_task(db, plan_id, mode)
     
-    # 如果没有任务，直��返回 None
+    # 如果没有任务，直接返回 None
     if task is None:
         app_logger.debug("没有找到待复习任务，返回null")
         return None
@@ -272,7 +270,7 @@ async def get_task_history(
     response_model=RevisionTaskResponse,
     summary="调整任务计划",
     description="""
-    调整任务复习计划，支持：
+    调整任���复习计划，支持：
     - 修改计划日期
     - 调整优先级
     - 添加调整说明
