@@ -54,7 +54,8 @@ const FILE_TYPES = {
     'application/vnd.ms-excel',
     'application/vnd.ms-powerpoint',
     'text/markdown',
-    'application/json'
+    'application/json',
+    'text/x-markdown'
   ],
   AUDIO: [
     'audio/mpeg',
@@ -67,16 +68,33 @@ const FILE_TYPES = {
 
 // 判断文件类型
 function getFileType(file: File) {
+  // 通过文件扩展名判断
+  const fileName = file.name.toLowerCase()
+  
   if (FILE_TYPES.IMAGE.includes(file.type)) return 'image'
-  if (FILE_TYPES.DOCUMENT.includes(file.type)) return 'document'
   if (FILE_TYPES.AUDIO.includes(file.type)) return 'audio'
+  if (FILE_TYPES.DOCUMENT.includes(file.type)) return 'document'
+  
+  // 如果 MIME 类型检查失败，通过文件扩展名进行后备检查
+  if (fileName.endsWith('.md') || fileName.endsWith('.markdown')) return 'document'
+  if (fileName.endsWith('.txt') || fileName.endsWith('.pdf')) return 'document'
+  if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) return 'document'
+  if (fileName.endsWith('.xls') || fileName.endsWith('.xlsx')) return 'document'
+  if (fileName.endsWith('.ppt') || fileName.endsWith('.pptx')) return 'document'
+  
   return null
 }
 
 // 处理文件上传
 const handleFileUpload = async (file: { file: File }) => {
+  console.log('Uploaded file:', file.file)
+  console.log('File type:', file.file.type)
+  console.log('File name:', file.file.name)
+  
   const uploadFile = file.file
   const fileType = getFileType(uploadFile)
+  
+  console.log('Detected file type:', fileType)
   
   if (!fileType) {
     showToast('不支持的文件类型')
@@ -87,7 +105,7 @@ const handleFileUpload = async (file: { file: File }) => {
 
   // 根据文件类型设置默认提示文本
   messageText.value = fileType === 'image' 
-    ? '请帮我分析这张图片：\n' + (messageText.value || '')
+    ? '请帮我分析这张图片\n' + (messageText.value || '')
     : fileType === 'audio'
     ? '请帮我分析这段音频：\n' + (messageText.value || '')
     : '请帮我分析这个文件：\n' + (messageText.value || '')
@@ -189,6 +207,8 @@ function handleOnEnd() {
   uploadController.value = null
   uploadProgress.value = 0
   uploadedFile.value = null
+    // 更新会话列表
+  chatStore.updateConversationList()
 }
 
 // 文件预览
@@ -205,7 +225,7 @@ function getFilePreview(file: File) {
     <div class="toolbar">
       
       <van-uploader
-      accept=".txt,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.epub,.md,.json,image/*,.mp3,.wav,.ogg,.m4a,.aac"
+      accept=".txt,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.epub,.md,.markdown,text/markdown,text/x-markdown,image/*,.mp3,.wav,.ogg,.m4a,.aac"
       :max-size="30 * 1024 * 1024"
       :max-count="1"
       :before-read="beforeUpload"
