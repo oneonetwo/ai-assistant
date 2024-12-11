@@ -73,11 +73,19 @@ class RevisionService:
         status: Optional[str] = None
     ) -> List[RevisionPlan]:
         """获取复习计划列表"""
-        query = select(RevisionPlan)
-        if status:
-            query = query.filter(RevisionPlan.status == status)
-        result = await db.execute(query)
-        return result.scalars().all()
+        try:
+            # 添加 order_by(desc(RevisionPlan.created_at)) 实现按创建时间倒序
+            result = await db.execute(
+                select(RevisionPlan)
+                .order_by(desc(RevisionPlan.created_at))  # 添加这一行
+            )
+            return result.scalars().all()
+        except Exception as e:
+            app_logger.error(f"获取复习计划列表失败: {str(e)}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"获取复习计划列表失败: {str(e)}"
+            )
 
     @staticmethod
     async def get_plan(

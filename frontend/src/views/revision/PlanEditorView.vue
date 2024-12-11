@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRevisionStore } from '@/stores/revision'
 import { useHandbookStore } from '@/stores/handbook'
@@ -14,8 +14,8 @@ const formData = ref({
   name: '',
   start_date: '',
   end_date: '',
+  category_id: -1,
   handbook_ids: [] as number[],
-  category_ids: [] as number[],
   tag_ids: [] as number[],
   note_statuses: [] as string[]
 })
@@ -34,12 +34,38 @@ function validateDates() {
   return end >= start
 }
 
+// Add computed properties for filtered handbooks
+const filteredHandbooks = computed(() => {
+  if (formData.value.category_id === -1) {
+    return handbookStore.handbooks
+  }
+  return handbookStore.handbooks.filter(
+    handbook => handbook.category_id === formData.value.category_id
+  )
+})
+
+// Watch category changes to update handbook selection
+watch(() => formData.value.category_id, (newCategoryId) => {
+  // Select all handbooks in the current category
+  formData.value.handbook_ids = filteredHandbooks.value.map(h => h.id)
+})
+
+// Add color cycling function
+function getColorByTagId(id: number): number {
+  return (id % 5) + 1
+}
+
 // 加载手册数据
 onMounted(async () => {
   try {
     await handbookStore.fetchHandbooks()
     await handbookStore.fetchCategories()
     await handbookStore.fetchTags()
+    
+    // Set initial values
+    formData.value.category_id = -1
+    formData.value.handbook_ids = handbookStore.handbooks.map(h => h.id)
+    formData.value.tag_ids = [] // 默认不选中任何标签
   } catch (error) {
     showToast('加载数据失败')
   }
@@ -80,7 +106,7 @@ async function handleSubmit() {
           <van-field
             v-model="formData.name"
             label="计划名称"
-            placeholder="请输入计划名称"
+            placeholder="请输入计划名称称"
             :rules="[{ required: true, message: '请输入计划名称' }]"
           />
 
@@ -104,45 +130,70 @@ async function handleSubmit() {
             ]"
           />
 
-          <van-field name="handbook" label="选择手册">
-            <template #input>
-              <van-checkbox-group v-model="formData.handbook_ids">
-                <van-checkbox
-                  v-for="handbook in handbookStore.handbooks"
-                  :key="handbook.id"
-                  :name="handbook.id"
-                >
-                  {{ handbook.name }}
-                </van-checkbox>
-              </van-checkbox-group>
-            </template>
-          </van-field>
-
           <van-field name="categories" label="选择分类">
             <template #input>
-              <van-checkbox-group v-model="formData.category_ids">
-                <van-checkbox
+              <van-radio-group v-model="formData.category_id">
+                <van-radio :name="-1">全部</van-radio>
+                <van-radio
                   v-for="category in handbookStore.categories"
                   :key="category.id"
                   :name="category.id"
                 >
                   {{ category.name }}
-                </van-checkbox>
-              </van-checkbox-group>
+                </van-radio>
+              </van-radio-group>
+            </template>
+          </van-field>
+
+          <van-field 
+            name="handbook" 
+            label="选择手册"
+            :rules="[{ required: true, message: '请至少选择一个手册' }]"
+          >
+            <template #input>
+              <div class="handbook-selector">
+                <div class="handbook-count">
+                  已选择 {{ formData.handbook_ids.length }} 个手册
+                </div>
+                <van-checkbox-group v-model="formData.handbook_ids">
+                  <div 
+                    v-for="handbook in filteredHandbooks" 
+                    :key="handbook.id"
+                    class="handbook-item"
+                  >
+                    <van-checkbox 
+                      :name="handbook.id"
+                      class="handbook-checkbox"
+                    >
+                      <div class="handbook-info">
+                        <span class="handbook-name">{{ handbook.name }}</span>
+                      </div>
+                    </van-checkbox>
+                  </div>
+                </van-checkbox-group>
+              </div>
             </template>
           </van-field>
 
           <van-field name="tags" label="选择标签">
             <template #input>
-              <van-checkbox-group v-model="formData.tag_ids">
-                <van-checkbox
-                  v-for="tag in handbookStore.tags"
-                  :key="tag.id"
-                  :name="tag.id"
-                >
-                  {{ tag.name }}
-                </van-checkbox>
-              </van-checkbox-group>
+              <div class="tag-selector">
+                <div class="tag-count">
+                  已选择 {{ formData.tag_ids.length }} 个标签
+                </div>
+                <van-checkbox-group v-model="formData.tag_ids">
+                  <van-checkbox
+                    v-for="tag in handbookStore.tags"
+                    :key="tag.id"
+                    :name="tag.id"
+                    class="tag-checkbox"
+                  >
+                    <div :class="['custom-tag', `color-${getColorByTagId(tag.id)}`, { 'is-selected': formData.tag_ids.includes(tag.id) }]">
+                      {{ tag.name }}
+                    </div>
+                  </van-checkbox>
+                </van-checkbox-group>
+              </div>
             </template>
           </van-field>
 
@@ -198,16 +249,187 @@ async function handleSubmit() {
     padding: 0 16px;
   }
 
-  :deep(.van-checkbox-group) {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 8px 0;
+  :deep {
+    .van-radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 8px 0;
+    }
+    
+    .van-checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 8px 0;
+    }
+
+    .handbook-selector {
+      padding: 8px 0;
+
+      .handbook-count {
+        font-size: 14px;
+        color: var(--van-gray-6);
+        margin-bottom: 12px;
+      }
+
+      .handbook-item {
+        margin-bottom: 12px;
+        background: var(--van-background-2);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .van-checkbox {
+          width: 100%;
+          padding: 12px;
+        }
+
+        .handbook-info {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .handbook-name {
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--van-text-color);
+        }
+
+        .handbook-meta {
+          font-size: 12px;
+          color: var(--van-gray-6);
+        }
+      }
+
+      .van-checkbox__label {
+        flex: 1;
+      }
+
+      .van-checkbox__icon {
+        flex-shrink: 0;
+      }
+
+      // 选中状态样式
+      .van-checkbox__icon--checked + .van-checkbox__label {
+        .handbook-item {
+          background: var(--van-primary-light);
+        }
+        
+        .handbook-name {
+          color: var(--van-primary);
+        }
+      }
+    }
+
+    .tag-selector {
+      padding: 8px 0;
+
+      .tag-count {
+        font-size: 14px;
+        color: var(--van-gray-6);
+        margin-bottom: 12px;
+      }
+
+      .van-checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .tag-checkbox {
+        margin: 0 !important;
+        padding: 0 !important;
+
+        // 隐藏默认的复选框图标
+        .van-checkbox__icon {
+          display: none;
+        }
+      }
+    }
   }
 
-  :deep(.van-radio-group) {
-    display: flex;
-    gap: 16px;
+  .custom-tag {
+    border-radius: 16px !important;
+    padding: 2px 8px !important;
+    margin: 4px !important;
+    border: none !important;
+    font-size: 12px !important;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: transparent !important;
+    border: 0.5px solid transparent !important;
+    
+    &.color-1 {
+      color: #00B4DB !important;
+      border-color: #00B4DB !important;
+      
+      &.is-selected {
+        background-color: #00B4DB !important;
+        color: #ffffff !important;
+      }
+    }
+    
+    &.color-2 {
+      color: #2C5E1A !important;
+      border-color: #9BE36D !important;
+      
+      &.is-selected {
+        background-color: #9BE36D !important;
+        color: #2C5E1A !important;
+      }
+    }
+    
+    &.color-3 {
+      color: #A78BFA !important;
+      border-color: #A78BFA !important;
+      
+      &.is-selected {
+        background-color: #A78BFA !important;
+        color: #ffffff !important;
+      }
+    }
+    
+    &.color-4 {
+      color: #FF8C82 !important;
+      border-color: #FF8C82 !important;
+      
+      &.is-selected {
+        background-color: #FF8C82 !important;
+        color: #ffffff !important;
+      }
+    }
+    
+    &.color-5 {
+      color: #14B8A6 !important;
+      border-color: #14B8A6 !important;
+      
+      &.is-selected {
+        background-color: #14B8A6 !important;
+        color: #ffffff !important;
+      }
+    }
+  }
+}
+
+// 暗色主题适配
+:root[data-theme='dark'] {
+  .plan-editor {
+    .custom-tag {
+      &.color-1,
+      &.color-2,
+      &.color-3,
+      &.color-4,
+      &.color-5 {
+        &:not(.is-selected) {
+          color: #ffffff !important;
+        }
+      }
+    }
   }
 }
 </style> 
