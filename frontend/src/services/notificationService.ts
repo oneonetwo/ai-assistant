@@ -1,3 +1,11 @@
+/*
+ * @Author: yangjingyuan yangjingyuan@pwrd.com
+ * @Date: 2024-12-09 09:59:06
+ * @LastEditors: yangjingyuan yangjingyuan@pwrd.com
+ * @LastEditTime: 2024-12-11 14:45:21
+ * @FilePath: \frontend\src\services\notificationService.ts
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import { request } from '@/utils/request'
 import type { NotificationSettings, NotificationSummary, UpdateSettingsRequest } from '@/types/notification'
 import { notificationManager } from '@/utils/notification'
@@ -36,11 +44,10 @@ export class NotificationService {
 
     try {
       const summary = await NotificationAPI.getSummary()
-      
-      if (summary.pending_tasks > 0) {
+      if (summary.has_tasks) {
         await notificationManager.show({
           title: '复习提醒',
-          body: `您有 ${summary.pending_tasks} 个待复习任务`,
+          body: `您有 ${summary.total_tasks} 个待复习任务`,
           onClick: () => {
             window.open('/revision/daily-summary', '_blank')
           }

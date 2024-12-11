@@ -56,6 +56,7 @@ export const useNotificationStore = defineStore('notification', () => {
     // 每分钟检查一次
     checkInterval = window.setInterval(async () => {
       if (!settings.value) return
+      console.log('开始检查提醒通知')
       await NotificationService.checkAndNotify(settings.value)
     }, 60000)
   }
