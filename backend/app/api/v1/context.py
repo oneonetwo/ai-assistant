@@ -15,7 +15,7 @@ from typing import List
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 from app.db.models import Conversation, File
-from sqlalchemy import desc
+from sqlalchemy import desc, asc
 import json
 
 router = APIRouter(prefix="/context", tags=["context"])
@@ -105,7 +105,7 @@ async def get_all_conversations(
 ):
     """获取所有会话列表"""
     try:
-        # 获取所有会话及其关联的消息和文件
+        # 获取所有会话及其关联的消息
         stmt = (
             select(Conversation)
             .options(joinedload(Conversation.messages))
@@ -117,8 +117,11 @@ async def get_all_conversations(
         # 转换响应格式
         response_conversations = []
         for conv in conversations:
+            # 按创建时间升序排序消息
+            sorted_messages = sorted(conv.messages, key=lambda msg: msg.created_at)
+            
             messages = []
-            for msg in conv.messages:
+            for msg in sorted_messages:
                 # 如果消息有关联文件，获取文件信息
                 file_info = None
                 if msg.file_id:
