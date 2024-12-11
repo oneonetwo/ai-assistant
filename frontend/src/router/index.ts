@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import { useChatStore } from '@/stores/chat'
-import { statisticsRoutes } from './routes/statistics'
 // 定义路由配置
 const routes: Array<RouteRecordRaw> = [
   {
@@ -192,21 +191,21 @@ const routes: Array<RouteRecordRaw> = [
     ]
   },
   // 统计相关路由
-  ...statisticsRoutes,
+  {
+    path: '/statistics',
+    name: 'Statistics',
+    component: () => import('@/views/statistics/StatisticsView.vue'),
+    meta: {
+      title: '学习统计',
+      requiresAuth: true
+    }
+  },
   {
     path: '/settings',
     name: 'settings',
     component: () => import('@/views/SettingsView.vue'),
     meta: {
       title: '设置'
-    }
-  },
-  {
-    path: '/analyze',
-    name: 'analyze',
-    component: () => import('@/views/analyze/AnalyzeView.vue'),
-    meta: {
-      title: '分析整理'
     }
   },
   {

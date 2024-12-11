@@ -176,44 +176,23 @@ async def update_task(
     }
 )
 async def get_daily_tasks(
-    date: date = Query(
-        default=None, 
-        description="指定日期，默认为今天",
-        example="2024-03-14"
-    ),
-    status: str = Query(
-        None, 
-        description="按状态筛选 (pending/completed/skipped)",
-        example="pending"
-    ),
+    status: Optional[str] = Query(None, description="任务状态"),
+    date: Optional[datetime] = None,
     db: AsyncSession = Depends(get_db)
 ):
     """获取每日任务列表"""
     try:
         tasks = await RevisionService.get_daily_tasks(
-            db, 
-            date or datetime.now().date(),
-            status=status
+            db=db,
+            task_status=status,
+            target_date=date
         )
-        
-        # 预加载笔记数据
-        for task in tasks:
-            if task.note_id:
-                note = await db.get(Note, task.note_id)
-                if note:
-                    task.note = note
-            
-            # 确保 mastery_level 有默认值
-            if task.mastery_level is None:
-                task.mastery_level = "not_mastered"  # 或者其他默认值
-        
         return tasks
-        
     except Exception as e:
         app_logger.error(f"获取每日任务失败: {str(e)}")
         raise HTTPException(
             status_code=500,
-            detail=f"获取每日任务失败: {str(e)}"
+            detail=str(e)
         )
 
 @router.get("/tasks/next", 
@@ -270,7 +249,7 @@ async def get_task_history(
     response_model=RevisionTaskResponse,
     summary="调整任务计划",
     description="""
-    调整任���复习计划，支持：
+    调整任务复习计划，支持：
     - 修改计划日期
     - 调整优先级
     - 添加调整说明
@@ -341,7 +320,7 @@ async def get_daily_summary(
             }
         },
         500: {
-            "description": "检查复习计划失败",
+            "description": "检查复习计划���败",
             "content": {
                 "application/json": {
                     "example": {"detail": "检查复习计划失败: 具体错误信息"}

@@ -106,23 +106,170 @@ function handleReminderTimeChange(value: string) {
   height: 100%;
   display: flex;
   flex-direction: column;
+  background: var(--van-background-2);
   
   .settings-content {
     flex: 1;
-    padding: 16px;
+    padding: 20px;
     overflow-y: auto;
+    
+    :deep {
+      .van-cell-group {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        
+        .van-cell {
+          align-items: center;
+          padding: 16px;
+          font-size: 15px;
+          
+          &::after {
+            border-color: var(--van-border-color);
+          }
+          
+          &__title {
+            color: var(--van-text-color);
+            font-weight: 500;
+          }
+          
+          .van-switch {
+            &__node {
+              background: var(--van-background);
+            }
+          }
+        }
+        
+        // TimePickerField 相关样式
+        .time-picker-field {
+          .van-field {
+            padding: 16px;
+            
+            &__value {
+              color: var(--van-primary-color);
+              font-size: 16px;
+              font-weight: 500;
+            }
+          }
+          
+          .van-popup {
+            border-radius: 16px;
+            overflow: hidden;
+          }
+          
+          .van-picker {
+            &-toolbar {
+              border-bottom: 1px solid var(--van-border-color);
+            }
+            
+            &__title {
+              font-weight: 500;
+            }
+            
+            &__confirm {
+              color: var(--van-primary-color);
+            }
+            
+            &-column {
+              &__item {
+                color: var(--van-text-color);
+                
+                &--selected {
+                  color: var(--van-primary-color);
+                  font-weight: 500;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
   
   .settings-tips {
-    margin-top: 12px;
-    padding: 0 12px;
+    margin-top: 16px;
+    padding: 0 16px;
     font-size: 14px;
-    color: var(--van-text-color-2);
+    color: var(--van-text-color-3);
+    line-height: 1.6;
   }
   
   .settings-actions {
-    padding: 16px;
+    padding: 20px;
     background: var(--van-background-2);
+    border-top: 1px solid var(--van-border-color);
+    
+    :deep {
+      .van-button {
+        height: 44px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// 暗黑主题特定样式
+:root[data-theme="dark"] {
+  .notification-settings {
+    .settings-content {
+      :deep {
+        .van-cell-group {
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+          
+          .van-cell {
+            background: var(--van-background);
+          }
+        }
+        
+        .time-picker-field {
+          .van-popup {
+            background: var(--van-background);
+            
+            .van-picker {
+              background: var(--van-background);
+              
+              &-toolbar {
+                background: var(--van-background);
+                
+                .van-picker__title {
+                  color: var(--van-text-color);
+                }
+                
+                .van-picker__cancel,
+                .van-picker__confirm {
+                  color: var(--van-text-color-2);
+                  
+                  &:active {
+                    opacity: 0.8;
+                  }
+                }
+                
+                .van-picker__confirm {
+                  color: var(--van-primary-color);
+                }
+              }
+              
+              &-column {
+                &__item {
+                  color: var(--van-text-color-2);
+                  
+                  &--selected {
+                    color: var(--van-text-color);
+                    font-weight: 500;
+                  }
+                }
+              }
+            }
+          }
+          
+          .van-overlay {
+            background-color: rgba(0, 0, 0, 0.9);
+          }
+        }
+      }
+    }
   }
 }
 </style> 

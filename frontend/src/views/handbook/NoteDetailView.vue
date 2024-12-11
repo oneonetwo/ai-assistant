@@ -180,21 +180,24 @@ function toggleAudioPlay(fileInfo: FileInfo) {
     isPlaying.value = true
   }
 }
-
+function isImage(fileType: string) {
+  return /image|jpg|jpeg|png|gif|bmp|tiff|ico|webp/.test(fileType)
+}
 // 图片预览方法
 function previewImage(imagePath: string, index: number) {
   // 收集所有图片URL
-  previewImages.value = note.value?.attachments
-    ?.filter(att => attachmentDetails.value[att.file_id]?.file_type?.startsWith('image/'))
+  const images = note.value?.attachments
+    ?.filter(att => isImage(attachmentDetails.value[att.file_id]?.file_type))
     ?.map(att => attachmentDetails.value[att.file_id].file_path) || []
   
-  currentImageIndex.value = index
-  
-  // 使用 showImagePreview
+  // 使用 ImagePreview
   ImagePreview({
-    images: previewImages.value,
-    startPosition: currentImageIndex.value,
+    images,
+    startPosition: index,
     closeable: true,
+    showIndex: true,
+    closeIconPosition: 'top-right',
+    swipeDuration: 300,
   })
 }
 
@@ -282,7 +285,7 @@ function getNextColor(): number {
             class="attachment-item"
           >
             <template v-if="attachmentDetails[attachment.file_id]">
-              <template v-if="attachmentDetails[attachment.file_id].file_type.startsWith('image/')">
+              <template v-if="isImage(attachmentDetails[attachment.file_id].file_type)">
                 <div 
                   class="image-preview" 
                   @click="previewImage(attachmentDetails[attachment.file_id].file_path, index)"
@@ -511,8 +514,8 @@ function getNextColor(): number {
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
           img {
-            width: 100%;
-            height: 200px;
+            max-width: 120px;
+            max-height: 120px;
             object-fit: cover;
             transition: transform 0.3s;
           }

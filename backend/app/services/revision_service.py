@@ -229,38 +229,66 @@ class RevisionService:
 
     @staticmethod
     async def get_daily_tasks(
-        db: AsyncSession, 
-        date: date,
-        status: Optional[str] = None
-    ) -> List[RevisionTask]:
-        """获取指定日期的复习任务
-        
-        Args:
-            db: 数据库会话
-            date: 指定日期
-            status: 任务状态筛选
-        """
+        db: AsyncSession,
+        task_status: Optional[str] = None,
+        target_date: Optional[datetime] = None
+    ) -> List[RevisionTaskResponse]:
+        """获取每日任务列表"""
         try:
-            # 构建基础查询
-            query = select(RevisionTask).filter(
-                func.date(RevisionTask.scheduled_date) == date
+            # 如果没有指定日期，使用当前日期
+            current_date = target_date or datetime.now()
+            start_of_day = datetime.combine(current_date.date(), datetime.min.time())
+            end_of_day = datetime.combine(current_date.date(), datetime.max.time())
+
+            # 构建查询
+            query = (
+                select(RevisionTask)
+                .options(
+                    joinedload(RevisionTask.note),
+                    joinedload(RevisionTask.plan)
+                )
+                .where(
+                    and_(
+                        RevisionTask.scheduled_date >= start_of_day,
+                        RevisionTask.scheduled_date <= end_of_day
+                    )
+                )
             )
-            
-            # 添加状态筛选
-            if status:
-                query = query.filter(RevisionTask.status == status)
-            
-            # 预加载笔记关系
-            query = query.options(
-                selectinload(RevisionTask.note)
-            )
-            
+
+            # 添加状态过滤
+            if task_status:
+                query = query.where(RevisionTask.status == task_status)
+
             # 执行查询
             result = await db.execute(query)
-            tasks = result.scalars().all()
+            tasks = result.unique().scalars().all()
+
+            # 确保每个任务都有默认值
+            for task in tasks:
+                # 设置默认优先级
+                if task.priority is None:
+                    task.priority = 0
+                
+                # 设置其他可能为空的字段的默认值
+                if task.status is None:
+                    task.status = "pending"
+                if task.mastery_level is None:
+                    task.mastery_level = "not_mastered"
+                if task.revision_mode is None:
+                    task.revision_mode = "normal"
+
+                # 如果有关联的笔记，确保笔记的字段也有默认值
+                if task.note:
+                    if task.note.status is None:
+                        task.note.status = "active"
+                    if task.note.priority is None:
+                        task.note.priority = "normal"
+
+            # 按优先级和计划时间排序
+            tasks = sorted(tasks, key=lambda x: (-x.priority, x.scheduled_date))
             
-            return list(tasks)
-            
+            return tasks
+
         except Exception as e:
             app_logger.error(f"获取每日任务失败: {str(e)}")
             raise HTTPException(
@@ -274,7 +302,7 @@ class RevisionService:
         plan_id: int,
         mode: str = "normal"
     ) -> Optional[RevisionTask]:
-        """获取下一个待复习任务"""
+        """获���下一个待复习任务"""
         try:
             app_logger.info(f"获取下一个待复习任务: plan_id={plan_id}, mode={mode}")
             
