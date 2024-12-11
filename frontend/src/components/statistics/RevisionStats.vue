@@ -11,6 +11,7 @@ const { revisionStats, isLoading } = storeToRefs(statisticsStore)
 
 const trendChartRef = ref<HTMLElement>()
 const completionChartRef = ref<HTMLElement>()
+const categoryChartRef = ref<HTMLElement>()
 
 // 初始化图表
 function initCharts() {
@@ -21,9 +22,7 @@ function initCharts() {
   const trendOption: EChartsOption = {
     tooltip: {
       trigger: 'axis',
-      axisPointer: {
-        type: 'shadow'
-      }
+      axisPointer: { type: 'shadow' }
     },
     legend: {
       data: ['计划复习', '实际完成']
@@ -31,9 +30,7 @@ function initCharts() {
     xAxis: {
       type: 'category',
       data: revisionStats.value.trend.map(item => item.date),
-      axisLabel: {
-        rotate: 45
-      }
+      axisLabel: { rotate: 45 }
     },
     yAxis: {
       type: 'value',
@@ -64,32 +61,20 @@ function initCharts() {
       type: 'gauge',
       startAngle: 90,
       endAngle: -270,
-      pointer: {
-        show: false
-      },
+      pointer: { show: false },
       progress: {
         show: true,
         overlap: false,
         roundCap: true,
         clip: false,
-        itemStyle: {
-          color: '#42b883'
-        }
+        itemStyle: { color: '#42b883' }
       },
       axisLine: {
-        lineStyle: {
-          width: 20
-        }
+        lineStyle: { width: 20 }
       },
-      splitLine: {
-        show: false
-      },
-      axisTick: {
-        show: false
-      },
-      axisLabel: {
-        show: false
-      },
+      splitLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: { show: false },
       detail: {
         valueAnimation: true,
         formatter: '{value}%',
@@ -103,6 +88,41 @@ function initCharts() {
     }]
   }
   completionChart.setOption(completionOption)
+
+  // 分类统计图
+  const categoryChart = echarts.init(categoryChartRef.value!)
+  const categoryOption: EChartsOption = {
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' }
+    },
+    legend: {
+      data: ['计划复习', '已完成']
+    },
+    xAxis: {
+      type: 'value',
+      name: '知识点数量'
+    },
+    yAxis: {
+      type: 'category',
+      data: revisionStats.value.categories.map(item => item.name)
+    },
+    series: [
+      {
+        name: '计划复习',
+        type: 'bar',
+        data: revisionStats.value.categories.map(item => item.planned),
+        itemStyle: { color: '#4f46e5' }
+      },
+      {
+        name: '已完成',
+        type: 'bar',
+        data: revisionStats.value.categories.map(item => item.completed),
+        itemStyle: { color: '#42b883' }
+      }
+    ]
+  }
+  categoryChart.setOption(categoryOption)
 }
 
 onMounted(async () => {
@@ -159,6 +179,11 @@ onMounted(async () => {
         <div class="chart-title">计划完成率</div>
         <div ref="completionChartRef" class="chart" />
       </div>
+
+      <div class="chart-container">
+        <div class="chart-title">分类统计</div>
+        <div ref="categoryChartRef" class="chart" />
+      </div>
     </div>
 
     <div class="revision-list" v-if="revisionStats?.upcoming.length">
@@ -182,5 +207,64 @@ onMounted(async () => {
   </div>
 </template>
 
-<style>
+<style lang="scss" scoped>
+.revision-stats {
+  .stats-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--van-padding-sm);
+    margin-bottom: var(--van-padding-lg);
+    
+    :deep {
+      .van-card{
+      background: var(--van-background-2);
+      border-radius: var(--van-radius-md);
+      
+      &__title {
+        font-size: 14px;
+        color: var(--van-text-color-2);
+      }
+      
+      .highlight {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--van-primary-color);
+      }
+    }}
+  }
+  
+  .charts {
+    .chart-container {
+      margin-bottom: var(--van-padding-lg);
+      
+      .chart-title {
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: var(--van-padding-sm);
+        color: var(--van-text-color);
+      }
+      
+      .chart {
+        height: 300px;
+        background: var(--van-background-2);
+        border-radius: var(--van-radius-md);
+        padding: var(--van-padding-sm);
+      }
+    }
+  }
+  
+  .revision-list {
+    .list-title {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: var(--van-padding-sm);
+      color: var(--van-text-color);
+    }
+    
+    .due-date {
+      font-size: 14px;
+      color: var(--van-danger-color);
+    }
+  }
+}
 </style>
