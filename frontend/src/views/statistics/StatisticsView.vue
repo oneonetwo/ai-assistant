@@ -127,36 +127,128 @@ onUnmounted(() => {
 .statistics-view {
   min-height: 100vh;
   padding-bottom: var(--van-tabbar-height);
-  background-color: var(--van-background);
+  background: linear-gradient(135deg, var(--van-background) 0%, rgba(var(--van-primary-color), 0.05) 100%);
   
   .statistics-content {
     padding: var(--van-padding-md);
-    padding-top: 56px; // 为固定头部预留空间
+    padding-top: 60px;
     
     .stats-section {
       margin-bottom: var(--van-padding-xl);
-      scroll-margin-top: 60px; // 为固定导航栏预留空间
-      background-color: var(--van-background-2);
+      scroll-margin-top: 60px;
+      background: linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.05) 100%
+      );
       border-radius: var(--van-radius-lg);
-      padding: var(--van-padding-md);
+      padding: var(--van-padding-lg);
+      box-shadow: 
+        20px 20px 60px rgba(0, 0, 0, 0.1),
+        -20px -20px 60px rgba(255, 255, 255, 0.1),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      transform: perspective(1000px) translateZ(0);
+      transform-style: preserve-3d;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: inherit;
+        background: linear-gradient(
+          45deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.1) 100%
+        );
+        z-index: -1;
+        transition: opacity 0.3s ease;
+        opacity: 0;
+      }
+      
+      &:hover {
+        transform: perspective(1000px) translateZ(20px) rotateX(2deg) rotateY(2deg);
+        box-shadow: 
+          30px 30px 80px rgba(0, 0, 0, 0.15),
+          -30px -30px 80px rgba(255, 255, 255, 0.15),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+          
+        &::before {
+          opacity: 1;
+        }
+      }
       
       h2 {
-        font-size: 18px;
-        font-weight: 500;
-        margin-bottom: var(--van-padding-md);
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: var(--van-padding-lg);
         color: var(--van-text-color);
+        padding-bottom: var(--van-padding-xs);
+        position: relative;
+        display: inline-block;
+        text-shadow: 0 0 10px rgba(var(--van-primary-color), 0.3);
+        
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 2px;
+          background: linear-gradient(
+            90deg,
+            var(--van-primary-color) 0%,
+            transparent 100%
+          );
+          box-shadow: 0 0 10px rgba(var(--van-primary-color), 0.5);
+        }
       }
     }
   }
   
-  :deep(.van-tabbar) {
-    border-top: 1px solid var(--van-border-color);
-    
-    .van-tabbar-item {
-      color: var(--van-text-color);
+  :deep {
+    .van-tabbar {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      background: linear-gradient(
+        180deg,
+        rgba(var(--van-background-2), 0.8) 0%,
+        rgba(var(--van-background-2), 0.95) 100%
+      );
+      box-shadow: 
+        0 -10px 20px rgba(0, 0, 0, 0.1),
+        0 -4px 6px rgba(0, 0, 0, 0.05);
       
-      &--active {
-        color: var(--van-primary-color);
+      .van-tabbar-item {
+        color: var(--van-gray-6);
+        font-size: 12px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        
+        &__icon {
+          font-size: 20px;
+          margin-bottom: 4px;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.2));
+        }
+        
+        &--active {
+          color: var(--van-primary-color);
+          font-weight: 500;
+          text-shadow: 0 0 10px rgba(var(--van-primary-color), 0.3);
+          
+          .van-tabbar-item__icon {
+            transform: translateY(-2px) scale(1.1);
+            filter: drop-shadow(0 0 4px rgba(var(--van-primary-color), 0.5));
+          }
+        }
+        
+        &:active {
+          transform: scale(0.95);
+        }
       }
     }
   }
