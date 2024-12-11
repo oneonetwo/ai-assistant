@@ -5,6 +5,7 @@ import { useRevisionStore } from '@/stores/revision'
 import { useHandbookStore } from '@/stores/handbook'
 import { showToast } from 'vant'
 import type { RevisionPlan } from '@/types/revision'
+import type { Note } from '@/types/handbook'
 
 const router = useRouter()
 const revisionStore = useRevisionStore()
@@ -55,20 +56,45 @@ function getColorByTagId(id: number): number {
   return (id % 5) + 1
 }
 
-// 加载手册数据
+// 在现有的 imports 中添加
+import type { Note } from '@/types/handbook'
+
+// 在 setup 中添加
+const notes = ref<Note[]>([])
+
+// 在 onMounted 中添加获取笔记的逻辑
 onMounted(async () => {
   try {
     await handbookStore.fetchHandbooks()
     await handbookStore.fetchCategories()
     await handbookStore.fetchTags()
     
-    // Set initial values
+    // 设置初始值
     formData.value.category_id = -1
     formData.value.handbook_ids = handbookStore.handbooks.map(h => h.id)
-    formData.value.tag_ids = [] // 默认不选中任何标签
+    formData.value.tag_ids = []
+    
+    // 获取所有笔记
+    await handbookStore.fetchNotes()
+    notes.value = handbookStore.notes
   } catch (error) {
     showToast('加载数据失败')
   }
+})
+
+// 添加计算属性来过滤笔记
+const filteredNotes = computed(() => {
+  if (!notes.value) return []
+  return notes.value.filter(note => {
+    const matchHandbook = formData.value.handbook_ids.includes(note.handbook_id)
+    const matchStatus = formData.value.note_statuses.length === 0 || 
+      formData.value.note_statuses.includes(note.status)
+    const matchTags = formData.value.tag_ids.length === 0 ||
+      formData.value.tag_ids.some(tagId => 
+        note.tags.some(t => t.id === tagId)
+      )
+    return matchHandbook && matchStatus && matchTags
+  })
 })
 
 // 提交表单
@@ -82,7 +108,11 @@ async function handleSubmit() {
       showToast('请选择至少一个手册')
       return
     }
-
+    // 添加笔记验证
+    if (filteredNotes.value.length === 0) {
+      showToast('当前筛选条件下没有可用的笔记，请调整筛选条件')
+      return
+    }
     await revisionStore.createPlan(formData.value)
     showToast('创建成功')
     router.push({ name: 'revision-plans' })
@@ -90,6 +120,9 @@ async function handleSubmit() {
     showToast('创建失败')
   }
 }
+
+// 在 script setup 中添加
+const isNotesExpanded = ref(false)
 </script>
 
 <template>
@@ -208,6 +241,39 @@ async function handleSubmit() {
                   {{ option.text }}
                 </van-checkbox>
               </van-checkbox-group>
+            </template>
+          </van-field>
+
+          <van-field name="notes" label="包含的笔记">
+            <template #input>
+              <div class="notes-preview">
+                <div class="notes-header" @click="isNotesExpanded = !isNotesExpanded">
+                  <span class="notes-count">共 {{ filteredNotes.length }} 个笔记</span>
+                  <span v-if="filteredNotes.length === 0" class="error-text">
+                    (请调整筛选条件)
+                  </span>
+                  <van-icon 
+                    :name="isNotesExpanded ? 'arrow-up' : 'arrow-down'" 
+                    class="expand-icon"
+                  />
+                </div>
+                <collapse-transition>
+                  <van-cell-group 
+                    inset 
+                    v-show="isNotesExpanded"
+                    class="notes-list"
+                  >
+                    <template v-if="filteredNotes.length">
+                      <van-cell
+                        v-for="note in filteredNotes"
+                        :key="note.id"
+                        :title="note.title"
+                      />
+                    </template>
+                    <van-empty v-else description="暂无符合条件的笔记" />
+                  </van-cell-group>
+                </collapse-transition>
+              </div>
             </template>
           </van-field>
         </van-cell-group>
@@ -345,7 +411,7 @@ async function handleSubmit() {
         margin: 0 !important;
         padding: 0 !important;
 
-        // 隐藏默认的复选框图标
+        // ��藏默认的复选框图标
         .van-checkbox__icon {
           display: none;
         }
@@ -414,8 +480,94 @@ async function handleSubmit() {
       }
     }
   }
-}
 
+  .notes-preview {
+    padding: 8px 0;
+
+    .notes-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--van-background-2);
+      border-radius: var(--van-radius-md);
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-bottom: 8px;
+      
+      &:active {
+        background: var(--van-active-color);
+      }
+
+      .notes-count {
+        font-size: 14px;
+        color: var(--van-text-color);
+        font-weight: 500;
+      }
+
+      .expand-icon {
+        color: var(--van-gray-6);
+        transition: transform 0.3s;
+      }
+    }
+
+    .notes-list {
+      margin-top: 8px;
+      max-height: 300px;
+      overflow-y: auto;
+      background: var(--van-background-2);
+      border-radius: var(--van-radius-md);
+      
+      :deep {
+        .van-cell {
+          background: transparent;
+          
+          &:not(:last-child) {
+            &::after {
+              border-bottom: 0.5px solid var(--van-border-color);
+            }
+          }
+          
+          .van-cell__title {
+            font-size: 14px;
+            color: var(--van-text-color);
+            
+            span {
+              display: inline-block;
+              max-width: 100%;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+          }
+        }
+
+        .van-empty {
+          padding: 32px 0;
+          background: transparent;
+        }
+      }
+
+      &::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: var(--van-gray-5);
+        border-radius: 2px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background-color: transparent;
+      }
+    }
+  }
+}
+.error-text {
+  color: var(--van-danger-color);
+  font-size: 12px;
+  margin-left: 4px;
+}
 // 暗色主题适配
 :root[data-theme='dark'] {
   .plan-editor {
@@ -428,6 +580,14 @@ async function handleSubmit() {
         &:not(.is-selected) {
           color: #ffffff !important;
         }
+      }
+    }
+  }
+
+  .notes-preview {
+    .notes-header {
+      &:active {
+        background: var(--van-active-color);
       }
     }
   }
