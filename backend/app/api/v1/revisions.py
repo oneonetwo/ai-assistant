@@ -184,8 +184,8 @@ async def get_daily_tasks(
     try:
         tasks = await RevisionService.get_daily_tasks(
             db=db,
-            task_status=status,
-            target_date=date
+            date=date or datetime.now().date(),
+            status=status  # 修改这里的参数名
         )
         return tasks
     except Exception as e:

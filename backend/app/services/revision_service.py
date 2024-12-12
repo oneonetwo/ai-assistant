@@ -221,37 +221,39 @@ class RevisionService:
 
     @staticmethod
     async def get_daily_tasks(
-        db: AsyncSession, 
-        date: date,
+        db: AsyncSession,
+        date: datetime,
         status: Optional[str] = None
     ) -> List[RevisionTask]:
-        """获取指定日期的复习任务
-        
-        Args:
-            db: 数据库会话
-            date: 指定日期
-            status: 任务状态筛选
-        """
+        """获取每日任务列表"""
         try:
-            # 构建基础查询
-            query = select(RevisionTask).filter(
-                func.date(RevisionTask.scheduled_date) == date
+            # ��建基础查询
+            query = (
+                select(RevisionTask)
+                .options(joinedload(RevisionTask.note))  # 预加载笔记信息
+                .where(
+                    func.date(RevisionTask.scheduled_date) == date
+                )
             )
             
             # 添加状态筛选
             if status:
-                query = query.filter(RevisionTask.status == status)
-            
-            # 预加载笔记关系
-            query = query.options(
-                selectinload(RevisionTask.note)
-            )
+                query = query.where(RevisionTask.status == status)
             
             # 执行查询
             result = await db.execute(query)
-            tasks = result.scalars().all()
+            tasks = result.unique().scalars().all()
             
-            return list(tasks)
+            # 确保每个任务都有默认值
+            for task in tasks:
+                if task.mastery_level is None:
+                    task.mastery_level = "not_mastered"  # 设置默认值
+                if task.status is None:
+                    task.status = "pending"
+                if task.revision_mode is None:
+                    task.revision_mode = "normal"
+            
+            return tasks
             
         except Exception as e:
             app_logger.error(f"获取每日任务失败: {str(e)}")
@@ -409,7 +411,7 @@ class RevisionService:
             await db.rollback()
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"批量更新任务��败: {str(e)}"
+                detail=f"批量更新任务失败: {str(e)}"
             )
 
     @staticmethod
