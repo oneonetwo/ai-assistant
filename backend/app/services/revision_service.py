@@ -76,6 +76,7 @@ class RevisionService:
         query = select(RevisionPlan)
         if status:
             query = query.where(RevisionPlan.status == status)
+        query = query.order_by(desc(RevisionPlan.created_at))
         result = await db.execute(query)
         return result.scalars().all()
 
@@ -227,7 +228,7 @@ class RevisionService:
     ) -> List[RevisionTask]:
         """获取每日任务列表"""
         try:
-            # ��建基础查询
+            # 建基础查询
             query = (
                 select(RevisionTask)
                 .options(joinedload(RevisionTask.note))  # 预加载笔记信息

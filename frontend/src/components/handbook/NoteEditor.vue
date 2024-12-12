@@ -224,7 +224,7 @@ async function handleSave() {
     }
 
     showToast('保存成功')
-    router.back()
+    router.push(`/handbooks/${handbookId}`)
   } catch (error) {
     console.error(error)
     showToast('保存失败')

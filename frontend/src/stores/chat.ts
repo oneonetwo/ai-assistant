@@ -504,6 +504,7 @@ export const useChatStore = defineStore('chat', () => {
             onEnd: () => {
               assistantMessage.status = 'success'
               conversation.lastTime = new Date().toISOString()
+              options.onEnd?.()
             },
             onError: (error) => {
               assistantMessage.status = 'error'

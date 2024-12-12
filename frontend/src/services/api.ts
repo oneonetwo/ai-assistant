@@ -341,11 +341,13 @@ export class ChatAPI {
               break
               
             case 'end':
+              console.log('end>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', response.data.message)
               callbacks.onEnd?.(fullText)
               eventSource.close()
               break
               
             case 'error':
+              console.log('error>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', response.data.message)
               throw new Error(response.data.message)
           }
         } catch (error) {

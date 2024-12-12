@@ -210,7 +210,9 @@ function handleOnEnd() {
     // 更新会话列表
   chatStore.updateConversationList()
 }
-
+function handleVoiceInput(input: string) {
+  console.log('handleVoiceInput>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', input)
+}
 // 文件预览
 function getFilePreview(file: File) {
   if (FILE_TYPES.IMAGE.includes(file.type)) {
@@ -228,7 +230,6 @@ function getFilePreview(file: File) {
       accept=".txt,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.epub,.md,.markdown,text/markdown,text/x-markdown,image/*,.mp3,.wav,.ogg,.m4a,.aac"
       :max-size="30 * 1024 * 1024"
       :max-count="1"
-      :before-read="beforeUpload"
       :after-read="handleFileUpload"
       >
       <van-button size="small" icon="photograph">
