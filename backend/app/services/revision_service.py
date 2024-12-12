@@ -40,32 +40,80 @@ class RevisionService:
 
     @staticmethod
     async def _generate_tasks(db: AsyncSession, plan: RevisionPlan):
-        # 查询符合条件的笔记
-        query = select(Note)
-        
-        if plan.handbook_ids:
-            query = query.filter(Note.handbook_id.in_(plan.handbook_ids))
+        """根据复习计划的条件生成复习任务"""
+        try:
+            # 构建基础查询
+            query = select(Note)
+            conditions = []
+
+            # 添加手册ID筛选
+            if plan.handbook_ids:
+                conditions.append(Note.handbook_id.in_(plan.handbook_ids))
             
-        # ... 其他筛选条件
-        
-        result = await db.execute(query)
-        notes = result.scalars().all()
-        
-        # 生成复习时间点
-        revision_points = [1, 2, 4, 7, 15, 30]  # 艾宾浩斯遗忘曲线
-        
-        for note in notes:
-            for days in revision_points:
-                scheduled_date = plan.start_date + timedelta(days=days)
-                if scheduled_date <= plan.end_date:
-                    task = RevisionTask(
-                        plan_id=plan.id,
-                        note_id=note.id,
-                        scheduled_date=scheduled_date
-                    )
-                    db.add(task)
-        
-        await db.commit() 
+            # 添加分类ID筛选
+            if plan.category_ids:
+                conditions.append(Note.category_id.in_(plan.category_ids))
+            
+            # 添加标签ID筛选
+            if plan.tag_ids:
+                # 使用任意一个标签匹配的方式
+                conditions.append(Note.tag_ids.overlap(plan.tag_ids))
+            
+            # 添加笔记状态筛选
+            if plan.note_statuses:
+                conditions.append(Note.status.in_(plan.note_statuses))
+            
+            # 只选择激活状态的笔记
+            conditions.append(Note.status != 'deleted')
+            
+            # 组合所有条件
+            if conditions:
+                query = query.where(and_(*conditions))
+            
+            # 按创建时间排序
+            query = query.order_by(Note.created_at)
+            
+            # 执行查询
+            result = await db.execute(query)
+            notes = result.scalars().all()
+            
+            # 生成复习时间点（基于艾宾浩斯遗忘曲线）
+            revision_points = [1, 2, 4, 7, 15, 30]  # 天数间隔
+            tasks_to_create = []
+            
+            for note in notes:
+                base_date = plan.start_date
+                
+                for days in revision_points:
+                    scheduled_date = base_date + timedelta(days=days)
+                    
+                    # 确保复习日期在计划结束日期之前
+                    if scheduled_date <= plan.end_date:
+                        task = RevisionTask(
+                            plan_id=plan.id,
+                            note_id=note.id,
+                            scheduled_date=scheduled_date,
+                            status="pending",
+                            mastery_level="not_mastered",
+                            revision_mode="normal",
+                            priority=1  # 默认优先级
+                        )
+                        tasks_to_create.append(task)
+            
+            # 批量创建任务
+            if tasks_to_create:
+                db.add_all(tasks_to_create)
+                await db.commit()
+                
+            return len(tasks_to_create)  # 返回创建的任务数量
+
+        except Exception as e:
+            await db.rollback()
+            app_logger.error(f"生成复习任务失败: {str(e)}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"生成复习任务失败: {str(e)}"
+            )
 
     @staticmethod
     async def get_plans(
@@ -334,7 +382,7 @@ class RevisionService:
             return task
 
         except Exception as e:
-            app_logger.error(f"获取下一个任务失败: {str(e)}")
+            app_logger.error(f"获取���一个任务失败: {str(e)}")
             raise HTTPException(
                 status_code=500,
                 detail=f"获取下一个任务失败: {str(e)}"

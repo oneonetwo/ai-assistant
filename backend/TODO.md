@@ -1,3 +1,11 @@
+<!--
+ * @Author: yangjingyuan yangjingyuan@pwrd.com
+ * @Date: 2024-12-11 09:41:04
+ * @LastEditors: yangjingyuan yangjingyuan@pwrd.com
+ * @LastEditTime: 2024-12-12 11:37:55
+ * @FilePath: \backend\TODO.md
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 1. 整理首页
 1. 整理分析收录笔记的时候，添加创建手册按钮
 2. 创建笔记可以上传附件，附件可以下载
@@ -22,8 +30,6 @@
 
 
 
-核心功能主要包含三大模块： 知识管理，学习计划，AI助手。
-1. 知识管理：用户可以管理手册，笔记，分类，标签，附件。
 
 
 
