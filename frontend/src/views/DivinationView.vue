@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useChatStore } from '@/stores/chat'
 import { showToast } from 'vant'
 import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
+import axios from 'axios'
 
 const md = new MarkdownIt({
   html: true,
@@ -27,7 +27,7 @@ const systemPromptMd = ref(
 2. 避免使用绝对性的语言，不做确定性预言，重点强调个人努力对命运的积极影响。
 3. 保护用户隐私，不主动要求敏感信息，仅根据用户提供的数据进行分析。
 4. 针对生辰八字，通过结合天干地支、五行、用神喜忌等详细推演命理。
-5. 如果用户切换到西方占星、塔罗牌等领域，你需自然过渡，保持专业水准。
+5. 如果用户切换到西方占星、塔罗牌等领域，你自然过渡，保持专业水准。
 
 ### **回答逻辑与核心内容**
 1. 从用户提供的出生信息推算四柱（年柱、月柱、日柱、时柱），分析命理结构，包括五行分布、强弱及平衡关系。
@@ -37,7 +37,7 @@ const systemPromptMd = ref(
 
 ### **回答风格与格式**
 - 所有回答应避免生硬的书面化结构，使用朋友般自然、亲切的语气，像聊天一样娓娓道来。
-- 不使用“分析”、“结论”、“建议”等标签性语言，而是以故事化、互动化的形式传递信息。
+- 不使用"分析"、"结论"、"建议"等标签性语言，而是以故事化、互动化的形式传递信息。
 - 即使内容涉及深奥理论，也应配以通俗易懂的解释，让用户感到亲切并易于接受。
 
 ### **补充说明**
@@ -45,6 +45,7 @@ const systemPromptMd = ref(
 
 ### **要求**
 1. 一定要严格按照 你的职责与分析原则 和  回答逻辑与核心内容 进行全面分析，不要遗漏任何信息。
+2. 对于用户的问题的回答，不少于1000字。 
 `
 )
 
@@ -57,10 +58,27 @@ const question = ref('我的事业怎么样？')
 const result = ref('')
 const isLoading = ref(false)
 
-const chatStore = useChatStore()
+// Add model options
+const modelOptions = [
+  { name: '通义千问', value: 'qwen' },
+  { name: '豆包', value: 'doubao' }
+]
+const selectedModel = ref('qwen')
+
+// Add collapse state
+const isPromptExpanded = ref(['prompt'])
 
 function renderMarkdown(content: string): string {
   return md.render(content)
+}
+
+async function callDivinationApi(birthday: string, question: string, systemPrompt: string) {
+  const response = await axios.post('/api/api/v1/chat-divination', {
+    message: `农历日期: ${birthday}\n问题: ${question}`,
+    model: selectedModel.value,
+    system_prompt: systemPrompt
+  })
+  return response.data
 }
 
 async function handleSubmit() {
@@ -71,14 +89,12 @@ async function handleSubmit() {
 
   isLoading.value = true
   try {
-    const response = await chatStore.sendMessageDivination({
-      systemPrompt: systemPromptMd.value,
-      content: `农历日期: ${birthday.value}\n问题: ${question.value}`,
-      conversationId: '9690fac4-2a04-4ece-87b2-90c7764c73b7',
-      onChunk: (message) => {
-        result.value = renderMarkdown(message)
-      }
-    })
+    const response = await callDivinationApi(
+      birthday.value, 
+      question.value, 
+      systemPromptMd.value
+    )
+    result.value = renderMarkdown(response.message)
   } catch (error) {
     showToast('请求失败,请重试')
   } finally {
@@ -92,12 +108,24 @@ async function handleSubmit() {
     <div class="divination-form">
       <van-form @submit="handleSubmit">
         <van-cell-group inset>
-          <van-cell>
-            <template #default>
+          <van-collapse v-model="isPromptExpanded">
+            <van-collapse-item title="系统设定" name="prompt">
               <div class="markdown-body prompt-content" v-html="systemPrompt" />
+            </van-collapse-item>
+          </van-collapse>
+          <van-field name="model" label="选择模型">
+            <template #input>
+              <van-radio-group v-model="selectedModel" direction="horizontal">
+                <van-radio 
+                  v-for="option in modelOptions" 
+                  :key="option.value" 
+                  :name="option.value"
+                >
+                  {{ option.name }}
+                </van-radio>
+              </van-radio-group>
             </template>
-          </van-cell>
-          
+          </van-field>
           <van-field
             v-model="birthday"
             label="生日"
@@ -140,6 +168,7 @@ async function handleSubmit() {
 <style lang="scss" scoped>
 .divination {
   padding: var(--van-padding-md);
+  color: #fff;
   
   .divination-form {
     margin-bottom: var(--van-padding-lg);
@@ -167,6 +196,73 @@ async function handleSubmit() {
       background: var(--van-background-2);
       border-radius: var(--van-radius-md);
       text-align: left;
+      p {
+        margin: var(--van-padding-xs) 0;
+        line-height: 1.6;
+      }
+
+      h1, h2, h3, h4, h5, h6 {
+        margin: var(--van-padding-sm) 0;
+        font-weight: bold;
+      }
+
+      ul, ol {
+        padding-left: var(--van-padding-lg);
+        margin: var(--van-padding-xs) 0;
+      }
+
+      li {
+        margin: var(--van-padding-xs) 0;
+      }
+
+      code {
+        background: var(--van-background);
+        padding: 2px 4px;
+        border-radius: var(--van-radius-sm);
+      }
+
+      pre {
+        background: var(--van-background);
+        padding: var(--van-padding-sm);
+        border-radius: var(--van-radius-md);
+        overflow-x: auto;
+      }
+
+      blockquote {
+        border-left: 4px solid var(--van-gray-3);
+        padding-left: var(--van-padding-sm);
+        margin: var(--van-padding-xs) 0;
+        color: var(--van-gray-6);
+      }
+    }
+
+    .van-radio-group {
+      display: flex;
+      gap: var(--van-padding-sm);
+      padding: var(--van-padding-xs) 0;
+    }
+
+    .van-radio {
+      margin-right: var(--van-padding-sm);
+    }
+
+    .van-collapse-item {
+      &__title {
+        font-size: var(--van-font-size-md);
+        font-weight: bold;
+      }
+
+      &__content {
+        padding: var(--van-padding-sm);
+      }
+    }
+
+    .prompt-content {
+      padding: 0;
+      background: transparent;
+      border-radius: 0;
+      text-align: left;
+      
       p {
         margin: var(--van-padding-xs) 0;
         line-height: 1.6;
