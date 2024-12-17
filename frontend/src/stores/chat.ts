@@ -283,7 +283,7 @@ export const useChatStore = defineStore('chat', () => {
       // 乐观更新
       conversation.name = name
       
-      // 调用重命名API
+      // 调��重命名API
       await ConversationAPI.updateConversation(id, name)
       
       showToast({
@@ -534,7 +534,7 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
-  // 添加文件上传进度更新方法
+  // 添加文���上传进度更新方法
   function updateFileProgress(messageId: string, progress: number) {
     const fileUpload = uploadingFiles.value.get(messageId)
     if (fileUpload) {
@@ -638,7 +638,7 @@ export const useChatStore = defineStore('chat', () => {
       
       conversation.messages.push(assistantMessage)
 
-      // 调用音频聊天 API
+      // ��用音频聊天 API
       const response = await ChatAPI.audioChat(
         currentConversationId.value,
         content,
@@ -666,6 +666,72 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
+  // 添加占卜专用函数
+  async function sendMessageDivination(options: {
+    systemPrompt: string
+    content: string
+    conversationId: string,
+    onChunk?: (message: string) => void
+  }) {
+    const { systemPrompt, content, conversationId } = options
+    if (!conversationId) {
+      throw new Error('未指定会话ID')
+    }
+
+    const abortController = new AbortController()
+    const tempMessageId = Date.now().toString()
+
+    try {
+      // 创建聊天客户端
+      const chatClient = new ChatClient(conversationId)
+      
+      let fullResponse = ''
+
+      // 发送消息并处理流式响应
+      await chatClient.streamChat(content, {
+        signal: abortController.signal,
+        systemPrompt, // 传入系统提示词
+        onStart: () => {
+
+        },
+        onChunk: (chunk: string) => {
+          fullResponse += chunk
+          options.onChunk?.(fullResponse)
+        },
+        onEnd: () => {
+        },
+        onError: (error: Error) => {
+          throw error
+        }
+      })
+
+      return {
+        content: fullResponse,
+        abort: () => abortController.abort()
+      }
+
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        console.log('请求已取消')
+        return
+      }
+
+      showToast({
+        type: 'fail',
+        message: error.message || '发送失败'
+      })
+      
+      // 更新消息状态
+      const failedMessage = conversation.messages.find(msg => msg.id === tempMessageId)
+      if (failedMessage) {
+        failedMessage.status = 'error'
+        failedMessage.error = error.message
+      }
+
+      throw error
+    }
+  }
+
   return {
     conversations,
     currentConversationId,
@@ -686,6 +752,7 @@ export const useChatStore = defineStore('chat', () => {
     updateFileProgress,
     cancelFileUpload,
     updateConversationList,
-    sendAudioMessage
+    sendAudioMessage,
+    sendMessageDivination
   }
 })

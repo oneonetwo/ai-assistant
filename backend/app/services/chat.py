@@ -26,15 +26,17 @@ import chardet
 async def process_chat(
     db: AsyncSession,
     session_id: str,
-    user_message: str
+    user_message: str,
+    system_prompt: Optional[str] = None
 ) -> Dict[str, str]:
     """处理普通聊天请求"""
     # 获取会话
     conversation = await get_conversation(db, session_id)
     if not conversation:
         raise NotFoundError(detail=f"会话 {session_id} 不存在")
-
+    
     try:
+        print(f"system_prompt>>>>>>>>: {system_prompt}")
         # 保存用户消息
         user_msg = MessageCreate(
             role="user",
@@ -50,11 +52,20 @@ async def process_chat(
             settings.MAX_CONTEXT_TURNS
         )
 
-        # 转换为AI客户端所需格式
-        messages = [
+              # 转换为AI客户端所需格式
+        messages = []
+        
+        # 添加系统提示（如果有）
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+            
+        # 添加上下文消息
+        messages.extend([
             {"role": msg.role, "content": msg.content}
             for msg in context_messages
-        ]
+        ])
+
+        # 添加当前用户消息
         messages.append({"role": "user", "content": user_message})
 
         # 生成AI回复
@@ -79,7 +90,8 @@ async def process_chat(
 async def initialize_stream_chat(
     db: AsyncSession,
     session_id: str,
-    user_message: str
+    user_message: str,
+    system_prompt: Optional[str] = None
 ) -> None:
     """初始化流式聊天"""
     conversation = await get_conversation(db, session_id)
@@ -99,14 +111,21 @@ async def initialize_stream_chat(
         )
 
         # 转换为AI客户端所需格式
-        messages = [
+        messages = []
+        
+        print(f"system_prompt>>>>>>>>: {system_prompt}")       
+        # 添加系统提示（如果有）
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+
+       # 添加上下文消息
+        messages.extend([
             {"role": msg.role, "content": msg.content}
             for msg in context_messages
-        ]
+        ])
         
         # 添加当前用户消息
         messages.append({"role": "user", "content": user_message})
-
         # 初始化流响应
         await ai_client.initialize_stream(session_id, messages)
 

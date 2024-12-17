@@ -87,6 +87,7 @@ export class ChatClient {
   async streamChat(
     message: string,
     callbacks: {
+      systemPrompt?: string
       onStart?: () => void
       onChunk?: (chunk: string, fullText: string) => void
       onEnd?: (fullText: string) => void
@@ -98,7 +99,8 @@ export class ChatClient {
     try {
       // 首先发送 POST ��求初始化流
       await request.post(`${this.baseUrl}/${this.sessionId}/stream`, {
-        message
+        message,
+        system_prompt: callbacks.systemPrompt
       })
 
       // 然后建立 SSE 连接

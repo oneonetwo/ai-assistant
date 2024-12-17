@@ -70,7 +70,8 @@ async def chat(
         response = await chat_service.process_chat(
             db,
             session_id,
-            request.message
+            request.message,
+            system_prompt=request.system_prompt  # 添加system_prompt参数
         )
         return ChatResponse(**response)
         
@@ -111,8 +112,13 @@ async def init_stream_chat(
         if ai_client.is_session_initialized(session_id):
             await ai_client.cleanup_stream(session_id)
 
-        # 初始化新的流式聊天
-        await chat_service.initialize_stream_chat(db, session_id, request.message)
+        # 初始化新的流式聊天，传入system_prompt
+        await chat_service.initialize_stream_chat(
+            db=db, 
+            session_id=session_id, 
+            user_message=request.message,
+            system_prompt=request.system_prompt  # 添加system_prompt参数
+        )
         return {"status": "initialized"}
         
     except NotFoundError as e:

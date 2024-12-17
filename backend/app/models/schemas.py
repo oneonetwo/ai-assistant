@@ -83,7 +83,8 @@ class ConversationUpdate(BaseModel):
     name: str = Field(..., description="新的会话名称", max_length=100)
 
 class ChatRequest(BaseModel):
-    message: str = Field(..., description="用户消息")
+    message: str
+    system_prompt: Optional[str] = None
 
 class ChatResponse(BaseModel):
     session_id: str = Field(..., description="会话ID")

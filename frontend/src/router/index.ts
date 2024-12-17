@@ -209,6 +209,14 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
   {
+    path: '/divination',
+    name: 'divination',
+    component: () => import('@/views/DivinationView.vue'),
+    meta: {
+      title: '智能占卜'
+    }
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: () => import('@/views/NotFoundView.vue'),
