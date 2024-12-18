@@ -83,7 +83,8 @@ class ConversationUpdate(BaseModel):
     name: str = Field(..., description="新的会话名称", max_length=100)
 
 class ChatRequest(BaseModel):
-    message: str = Field(..., description="用户消息")
+    message: str
+    system_prompt: Optional[str] = None
 
 class ChatResponse(BaseModel):
     session_id: str = Field(..., description="会话ID")
@@ -160,3 +161,70 @@ class DocumentAnalysisRequest(BaseModel):
     query: Optional[str] = None
     system_prompt: Optional[str] = None
     session_id: str
+
+class CategoryBase(BaseModel):
+    name: str = Field(..., description="分类名称")
+
+class CategoryCreate(CategoryBase):
+    pass
+
+class CategoryResponse(CategoryBase):
+    id: int
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+class HandbookBase(BaseModel):
+    title: str = Field(..., description="手册标题")
+    content: str = Field(..., description="手册内容")
+    category_id: int = Field(..., description="分类ID")
+
+class HandbookCreate(HandbookBase):
+    pass
+
+class HandbookResponse(HandbookBase):
+    id: int
+    created_at: datetime
+    category: Optional[CategoryResponse] = None
+    
+    class Config:
+        from_attributes = True
+
+class AudioChatRequest(BaseModel):
+    message: str
+    file: str
+    file_name: str
+    file_type: str
+    system_prompt: Optional[str] = None
+
+class AudioChatResponse(BaseModel):
+    session_id: str
+    response: str
+    file_id: str
+
+class BatchFileQuery(BaseModel):
+    """批量查询文件请求模型"""
+    ids: Optional[List[int]] = None
+    file_ids: Optional[List[str]] = None
+
+    @field_validator('ids', 'file_ids')
+    def validate_query_params(cls, v):
+        if v is not None and len(v) > 100:  # 限制单次查询数量
+            raise ValueError("一次最多查询100个文件")
+        return v
+
+class FileDetailResponse(BaseModel):
+    """文件详细信息响应模型"""
+    id: int
+    file_id: str
+    original_name: str
+    file_path: str
+    file_type: str
+    mime_type: Optional[str] = None
+    file_size: Optional[int] = None
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True

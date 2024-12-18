@@ -25,7 +25,7 @@ import { useChatStore } from '@/stores/chat'
 const chatStore = useChatStore()
 
 const featureTags = [
-  { id: 1, icon: 'image', label: '创建图片', prompt: '请帮我创建一张图片,' },
+  { id: 1, icon: 'image', label: '直接开始对话', prompt: '你好！' },
   { id: 2, icon: 'chart', label: '分析数据', prompt: '请帮我分析以下数据:' },
   { id: 3, icon: 'doc', label: '总结文本', prompt: '请帮我总结以下文本:' },
   { id: 4, icon: 'bulb', label: '构思', prompt: '请帮我构思一个' },

@@ -26,7 +26,7 @@ from app.core.config import settings
 import json
 import asyncio
 import uuid
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import base64
 from io import BytesIO
 import imghdr
@@ -34,6 +34,7 @@ import aiohttp
 import io
 from docx import Document
 from pathlib import Path
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -69,7 +70,8 @@ async def chat(
         response = await chat_service.process_chat(
             db,
             session_id,
-            request.message
+            request.message,
+            system_prompt=request.system_prompt  # 添加system_prompt参数
         )
         return ChatResponse(**response)
         
@@ -110,8 +112,13 @@ async def init_stream_chat(
         if ai_client.is_session_initialized(session_id):
             await ai_client.cleanup_stream(session_id)
 
-        # 初始化新的流式聊天
-        await chat_service.initialize_stream_chat(db, session_id, request.message)
+        # 初始化新的流式聊天，传入system_prompt
+        await chat_service.initialize_stream_chat(
+            db=db, 
+            session_id=session_id, 
+            user_message=request.message,
+            system_prompt=request.system_prompt  # 添加system_prompt参数
+        )
         return {"status": "initialized"}
         
     except NotFoundError as e:
@@ -615,3 +622,181 @@ async def handle_file_stream_chat(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         ) 
+
+class Message(BaseModel):
+    role: str
+    content: str
+    id: int
+
+class MessageAnalysisRequest(BaseModel):
+    messages: List[Message]
+    system_prompt: Optional[str] = None
+
+class MessageAnalysisInitResponse(BaseModel):
+    status: str
+    session_id: str
+
+@router.post("/analyze/stream/init",
+    response_model=MessageAnalysisInitResponse,
+    summary="初始化消息分析流",
+    description="初始化一个或多个消息的分析流")
+async def init_message_analysis_stream(
+    request: MessageAnalysisRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    初始化消息分析流
+    
+    - **messages**: 消息内容列表
+    - **system_prompt**: 可选的系统提示
+    
+    Returns:
+        MessageAnalysisInitResponse: 包含初始化状态和会话ID
+    """
+    try:
+        # 转换消息格式
+        messages = [
+            {
+                "role": msg.role,
+                "content": msg.content,
+                "id": msg.id
+            }
+            for msg in request.messages
+        ]
+        
+        # 获取会话ID
+        session_id = await chat_service.initialize_message_analysis_stream(
+            messages=messages,
+            system_prompt=request.system_prompt
+        )
+        
+        return MessageAnalysisInitResponse(
+            status="initialized",
+            session_id=session_id
+        )
+    except Exception as e:
+        app_logger.error(f"初始化消息分析流失败: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="初始化消息分析流失败"
+        )
+
+@router.get("/analyze/stream/{session_id}",
+    response_class=StreamingResponse,
+    summary="获取消息分析流式响应"
+)
+async def get_message_analysis_stream(session_id: str):
+    """获取消息分析的流式响应
+    
+    Args:
+        session_id: 分析会话ID
+    """
+    try:
+        return StreamingResponse(
+            chat_service.get_message_analysis_stream(session_id),  # 传入session_id
+            media_type='text/event-stream',
+            headers={
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+                'Content-Type': 'text/event-stream',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type',
+            }
+        )
+    except Exception as e:
+        app_logger.error(f"获取消息分析流失败: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        ) 
+    
+
+class AudioChatRequest(BaseModel):
+    message: str
+    file: str
+    file_name: str
+    file_type: str
+    system_prompt: Optional[str] = None
+
+class AudioChatResponse(BaseModel):
+    session_id: str
+    response: str
+    file_id: str
+
+@router.post("/{session_id}/audio", 
+    response_model=AudioChatResponse,
+    summary="Process audio chat",
+    description="Process audio file chat request and return analysis")
+async def audio_chat(
+    session_id: str,
+    request: AudioChatRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    try:
+        # Validate session_id format
+        try:
+            uuid.UUID(session_id)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid session ID format"
+            )
+            
+        # Create file record
+        file_id = str(uuid.uuid4())
+        file_record = File(
+            file_id=file_id,
+            original_name=request.file_name,
+            file_path=request.file,
+            file_type="audio",
+            mime_type=request.file_type,
+            file_size=0,
+            user_session_id=session_id
+        )
+        db.add(file_record)
+        await db.commit()
+        
+        # Get conversation
+        conversation = await get_conversation(db, session_id)
+        if not conversation:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Conversation not found"
+            )
+
+        # Save user message
+        user_msg = MessageCreate(
+            role="user",
+            content=request.message,
+            file_id=file_id
+        )
+        saved_user_msg = await add_message(db, conversation.id, user_msg)
+
+        # Analyze audio
+        response = await ai_client.analyze_audio(
+            audio_url=request.file,
+            query=request.message,
+            system_prompt=request.system_prompt
+        )
+
+        # Save AI response
+        ai_msg = MessageCreate(
+            role="assistant",
+            content=response,
+            parent_message_id=saved_user_msg.id
+        )
+        await add_message(db, conversation.id, ai_msg)
+
+        return AudioChatResponse(
+            session_id=session_id,
+            response=response,
+            file_id=file_id
+        )
+
+    except Exception as e:
+        app_logger.error(f"Audio chat processing failed: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )

@@ -19,7 +19,7 @@ const chatStore = useChatStore()
 const { isLoading } = storeToRefs(chatStore)
 
 const featureTags = [
-  { id: 1, icon: 'image', label: '创建图片' },
+  { id: 1, icon: 'image', label: '直接对话' },
   { id: 2, icon: 'chart', label: '分析数据' },
   { id: 3, icon: 'doc', label: '总结文本' },
   { id: 4, icon: 'bulb', label: '构思' },
@@ -36,27 +36,65 @@ const uploadController = ref<AbortController | null>(null)
 
 // 文件类型映射
 const FILE_TYPES = {
-  IMAGE: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+  IMAGE: [
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+    'image/svg+xml',
+    'image/bmp'
+  ],
   DOCUMENT: [
     'text/plain',
     'application/pdf',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'application/epub+zip',
-    'text/markdown'
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'application/msword',
+    'application/vnd.ms-excel',
+    'application/vnd.ms-powerpoint',
+    'text/markdown',
+    'application/json',
+    'text/x-markdown'
+  ],
+  AUDIO: [
+    'audio/mpeg',
+    'audio/wav',
+    'audio/ogg',
+    'audio/x-m4a',
+    'audio/aac'
   ]
 } as const
 
 // 判断文件类型
 function getFileType(file: File) {
+  // 通过文件扩展名判断
+  const fileName = file.name.toLowerCase()
+  
   if (FILE_TYPES.IMAGE.includes(file.type)) return 'image'
+  if (FILE_TYPES.AUDIO.includes(file.type)) return 'audio'
   if (FILE_TYPES.DOCUMENT.includes(file.type)) return 'document'
+  
+  // 如果 MIME 类型检查失败，通过文件扩展名进行后备检查
+  if (fileName.endsWith('.md') || fileName.endsWith('.markdown')) return 'document'
+  if (fileName.endsWith('.txt') || fileName.endsWith('.pdf')) return 'document'
+  if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) return 'document'
+  if (fileName.endsWith('.xls') || fileName.endsWith('.xlsx')) return 'document'
+  if (fileName.endsWith('.ppt') || fileName.endsWith('.pptx')) return 'document'
+  
   return null
 }
 
 // 处理文件上传
 const handleFileUpload = async (file: { file: File }) => {
+  console.log('Uploaded file:', file.file)
+  console.log('File type:', file.file.type)
+  console.log('File name:', file.file.name)
+  
   const uploadFile = file.file
   const fileType = getFileType(uploadFile)
+  
+  console.log('Detected file type:', fileType)
   
   if (!fileType) {
     showToast('不支持的文件类型')
@@ -67,32 +105,32 @@ const handleFileUpload = async (file: { file: File }) => {
 
   // 根据文件类型设置默认提示文本
   messageText.value = fileType === 'image' 
-    ? '请帮我分析这张图片：\n' + (messageText.value || '')
+    ? '请帮我分析这张图片\n' + (messageText.value || '')
+    : fileType === 'audio'
+    ? '请帮我分析这段音频：\n' + (messageText.value || '')
     : '请帮我分析这个文件：\n' + (messageText.value || '')
 }
 
 // 移除文件
 const removeFile = () => {
   uploadedFile.value = null
+  uploadProgress.value = 0
+  if (uploadController.value) {
+    uploadController.value.abort()
+    uploadController.value = null
+  }
 }
 
 // 获取文件图标
 const getFileIcon = (fileType: string) => {
   if (fileType.startsWith('image/')) return 'image'
+  if (fileType.startsWith('audio/')) return 'audio'
   if (fileType === 'application/pdf') return 'pdf'
   if (fileType === 'text/plain') return 'txt'
   if (fileType.includes('word')) return 'doc'
+  if (fileType.includes('sheet') || fileType.includes('excel')) return 'excel'
+  if (fileType.includes('presentation') || fileType.includes('powerpoint')) return 'ppt'
   return 'file'
-}
-
-// 处理标签点击
-function handleTagClick(tag: typeof featureTags[0]) {
-  messageText.value = `${tag.label}：\n`
-}
-
-// 处理语音输入
-function handleVoiceInput(text: string) {
-  messageText.value = text
 }
 
 // 处理发送消息
@@ -104,22 +142,41 @@ async function handleSend() {
       uploadController.value = new AbortController()
       const fileType = getFileType(uploadedFile.value)
       const isImage = fileType === 'image'
+      const isAudio = fileType === 'audio'
 
-      // 使用统一的 sendMessageWithFile 方法
-      await chatStore.sendMessageWithFile(
-        messageText.value,
-        uploadedFile.value,
-        {
-          // 图片特有的选项
-          systemPrompt: isImage ? '请分析这张图片' : undefined,
-          extractText: isImage ? true : undefined,
-          // 通用选项
-          onProgress: (progress) => {
-            uploadProgress.value = progress
-          },
-          signal: uploadController.value.signal
-        }
-      )
+      if (isAudio) {
+        // 使用音频专用的发送方法
+        await chatStore.sendAudioMessage(
+          messageText.value,
+          uploadedFile.value,
+          {
+            onProgress: (progress) => {
+              uploadProgress.value = progress
+            },
+            onEnd: () => {
+              handleOnEnd()
+            },
+            signal: uploadController.value.signal
+          }
+        )
+      } else {
+        // 使用通用的文件发送方法
+        await chatStore.sendMessageWithFile(
+          messageText.value,
+          uploadedFile.value,
+          {
+            systemPrompt: isImage ? '请分析这张图片' : undefined,
+            extractText: isImage ? true : undefined,
+            onProgress: (progress) => {
+              uploadProgress.value = progress
+            },
+            onEnd: () => {
+              handleOnEnd()
+            },
+            signal: uploadController.value.signal
+          }
+        )
+      }
       
       // 重置文件上传状态
       uploadedFile.value = null
@@ -127,49 +184,35 @@ async function handleSend() {
     } else {
       // 普通文本消息
       await chatStore.sendMessage(messageText.value, {
-        quote: props.quotedMessage || undefined
+        quote: props.quotedMessage || undefined,
+        onEnd: () => {
+          handleOnEnd()
+        }
       })
     }
-    
-    // 重置输入
-    messageText.value = ''
-    emit('quote-remove')
   } catch (error) {
     if (error.name === 'AbortError') {
       showToast('已取消上传')
     } else {
-      console.error('发送消息失败:', error)
       showToast('发送失败')
+      console.error('发送失败:', error)
     }
-  } finally {
-    uploadController.value = null
   }
 }
 
-// 移除引用
-function removeQuote() {
+// 处理发送完成
+function handleOnEnd() {
+  messageText.value = ''
   emit('quote-remove')
-}
-
-watch(() => chatStore.isLoading, (newVal) => {
-  // 处理消息保存
-  async function handleSave(content: string) {
-    try {
-      await chatStore.saveMessage(content)
-    } catch (error) {
-      showToast('保存失败')
-    }
-  }
-})
-
-// 取消上传
-const cancelUpload = () => {
-  uploadController.value?.abort()
   uploadController.value = null
   uploadProgress.value = 0
   uploadedFile.value = null
+    // 更新会话列表
+  chatStore.updateConversationList()
 }
-
+function handleVoiceInput(input: string) {
+  console.log('handleVoiceInput>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', input)
+}
 // 文件预览
 function getFilePreview(file: File) {
   if (FILE_TYPES.IMAGE.includes(file.type)) {
@@ -181,38 +224,37 @@ function getFilePreview(file: File) {
 
 <template>
   <div class="chat-input">
-    <!-- 引用消息 -->
-    <div v-if="quotedMessage" class="quoted-message">
-      <div class="quote-content">
-        <span class="quote-text">{{ quotedMessage.content }}</span>
-        <van-icon name="cross" @click="removeQuote" />
-      </div>
+    <div class="toolbar">
+      
+      <van-uploader
+      accept=".txt,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.epub,.md,.markdown,text/markdown,text/x-markdown,image/*,.mp3,.wav,.ogg,.m4a,.aac"
+      :max-size="30 * 1024 * 1024"
+      :max-count="1"
+      :after-read="handleFileUpload"
+      >
+      <van-button size="small" icon="photograph">
+        上传文件
+      </van-button>
+    </van-uploader>
+    
+    <VoiceInput @input="handleVoiceInput" />
+    <!-- 选择模式切换按钮 -->
+    <slot name="toolbar-right" />
     </div>
     
     <div class="input-area">
-      <div class="toolbar">
-        <van-uploader
-          accept=".txt,.pdf,.docx,.epub,.md,image/*"
-          :max-size="2000 * 1024"
-          :max-count="1"
-          :before-read="beforeUpload"
-          :after-read="handleFileUpload"
-        >
-          <van-button size="small" icon="photograph">
-            上传文件
-          </van-button>
-        </van-uploader>
-        
-        <VoiceInput @input="handleVoiceInput" />
-      </div>
-
       <van-field
         v-model="messageText"
         type="textarea"
         placeholder="输入消息，Shift + Enter 换行"
         rows="3"
         autosize
-        @keydown.enter.prevent="handleSend"
+        @keydown.enter="(e: KeyboardEvent) => {
+          if (!e.shiftKey) {
+            e.preventDefault()
+            handleSend()
+          }
+        }"
         ref="inputRef"
       >
         <template #button>

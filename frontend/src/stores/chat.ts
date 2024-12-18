@@ -91,6 +91,7 @@ export const useChatStore = defineStore('chat', () => {
     quote?: Message
     retry?: boolean
     messageId?: string
+    onEnd?: () => void
   } = {}) {
     console.log('sendMessage', content, options)
     console.log('currentConversation.value', currentConversation.value)
@@ -152,6 +153,7 @@ export const useChatStore = defineStore('chat', () => {
           assistantMessage.status = 'success'
           // 更新会话时间
           conversation.lastTime = new Date().toISOString()
+          options.onEnd?.()
         },
         onError: (error: Error) => {
           console.log('onError>>>>>>>>>>>', error)
@@ -281,7 +283,7 @@ export const useChatStore = defineStore('chat', () => {
       // 乐观更新
       conversation.name = name
       
-      // 调用重命名API
+      // 调��重命名API
       await ConversationAPI.updateConversation(id, name)
       
       showToast({
@@ -390,6 +392,7 @@ export const useChatStore = defineStore('chat', () => {
     content: string,
     file: File,
     options: {
+      onEnd?: () => void
       onProgress?: (progress: number) => void
       signal?: AbortSignal
       systemPrompt?: string
@@ -471,6 +474,7 @@ export const useChatStore = defineStore('chat', () => {
             onEnd: () => {
               assistantMessage.status = 'success'
               conversation.lastTime = new Date().toISOString()
+              options.onEnd?.()
             },
             onError: (error) => {
               assistantMessage.status = 'error'
@@ -500,6 +504,7 @@ export const useChatStore = defineStore('chat', () => {
             onEnd: () => {
               assistantMessage.status = 'success'
               conversation.lastTime = new Date().toISOString()
+              options.onEnd?.()
             },
             onError: (error) => {
               assistantMessage.status = 'error'
@@ -529,7 +534,7 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
-  // 添加文件上传进度更新方法
+  // 添加文���上传进度更新方法
   function updateFileProgress(messageId: string, progress: number) {
     const fileUpload = uploadingFiles.value.get(messageId)
     if (fileUpload) {
@@ -543,6 +548,187 @@ export const useChatStore = defineStore('chat', () => {
     if (fileUpload) {
       fileUpload.controller.abort()
       uploadingFiles.value.delete(messageId)
+    }
+  }
+
+  // 添加更新会话列表的方法
+  async function updateConversationList() {
+    try {
+      const data = await ConversationAPI.getConversations()
+      conversations.value = data.map((conv: any) => ({
+        id: conv.session_id,
+        name: conv.name || '新会话',
+        messages: conv.messages || [],
+        lastTime: conv.created_at,
+        model: conv.model || 'gpt-3.5-turbo'
+      }))
+    } catch (error) {
+      console.error('更新会话列表失败:', error)
+      showToast({
+        type: 'fail',
+        message: '更新会话列表失败'
+      })
+    }
+  }
+
+  /**
+   * 发送音频消息
+   */
+  async function sendAudioMessage(
+    content: string,
+    file: File,
+    options: {
+      onEnd?: () => void
+      onProgress?: (progress: number) => void
+      signal?: AbortSignal
+      systemPrompt?: string
+    } = {}
+  ) {
+    if (!currentConversationId.value) {
+      throw new Error('未选择会话')
+    }
+
+
+    const conversation = currentConversation.value
+    if (!conversation) return
+
+    const messageId = generateUUID()
+
+    try {
+      // 创建用户消息
+      const userMessage: Message = {
+        id: messageId,
+        role: 'user',
+        content,
+        timestamp: Date.now(),
+        status: 'sending',
+        file: {
+          file_type: file.type,
+          original_name: file.name,
+          file_path: '',
+          uploading: true,
+          progress: 0
+        }
+      }
+      
+      conversation.messages.push(userMessage)
+
+      // 上传文件
+      const fileUrl = await uploadToOSS(file, {
+        onProgress: (progress) => {
+          updateFileProgress(messageId, progress)
+          options.onProgress?.(progress)
+        },
+        signal: options.signal
+      })
+
+      // 更新文件 URL
+      userMessage.file!.file_path = fileUrl
+      userMessage.status = 'success'
+
+      // 创建助手消息占位
+      const assistantMessage: Message = {
+        id: generateUUID(),
+        parent_message_id: userMessage.id,
+        role: 'assistant',
+        content: '',
+        timestamp: Date.now(),
+        status: 'sending'
+      }
+      
+      conversation.messages.push(assistantMessage)
+
+      // ��用音频聊天 API
+      const response = await ChatAPI.audioChat(
+        currentConversationId.value,
+        content,
+        fileUrl,
+        file.name,
+        file.type,
+        {
+          systemPrompt: options.systemPrompt
+        }
+      )
+
+      // 更新助手消息
+      assistantMessage.content = response
+      assistantMessage.status = 'success'
+      conversation.lastTime = new Date().toISOString()
+      options.onEnd?.()
+
+    } catch (error: any) {
+      console.error('发送音频消息失败:', error)
+      showToast({
+        type: 'fail',
+        message: error.message || '发送音频消息失败'
+      })
+      throw error
+    }
+  }
+
+  // 添加占卜专用函数
+  async function sendMessageDivination(options: {
+    systemPrompt: string
+    content: string
+    conversationId: string,
+    onChunk?: (message: string) => void
+  }) {
+    const { systemPrompt, content, conversationId } = options
+    if (!conversationId) {
+      throw new Error('未指定会话ID')
+    }
+
+    const abortController = new AbortController()
+    const tempMessageId = Date.now().toString()
+
+    try {
+      // 创建聊天客户端
+      const chatClient = new ChatClient(conversationId)
+      
+      let fullResponse = ''
+
+      // 发送消息并处理流式响应
+      await chatClient.streamChat(content, {
+        signal: abortController.signal,
+        systemPrompt, // 传入系统提示词
+        onStart: () => {
+
+        },
+        onChunk: (chunk: string) => {
+          fullResponse += chunk
+          options.onChunk?.(fullResponse)
+        },
+        onEnd: () => {
+        },
+        onError: (error: Error) => {
+          throw error
+        }
+      })
+
+      return {
+        content: fullResponse,
+        abort: () => abortController.abort()
+      }
+
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        console.log('请求已取消')
+        return
+      }
+
+      showToast({
+        type: 'fail',
+        message: error.message || '发送失败'
+      })
+      
+      // 更新消息状态
+      const failedMessage = conversation.messages.find(msg => msg.id === tempMessageId)
+      if (failedMessage) {
+        failedMessage.status = 'error'
+        failedMessage.error = error.message
+      }
+
+      throw error
     }
   }
 
@@ -564,6 +750,9 @@ export const useChatStore = defineStore('chat', () => {
     createNewChat,
     sendMessageWithFile,
     updateFileProgress,
-    cancelFileUpload
+    cancelFileUpload,
+    updateConversationList,
+    sendAudioMessage,
+    sendMessageDivination
   }
 })

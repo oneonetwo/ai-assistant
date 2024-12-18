@@ -1,8 +1,10 @@
 # 忽略所有 .venv 文件夹，无论在哪个目录下
 **/.venv/
+**/venv/
 # 忽略 Python 缓存文件
-__pycache__/
-*.py[cod]
+**/__pycache__/
+**/*.py[cod]
 # 忽略日志文件
-*.log
+**/*.log
 
+**/logs/

@@ -1,3 +1,4 @@
+import type { Message } from '@/types/chat'
 import { request } from '@/utils/request'
 
 const API_BASE_URL = '/api/v1'
@@ -73,8 +74,8 @@ export class ChatClient {
   private sessionId: string
   private baseUrl: string
 
-  constructor(sessionId: string) {
-    this.sessionId = sessionId
+  constructor(sessionId?: string) {
+    this.sessionId = sessionId || ''
     this.baseUrl = `${API_BASE_URL}/chat`
   }
 
@@ -86,6 +87,7 @@ export class ChatClient {
   async streamChat(
     message: string,
     callbacks: {
+      systemPrompt?: string
       onStart?: () => void
       onChunk?: (chunk: string, fullText: string) => void
       onEnd?: (fullText: string) => void
@@ -95,9 +97,10 @@ export class ChatClient {
     const { onStart = () => {}, onChunk = () => {}, onEnd = () => {}, onError = () => {} } = callbacks
 
     try {
-      // 首先发送 POST 请求初始化流
+      // 首先发送 POST ��求初始化流
       await request.post(`${this.baseUrl}/${this.sessionId}/stream`, {
-        message
+        message,
+        system_prompt: callbacks.systemPrompt
       })
 
       // 然后建立 SSE 连接
@@ -143,6 +146,68 @@ export class ChatClient {
 
     } catch (error) {
       onError(error as Error)
+    }
+  }
+
+  async streamAnalyze(
+    messages: Pick<Message, 'role' | 'content' | 'id'>[],
+    systemPrompt: string,
+    callbacks: {
+      onStart?: () => void
+      onChunk?: (content: string, section: string, fullText: string) => void
+      onEnd?: () => void
+      onError?: (error: Error) => void
+    } = {}
+  ) {
+    try {
+      // 初始化分析
+      const response = await request.post(`${this.baseUrl}/analyze/stream/init`, {
+        messages,
+        system_prompt: systemPrompt
+      })
+
+      // 建立 SSE 连接
+      const url = new URL(`${window.location.origin}/api${this.baseUrl}/analyze/stream/${response.session_id}`)
+      const eventSource = new EventSource(url.toString())
+      let fullText = ''
+      eventSource.onmessage = (event) => {
+        try {
+          const response = JSON.parse(event.data)
+          
+          switch (response.type) {
+            case 'start':
+              callbacks.onStart?.()
+              break
+              
+            case 'chunk':
+              callbacks.onChunk?.(
+                response.data.content, 
+                response.data.section,
+                response.data.full_text
+              )
+              break
+              
+            case 'end':
+              callbacks.onEnd?.()
+              eventSource.close()
+              break
+              
+            case 'error':
+              throw new Error(response.data.message)
+          }
+        } catch (error) {
+          eventSource.close()
+          callbacks.onError?.(error as Error)
+        }
+      }
+
+      eventSource.onerror = (error) => {
+        eventSource.close()
+        callbacks.onError?.(error as Error)
+      }
+
+    } catch (error) {
+      callbacks.onError?.(error as Error)
     }
   }
 }
@@ -278,11 +343,13 @@ export class ChatAPI {
               break
               
             case 'end':
+              console.log('end>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', response.data.message)
               callbacks.onEnd?.(fullText)
               eventSource.close()
               break
               
             case 'error':
+              console.log('error>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', response.data.message)
               throw new Error(response.data.message)
           }
         } catch (error) {
@@ -299,5 +366,29 @@ export class ChatAPI {
     } catch (error) {
       callbacks.onError?.(error as Error)
     }
+  }
+
+  /**
+   * 发送带音频的消息并获取AI分析
+   */
+  static async audioChat(
+    sessionId: string,
+    message: string,
+    audioUrl: string,
+    fileName: string,
+    fileType: string,
+    options: {
+      systemPrompt?: string
+    } = {}
+  ) {
+    const response = await request.post(`${API_BASE_URL}/chat/${sessionId}/audio`, {
+      message,
+      file: audioUrl,
+      file_name: fileName,
+      file_type: fileType,
+      system_prompt: options.systemPrompt || '你是一个专业的音频分析助手'
+    })
+    
+    return response
   }
 } 
